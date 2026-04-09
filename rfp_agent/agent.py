@@ -9,7 +9,10 @@ Run: adk web rfp_agent/
 
 from google.adk.agents import Agent
 from .custom_tools import (
-    google_drive, slack, gmail, create_docx, code_execution, date_time, calculate_pwin
+    gmail, create_docx, code_execution, date_time, calculate_pwin
+)
+from .mcp_bridge import (
+    slack_post_message, linear_create_issue, notion_search_pages, airtable_add_vendor_record, asana_create_task, gdrive_search
 )
 
 # ═══════════════════════════════════════════════════════
@@ -36,7 +39,7 @@ Structure the final RFP:
 
 Rely on your internal knowledge of standard local regulations, standard legal terms, and market conditions relevant to the target country or industry to ensure compliance.
 Output the complete RFP as a single, written format response.""",
-    tools=[google_drive, create_docx, slack, gmail, date_time]
+    tools=[gdrive_search, create_docx, slack_post_message, gmail, date_time, notion_search_pages]
 )
 
 # ═══════════════════════════════════════════════════════
@@ -80,7 +83,7 @@ Format:
 Rely on your internal knowledge if verifying any standard vendor certifications, market rate benchmarks, or standard company backgrounds is necessary.
 Output the complete evaluation as a single, written format response.
 """,
-    tools=[code_execution, calculate_pwin]
+    tools=[code_execution, calculate_pwin, airtable_add_vendor_record, linear_create_issue]
 )
 
 # ═══════════════════════════════════════════════════════
@@ -91,7 +94,7 @@ root_agent = Agent(
     name="rfp_director",
     model="gemini-2.5-flash",
     description="RFP Project Director — routes to RFP creation or Bid evaluation.",
-    instruction="""You are the RFP Project Director. You help organizations with two tasks:
+    instruction="""You are the RFP Project Director. You help organizations with multiple tasks:
 
 1. CREATE RFPs — When the user wants to issue a Request for Proposal:
    Ask: What are you procuring? Target country? Budget range? Timeline?
@@ -101,7 +104,10 @@ root_agent = Agent(
    Ask them to share the bids/proposals and the original RFP requirements.
    Then hand off to the `bid_evaluator` sub-agent.
 
-Start by asking: "Would you like to draft a new RFP or evaluate vendor bids?"
+3. ANSWER QUESTIONS — When the user asks about past RFPs, templates, or files:
+   You MUST instantly use your `gdrive_search` tools to locate the files and report the findings back to the user.
+
+Start by asking: "Would you like to draft a new RFP, evaluate vendor bids, or search past records?"
 Ensure you collect the required preliminary context (like target country) before routing.
 
 Before proceeding to RFP Creation, you MUST ask the user comprehensive questions in a structured format using bullet points. Ask about:
@@ -135,5 +141,5 @@ Before proceeding to RFP Creation, you MUST ask the user comprehensive questions
 
 Wait for complete answers before moving to the next agent. Format all questions with clear bullet points and category headers.""",
     sub_agents=[rfp_creator, bid_evaluator],
-    tools=[google_drive, slack, date_time]
+    tools=[gdrive_search, slack_post_message, date_time, asana_create_task]
 )
