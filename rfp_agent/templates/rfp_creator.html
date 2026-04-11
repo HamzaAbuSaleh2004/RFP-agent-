@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RFP Director | AI Assistant</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-on-surface": "#f0f1f2",
+                    "inverse-surface": "#2e3132",
+                    "tertiary-fixed-dim": "#fbbc00",
+                    "on-surface": "#191c1d",
+                    "on-tertiary-fixed-variant": "#5c4300",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "surface-container": "#edeeef",
+                    "on-tertiary": "#ffffff",
+                    "surface": "#f8f9fa",
+                    "tertiary-fixed": "#ffdfa0",
+                    "background": "#f8f9fa",
+                    "on-tertiary-container": "#ae8100",
+                    "tertiary-container": "#2d1f00",
+                    "surface-bright": "#f8f9fa",
+                    "surface-container-high": "#e7e8e9",
+                    "primary-fixed-dim": "#aec7f6",
+                    "secondary-fixed": "#d5e3ff",
+                    "on-surface-variant": "#44474e",
+                    "surface-tint": "#465f88",
+                    "secondary-fixed-dim": "#a7c8ff",
+                    "surface-container-highest": "#e1e3e4",
+                    "on-secondary-fixed-variant": "#1f477b",
+                    "outline": "#74777f",
+                    "error": "#ba1a1a",
+                    "outline-variant": "#c4c6cf",
+                    "on-background": "#191c1d",
+                    "surface-dim": "#d9dadb",
+                    "on-error": "#ffffff",
+                    "on-secondary-container": "#294f83",
+                    "error-container": "#ffdad6",
+                    "surface-variant": "#e1e3e4",
+                    "on-primary-container": "#708ab5",
+                    "on-error-container": "#93000a",
+                    "on-primary-fixed": "#001b3d",
+                    "on-secondary-fixed": "#001b3c",
+                    "on-tertiary-fixed": "#261a00",
+                    "primary": "#000a1e",
+                    "secondary": "#3a5f94",
+                    "surface-container-low": "#f3f4f5",
+                    "tertiary": "#100900",
+                    "inverse-primary": "#aec7f6",
+                    "primary-fixed": "#d6e3ff",
+                    "secondary-container": "#9fc2fe",
+                    "primary-container": "#002147",
+                    "on-primary-fixed-variant": "#2d476f",
+                    "on-secondary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Manrope', sans-serif; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+<!-- Shared SideNavBar -->
+<aside class="fixed left-0 top-0 h-full flex flex-col p-6 h-screen w-64 bg-slate-50 border-r-0 z-50">
+<div class="mb-10 flex flex-col gap-1">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-primary-container rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-sm" data-weight="fill">description</span>
+</div>
+<span class="text-xl font-bold tracking-tight text-blue-900">RFP Director</span>
+</div>
+<span class="text-xs font-medium text-slate-400 tracking-wider ml-11 uppercase">Enterprise Procurement</span>
+</div>
+<nav class="flex-grow space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/documents">
+<span class="material-symbols-outlined">description</span>
+<span class="font-medium">Documents</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/evaluations">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-medium">Evaluations</span>
+</a>
+<!-- Active Tab: Inferred as Dashboard/Home for the Agent UI -->
+<a class="flex items-center gap-3 px-4 py-3 text-blue-950 font-semibold bg-white rounded-lg shadow-sm" href="/chat">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+<span class="font-medium">AI Assistant</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-medium">Settings</span>
+</a>
+</nav>
+<button class="mt-auto bg-gradient-to-br from-primary-container to-primary text-white py-4 px-6 rounded-xl flex items-center justify-center gap-2 font-bold shadow-lg hover:scale-[0.98] transition-transform">
+<span class="material-symbols-outlined">add</span>
+<span>Create RFP</span>
+</button>
+</aside>
+<!-- Shared TopNavBar -->
+<header class="flex justify-between items-center w-[calc(100%-16rem)] px-12 py-6 sticky top-0 z-40 ml-64 bg-white/70 backdrop-blur-xl">
+<div class="flex items-center bg-surface-container-low px-4 py-2.5 rounded-full w-full max-w-md">
+<span class="material-symbols-outlined text-slate-400 mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-full text-on-surface" placeholder="Search RFPs, vendors, or intel..." type="text"/>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4 text-slate-400">
+<button class="hover:text-blue-900 transition-colors"><span class="material-symbols-outlined">notifications</span></button>
+<button class="hover:text-blue-900 transition-colors"><span class="material-symbols-outlined">help_outline</span></button>
+</div>
+<div class="h-10 w-10 rounded-full bg-slate-200 overflow-hidden">
+<img alt="Executive User Profile" class="w-full h-full object-cover" data-alt="Professional portrait of a senior procurement executive in a light-colored business suit against a clean studio background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCiKaw2mMA_X_2pHGq3lpDpIxJ4s_j63o2FjAE5b9ml195YcbZH2QVPoqFxQgUhHMi9Y8fDwIieJsu5yFrXmCUlBIrNOqgHhlmHY9phj8mwnIGHtNd7Fb6hkyQ8w8kotAA88bmEofM0xOtZXvHeCcVslbQU_Q8P412B7xS4X3erQT3dvlT4QMqKfR6exooEUAIT3vfOkal9-rpyupdlp0meTvNxvTZRHzZZli-pod6lTrW1_3uAVK6-5v7MlAsFVOMxs3vRTmbQ4Y"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-64 p-12 min-h-[calc(100vh-80px)] flex gap-8">
+<!-- Central Chat Area -->
+<section class="flex-grow flex flex-col gap-6 max-w-4xl">
+<header class="mb-4">
+<h1 class="text-4xl font-extrabold tracking-tight text-primary mb-2">RFP Intelligence Agent</h1>
+<p class="text-on-surface-variant max-w-xl">Accelerate your procurement workflow with context-aware AI drafting and compliance verification.</p>
+</header>
+<!-- Chat Interface -->
+<div class="flex-grow bg-surface-container-lowest rounded-3xl p-8 flex flex-col shadow-sm">
+<div id="chat-messages" class="flex-grow overflow-y-auto space-y-8 pr-4">
+</div>
+<!-- Input Area -->
+<div class="mt-8 pt-6 border-t border-slate-100">
+<div class="relative">
+<input id="chat-input" class="w-full bg-surface-container-low border-none rounded-2xl py-5 px-6 pr-16 text-primary focus:ring-2 focus:ring-tertiary-fixed-dim transition-all" placeholder="Ask follow-up questions or refine requirements..." type="text"/>
+<button id="send-button" class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-primary text-white rounded-xl flex items-center justify-center shadow-lg hover:scale-95 transition-transform">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+<div class="mt-4 flex gap-4 overflow-x-auto pb-2 no-scrollbar">
+<button class="bg-surface-container-high px-4 py-2 rounded-full text-xs font-bold text-primary whitespace-nowrap hover:bg-secondary-container transition-colors">Add Security Exhibit</button>
+<button class="bg-surface-container-high px-4 py-2 rounded-full text-xs font-bold text-primary whitespace-nowrap hover:bg-secondary-container transition-colors">Include pricing table</button>
+<button class="bg-surface-container-high px-4 py-2 rounded-full text-xs font-bold text-primary whitespace-nowrap hover:bg-secondary-container transition-colors">Export to PDF</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Right Side Panel: Live Agent Activity -->
+<aside class="w-80 shrink-0 space-y-5">
+
+  <!-- Active Agent Card -->
+  <div class="bg-primary text-white p-6 rounded-3xl shadow-xl relative overflow-hidden">
+    <div class="absolute -right-8 -top-8 w-32 h-32 bg-secondary opacity-20 rounded-full blur-2xl"></div>
+    <h3 class="text-sm font-black uppercase tracking-widest text-tertiary-fixed-dim mb-1">Active Agent</h3>
+    <p id="active-agent-label" class="text-xl font-bold">RFP Director</p>
+    <p id="active-agent-sub" class="text-xs text-secondary-container mt-1">Waiting for your message…</p>
+    <div id="agent-pulse" class="hidden mt-4 flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim animate-pulse inline-block"></span>
+      <span class="text-[11px] text-tertiary-fixed-dim font-bold uppercase tracking-wider">Processing</span>
+    </div>
+  </div>
+
+  <!-- Live Tool Activity Feed -->
+  <div class="bg-surface-container-lowest rounded-3xl overflow-hidden shadow-sm">
+    <div class="flex items-center justify-between px-6 pt-5 pb-3">
+      <p class="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">Live Tool Activity</p>
+      <span id="tool-count-badge" class="text-[10px] font-bold bg-surface-container-high text-slate-500 px-2 py-0.5 rounded-full">0 calls</span>
+    </div>
+    <div id="tool-feed" class="px-4 pb-4 space-y-2 max-h-56 overflow-y-auto">
+      <p id="tool-feed-empty" class="text-xs text-slate-400 text-center py-4">Tools will appear here as the agent works.</p>
+    </div>
+  </div>
+
+  <!-- Capabilities Grid -->
+  <div class="bg-surface-container-low p-5 rounded-3xl space-y-3">
+    <p class="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Integrations</p>
+    <div class="grid grid-cols-2 gap-2">
+      <div id="cap-firecrawl" class="cap-tile flex items-center gap-2 p-3 bg-white rounded-xl opacity-40 transition-all duration-300">
+        <span class="material-symbols-outlined text-orange-500 text-base">travel_explore</span>
+        <span class="text-[11px] font-bold text-primary leading-tight">Firecrawl<br/><span class="font-normal text-slate-400">Web Intel</span></span>
+      </div>
+      <div id="cap-fmp" class="cap-tile flex items-center gap-2 p-3 bg-white rounded-xl opacity-40 transition-all duration-300">
+        <span class="material-symbols-outlined text-emerald-600 text-base">show_chart</span>
+        <span class="text-[11px] font-bold text-primary leading-tight">FMP<br/><span class="font-normal text-slate-400">Financials</span></span>
+      </div>
+      <div id="cap-gdrive" class="cap-tile flex items-center gap-2 p-3 bg-white rounded-xl opacity-40 transition-all duration-300">
+        <span class="material-symbols-outlined text-blue-500 text-base">folder_open</span>
+        <span class="text-[11px] font-bold text-primary leading-tight">Drive<br/><span class="font-normal text-slate-400">Documents</span></span>
+      </div>
+      <div id="cap-slack" class="cap-tile flex items-center gap-2 p-3 bg-white rounded-xl opacity-40 transition-all duration-300">
+        <span class="material-symbols-outlined text-purple-500 text-base">forum</span>
+        <span class="text-[11px] font-bold text-primary leading-tight">Slack<br/><span class="font-normal text-slate-400">Alerts</span></span>
+      </div>
+      <div id="cap-pdf" class="cap-tile flex items-center gap-2 p-3 bg-white rounded-xl opacity-40 transition-all duration-300">
+        <span class="material-symbols-outlined text-red-500 text-base">picture_as_pdf</span>
+        <span class="text-[11px] font-bold text-primary leading-tight">PDF Gen<br/><span class="font-normal text-slate-400">Branded</span></span>
+      </div>
+      <div id="cap-linear" class="cap-tile flex items-center gap-2 p-3 bg-white rounded-xl opacity-40 transition-all duration-300">
+        <span class="material-symbols-outlined text-indigo-500 text-base">task_alt</span>
+        <span class="text-[11px] font-bold text-primary leading-tight">Linear<br/><span class="font-normal text-slate-400">Tracking</span></span>
+      </div>
+      <div id="cap-airtable" class="cap-tile flex items-center gap-2 p-3 bg-white rounded-xl opacity-40 transition-all duration-300">
+        <span class="material-symbols-outlined text-teal-500 text-base">table_view</span>
+        <span class="text-[11px] font-bold text-primary leading-tight">Airtable<br/><span class="font-normal text-slate-400">Records</span></span>
+      </div>
+      <div id="cap-pwin" class="cap-tile flex items-center gap-2 p-3 bg-white rounded-xl opacity-40 transition-all duration-300">
+        <span class="material-symbols-outlined text-amber-500 text-base">percent</span>
+        <span class="text-[11px] font-bold text-primary leading-tight">P(Win)<br/><span class="font-normal text-slate-400">Scoring</span></span>
+      </div>
+    </div>
+  </div>
+
+</aside>
+</main>
+<script>
+    const chatMessages = document.getElementById('chat-messages');
+    const chatInput = document.getElementById('chat-input');
+    const sendButton = document.getElementById('send-button');
+
+    // ── Sidebar refs ─────────────────────────────────────────────────────────
+    const activeAgentLabel = document.getElementById('active-agent-label');
+    const activeAgentSub   = document.getElementById('active-agent-sub');
+    const agentPulse       = document.getElementById('agent-pulse');
+    const toolFeed         = document.getElementById('tool-feed');
+    const toolFeedEmpty    = document.getElementById('tool-feed-empty');
+    const toolCountBadge   = document.getElementById('tool-count-badge');
+    let totalToolCalls = 0;
+
+    // Tool name → { capId, label, icon }
+    const TOOL_MAP = {
+        firecrawl_scrape:       { capId: 'cap-firecrawl', label: 'Firecrawl — Web Scrape',   icon: 'travel_explore',  color: 'text-orange-500' },
+        fmp_get_financials:     { capId: 'cap-fmp',       label: 'FMP — Financials',          icon: 'show_chart',      color: 'text-emerald-600' },
+        gdrive_search:          { capId: 'cap-gdrive',    label: 'Drive — Search',             icon: 'folder_open',     color: 'text-blue-500' },
+        gdrive_read_file:       { capId: 'cap-gdrive',    label: 'Drive — Read File',          icon: 'folder_open',     color: 'text-blue-500' },
+        create_rfp_pdf:         { capId: 'cap-pdf',       label: 'PDF — Generate & Upload',   icon: 'picture_as_pdf',  color: 'text-red-500' },
+        slack_post_message:     { capId: 'cap-slack',     label: 'Slack — Updates Channel',   icon: 'forum',           color: 'text-purple-500' },
+        slack_alert_legal:      { capId: 'cap-slack',     label: 'Slack — 🚨 Legal Alert',    icon: 'forum',           color: 'text-purple-500' },
+        slack_notify_finance:   { capId: 'cap-slack',     label: 'Slack — 💰 Finance Update', icon: 'forum',           color: 'text-purple-500' },
+        linear_create_issue:    { capId: 'cap-linear',    label: 'Linear — Create Issue',     icon: 'task_alt',        color: 'text-indigo-500' },
+        airtable_add_vendor_record: { capId: 'cap-airtable', label: 'Airtable — Add Vendor', icon: 'table_view',      color: 'text-teal-500' },
+        calculate_pwin:         { capId: 'cap-pwin',      label: 'P(Win) — Scoring',          icon: 'percent',         color: 'text-amber-500' },
+        code_execution:         { capId: 'cap-pwin',      label: 'Code — Weighted Scoring',   icon: 'code',            color: 'text-amber-500' },
+        gmail:                  { capId: null,             label: 'Gmail — Send Email',        icon: 'mail',            color: 'text-red-400' },
+        notion_search_pages:    { capId: null,             label: 'Notion — Search Pages',     icon: 'note_stack',      color: 'text-slate-500' },
+        date_time:              { capId: null,             label: 'Date/Time — Lookup',        icon: 'calendar_today',  color: 'text-slate-400' },
+        asana_create_task:      { capId: null,             label: 'Asana — Create Task',       icon: 'assignment',      color: 'text-pink-500' },
+    };
+
+    // Agent name → display label
+    const AGENT_LABELS = {
+        rfp_director: { label: 'RFP Director',   sub: 'Routing your request…' },
+        rfp_creator:  { label: 'RFP Creator',    sub: 'Drafting your RFP…' },
+        bid_evaluator:{ label: 'Bid Evaluator',  sub: 'Evaluating vendor bids…' },
+    };
+
+    function setAgentIdle() {
+        agentPulse.classList.add('hidden');
+        activeAgentSub.textContent = 'Ready for your next message.';
+    }
+
+    function setAgentActive(agentKey) {
+        agentPulse.classList.remove('hidden');
+        const info = AGENT_LABELS[agentKey];
+        if (info) {
+            activeAgentLabel.textContent = info.label;
+            activeAgentSub.textContent   = info.sub;
+        } else {
+            activeAgentSub.textContent = 'Processing…';
+        }
+    }
+
+    function flashCapability(capId) {
+        if (!capId) return;
+        const el = document.getElementById(capId);
+        if (!el) return;
+        el.classList.remove('opacity-40');
+        el.classList.add('ring-2', 'ring-tertiary-fixed-dim', 'scale-105');
+        setTimeout(() => el.classList.remove('scale-105', 'ring-2', 'ring-tertiary-fixed-dim'), 1500);
+    }
+
+    function addToolFeedEntry(statusText) {
+        // Try to match a known tool name in the status text
+        const rawTool = statusText.replace(/^Running tool:\s*/i, '').trim();
+        const meta    = TOOL_MAP[rawTool] || { label: statusText, icon: 'history_edu', color: 'text-slate-500', capId: null };
+
+        if (toolFeedEmpty) toolFeedEmpty.remove();
+        totalToolCalls++;
+        toolCountBadge.textContent = `${totalToolCalls} call${totalToolCalls === 1 ? '' : 's'}`;
+
+        const entry = document.createElement('div');
+        entry.className = 'flex items-center gap-2 bg-white rounded-xl px-3 py-2 shadow-sm animate-pulse-once';
+        entry.innerHTML = `
+            <span class="material-symbols-outlined text-sm ${meta.color}" style="font-variation-settings:'FILL' 1">${meta.icon}</span>
+            <span class="text-[11px] font-semibold text-on-surface truncate">${meta.label}</span>
+        `;
+        toolFeed.appendChild(entry);
+        toolFeed.scrollTop = toolFeed.scrollHeight;
+
+        flashCapability(meta.capId);
+    }
+
+    chatInput.focus();
+
+    // ── Welcome message ───────────────────────────────────────────────────────
+    function showWelcome() {
+        const container = document.createElement('div');
+        container.className = 'flex flex-col items-start gap-4 mr-12';
+        container.innerHTML = `
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-tertiary-fixed-dim rounded-full flex items-center justify-center">
+                    <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings:'FILL' 1;">auto_awesome</span>
+                </div>
+                <span class="text-[10px] uppercase tracking-widest text-primary font-bold">RFP Director • Ready</span>
+            </div>
+            <div class="bg-surface-container-low p-8 rounded-3xl rounded-tl-none w-full">
+                <div class="text-primary leading-relaxed font-medium space-y-3">
+                    <p class="font-bold text-base">Welcome. I'm your RFP Intelligence Agent.</p>
+                    <p class="text-sm text-on-surface-variant">I can help you with three things:</p>
+                    <ul class="text-sm text-on-surface-variant space-y-1 pl-4 list-disc">
+                        <li><strong class="text-primary">Create an RFP</strong> — draft a fully branded PDF with live regulatory intel and financial benchmarks</li>
+                        <li><strong class="text-primary">Evaluate vendor bids</strong> — score across Legal, Commercial, Technical, and Financial dimensions</li>
+                        <li><strong class="text-primary">Search past records</strong> — find files, templates, or past proposals in your Google Drive</li>
+                    </ul>
+                    <p class="text-sm text-on-surface-variant pt-2">What would you like to do?</p>
+                </div>
+            </div>
+        `;
+        chatMessages.appendChild(container);
+    }
+    showWelcome();
+
+    // ── Chat helpers ─────────────────────────────────────────────────────────
+    function appendUserMessage(text) {
+        const div = document.createElement('div');
+        div.className = 'flex flex-col items-end gap-3 ml-12';
+        div.innerHTML = `
+            <div class="bg-primary text-white p-6 rounded-2xl rounded-tr-none shadow-md max-w-[85%]">
+                <p class="leading-relaxed">${text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p>
+            </div>
+            <span class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold px-2">You • Just now</span>
+        `;
+        chatMessages.appendChild(div);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function createAgentMessageContainer() {
+        const container = document.createElement('div');
+        container.className = 'flex flex-col items-start gap-4 mr-12 mt-4';
+        container.innerHTML = `
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-tertiary-fixed-dim rounded-full flex items-center justify-center">
+                    <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings:'FILL' 1;">auto_awesome</span>
+                </div>
+                <span class="text-[10px] uppercase tracking-widest text-primary font-bold agent-status">RFP Agent • Thinking…</span>
+            </div>
+            <div class="bg-surface-container-low p-8 rounded-3xl rounded-tl-none space-y-4 w-full">
+                <div class="markdown-body text-primary leading-relaxed font-medium"></div>
+                <div class="agent-logs hidden bg-white/60 rounded-xl p-3 border-l-4 border-tertiary-fixed-dim flex-col gap-1.5"></div>
+            </div>
+        `;
+        chatMessages.appendChild(container);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        return {
+            contentDiv: container.querySelector('.markdown-body'),
+            statusSpan: container.querySelector('.agent-status'),
+            logsDiv:    container.querySelector('.agent-logs')
+        };
+    }
+
+    // ── Send message ──────────────────────────────────────────────────────────
+    async function sendMessage() {
+        const text = chatInput.value.trim();
+        if (!text) return;
+
+        appendUserMessage(text);
+        chatInput.value = '';
+        chatInput.disabled = true;
+        sendButton.disabled = true;
+
+        // Sidebar: mark as active
+        activeAgentSub.textContent = 'Thinking…';
+        agentPulse.classList.remove('hidden');
+
+        const agentUI = createAgentMessageContainer();
+        let markdownBuffer = '';
+        let hasLogs = false;
+
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text, session_id: 'default' })
+            });
+
+            const reader  = response.body.getReader();
+            const decoder = new TextDecoder('utf-8');
+
+            while (true) {
+                const { value, done } = await reader.read();
+                if (done) break;
+
+                const chunk = decoder.decode(value, { stream: true });
+                for (const line of chunk.split('\n')) {
+                    if (!line.startsWith('data: ')) continue;
+                    try {
+                        const data = JSON.parse(line.substring(6));
+
+                        if (data.type === 'chunk') {
+                            markdownBuffer += data.text;
+                            agentUI.contentDiv.innerHTML = marked.parse(markdownBuffer);
+                            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                        } else if (data.type === 'status') {
+                            // Update status span
+                            agentUI.statusSpan.innerText = 'RFP Agent • Processing';
+
+                            // Show inline log entry
+                            if (!hasLogs) {
+                                agentUI.logsDiv.classList.remove('hidden');
+                                agentUI.logsDiv.style.display = 'flex';
+                                hasLogs = true;
+                            }
+                            const logEntry = document.createElement('div');
+                            logEntry.className = 'flex items-center gap-2 text-xs font-medium text-on-surface-variant';
+                            logEntry.innerHTML = `<span class="material-symbols-outlined text-xs">chevron_right</span><span>${data.text}</span>`;
+                            agentUI.logsDiv.appendChild(logEntry);
+                            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                            // Check if it's a tool call or agent handoff
+                            if (data.text.startsWith('Running tool:')) {
+                                addToolFeedEntry(data.text);
+                            } else if (data.text.startsWith('Handed off to:')) {
+                                const agentKey = data.text.replace('Handed off to:', '').trim();
+                                setAgentActive(agentKey);
+                            }
+
+                        } else if (data.type === 'done') {
+                            agentUI.statusSpan.innerText = 'RFP Agent • Completed';
+                            setAgentIdle();
+
+                        } else if (data.type === 'error') {
+                            markdownBuffer += '\n\n**Error:** ' + data.text;
+                            agentUI.contentDiv.innerHTML = marked.parse(markdownBuffer);
+                            setAgentIdle();
+                        }
+                    } catch(e) { /* ignore parse errors on incomplete SSE frames */ }
+                }
+            }
+        } catch (error) {
+            console.error(error);
+            agentUI.statusSpan.innerText = 'RFP Agent • Error';
+            agentUI.contentDiv.innerHTML = '<span class="text-red-500">Failed to connect to the agent backend. Make sure the server is running.</span>';
+            setAgentIdle();
+        } finally {
+            chatInput.disabled = false;
+            sendButton.disabled = false;
+            chatInput.focus();
+        }
+    }
+
+    sendButton.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
+</script>
+</body></html>

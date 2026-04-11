@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RFP Director | Enterprise Procurement Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Manrope:wght@500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-on-surface": "#f0f1f2",
+                    "inverse-surface": "#2e3132",
+                    "tertiary-fixed-dim": "#fbbc00",
+                    "on-surface": "#191c1d",
+                    "on-tertiary-fixed-variant": "#5c4300",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "surface-container": "#edeeef",
+                    "on-tertiary": "#ffffff",
+                    "surface": "#f8f9fa",
+                    "tertiary-fixed": "#ffdfa0",
+                    "background": "#f8f9fa",
+                    "on-tertiary-container": "#ae8100",
+                    "tertiary-container": "#2d1f00",
+                    "surface-bright": "#f8f9fa",
+                    "surface-container-high": "#e7e8e9",
+                    "primary-fixed-dim": "#aec7f6",
+                    "secondary-fixed": "#d5e3ff",
+                    "on-surface-variant": "#44474e",
+                    "surface-tint": "#465f88",
+                    "secondary-fixed-dim": "#a7c8ff",
+                    "surface-container-highest": "#e1e3e4",
+                    "on-secondary-fixed-variant": "#1f477b",
+                    "outline": "#74777f",
+                    "error": "#ba1a1a",
+                    "outline-variant": "#c4c6cf",
+                    "on-background": "#191c1d",
+                    "surface-dim": "#d9dadb",
+                    "on-error": "#ffffff",
+                    "on-secondary-container": "#294f83",
+                    "error-container": "#ffdad6",
+                    "surface-variant": "#e1e3e4",
+                    "on-primary-container": "#708ab5",
+                    "on-error-container": "#93000a",
+                    "on-primary-fixed": "#001b3d",
+                    "on-secondary-fixed": "#001b3c",
+                    "on-tertiary-fixed": "#261a00",
+                    "primary": "#000a1e",
+                    "secondary": "#3a5f94",
+                    "surface-container-low": "#f3f4f5",
+                    "tertiary": "#100900",
+                    "inverse-primary": "#aec7f6",
+                    "primary-fixed": "#d6e3ff",
+                    "secondary-container": "#9fc2fe",
+                    "primary-container": "#002147",
+                    "on-primary-fixed-variant": "#2d476f",
+                    "on-secondary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        }
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-nav-shadow {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .ambient-shadow {
+            box-shadow: 0 12px 32px rgba(25, 28, 29, 0.04);
+        }
+        .glass-panel {
+            background: rgba(243, 244, 245, 0.7);
+            backdrop-filter: blur(24px);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-0 h-full flex flex-col p-6 h-screen w-64 bg-slate-50 dark:bg-slate-950 font-['Manrope'] antialiased">
+<div class="flex flex-col mb-10">
+<div class="flex items-center gap-3 mb-1">
+<div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center overflow-hidden">
+<img alt="RFP Director Logo" class="w-full h-full object-cover" data-alt="minimalist geometric logo for enterprise procurement company using navy and white colors architectural style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpZLLS4QJDdjky3Llue_mYCs_u0h6BRUK5E0MXQ_48_k1JNpyUZybTatEO5YAVHUVWDIMp1GuTNyUDIJIxXuFTuqx7JUvxyly2FnimyTGUS6jXcdlz8D-876iKfRKvFHjyU43H3AyrLDfaDhBASUPNaJ67WpR90rV3hJDjriLVmu975CmQLdlKgON6JZSZCxdDH2tEjYIEYmp9KTg6aBBkoF97ncEIb-Dc6bwW8RoCyE_8152uCGA1hVvEP14cIf05htQ5c_Hxcws"/>
+</div>
+<h1 class="text-xl font-bold tracking-tight text-blue-900 dark:text-blue-50">RFP Director</h1>
+</div>
+<p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold ml-1">Enterprise Procurement</p>
+</div>
+<nav class="flex-1 space-y-2">
+<!-- Active Tab: Dashboard -->
+<a class="flex items-center gap-3 px-4 py-3 text-blue-950 dark:text-white font-semibold bg-white dark:bg-blue-900/30 rounded-lg shadow-sm transition-transform duration-150 active:scale-95" href="/">
+<span class="material-symbols-outlined text-blue-900" data-icon="dashboard">dashboard</span>
+<span class="text-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-blue-900 dark:hover:text-blue-200 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors" href="/documents">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="text-sm">Documents</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-blue-900 dark:hover:text-blue-200 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors" href="/evaluations">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="text-sm">Evaluations</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-blue-900 dark:hover:text-blue-200 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="text-sm">Settings</span>
+</a>
+</nav>
+<div class="mt-auto">
+<a href="/chat" class="block w-full bg-primary-container text-white py-3 rounded-lg font-bold text-sm shadow-lg hover:brightness-110 transition-all text-center">
+                Create RFP
+            </a>
+</div>
+</aside>
+<!-- TopNavBar Shell -->
+<header class="flex justify-between items-center w-full px-8 py-4 sticky top-0 z-40 ml-64 bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl">
+<div class="flex items-center w-1/3">
+<div class="relative w-full max-w-sm">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg" data-icon="search">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-tertiary-fixed-dim transition-all" placeholder="Search RFPs, vendors, or docs..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex gap-4">
+<button class="text-slate-400 hover:text-blue-700 transition-all duration-300">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-slate-400 hover:text-blue-700 transition-all duration-300">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+</button>
+</div>
+<div class="h-8 w-[1px] bg-outline-variant/20"></div>
+<div class="flex items-center gap-3">
+<div class="text-right">
+<p class="text-xs font-bold text-primary">Alex Sterling</p>
+<p class="text-[10px] text-slate-400">Executive Director</p>
+</div>
+<img alt="Executive User Profile" class="w-9 h-9 rounded-full object-cover ring-2 ring-surface-container-high" data-alt="professional portrait of a corporate executive in a modern bright office setting soft lighting high-end aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTcWdH7qA3eeGEQCR1saQUN_SAuXVa7cwjbM_FTISLKJQYrX2WaRmNJhpxvErwrgczJ4WjAvPhY-zUE1WIWL85H4wxB_PNVfMaSkNjLn_Coi7GhtUb0ExOfCimWCwdbBTI4bkbNZda80DOWx1P9KI4juMXoLbgAJT8BqRrQUGA8m1-J5kGFOtkqFEF2s2-i04Xk6XXkb0SGX6c3PPrDF4cyzee4Pl4C-NSHyPpZjwTwMMmZENOZvagk03QCcljIXmQbx-6lT9fbDA"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-64 p-8 min-h-screen">
+<!-- Hero Action Section: Editorial Layout -->
+<section class="mb-12 flex flex-col md:flex-row justify-between items-end gap-8">
+<div class="max-w-2xl">
+<h2 class="text-4xl font-extrabold tracking-tight text-primary mb-4 leading-tight">
+                    Welcome back, Director. <br/>
+<span class="text-primary-container/60">Your procurement pipeline is at 84% efficiency.</span>
+</h2>
+<p class="text-on-surface-variant font-medium max-w-lg">
+                    Three evaluations require your signature today. The Laptop Fleet RFP has received 12 new competitive bids.
+                </p>
+</div>
+<div class="flex gap-4">
+<a href="/chat" class="bg-gradient-to-br from-primary-container to-primary text-white px-8 py-4 rounded-xl font-bold flex items-center gap-3 ambient-shadow hover:scale-[1.02] transition-transform">
+<span class="material-symbols-outlined" data-icon="add_circle" style="font-variation-settings: 'FILL' 1;">add_circle</span>
+                    Create New RFP
+                </a>
+<a href="/chat" class="bg-surface-container-high text-primary px-8 py-4 rounded-xl font-bold flex items-center gap-3 hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+                    Evaluate Bids
+                </a>
+</div>
+</section>
+<!-- Stats Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+<div class="bg-surface-container-lowest p-8 rounded-2xl ambient-shadow">
+<p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Active RFPs</p>
+<div class="flex items-baseline gap-3">
+<span class="text-5xl font-black text-primary leading-none">12</span>
+<span class="text-sm font-bold text-emerald-600 flex items-center">
+<span class="material-symbols-outlined text-sm" data-icon="trending_up">trending_up</span>
+                        +2
+                    </span>
+</div>
+<div class="mt-6 w-full bg-surface-container-low h-1 rounded-full overflow-hidden">
+<div class="bg-primary-container h-full w-2/3"></div>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-8 rounded-2xl ambient-shadow">
+<p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Pending Evaluations</p>
+<div class="flex items-baseline gap-3">
+<span class="text-5xl font-black text-primary leading-none">07</span>
+<span class="px-2 py-0.5 bg-tertiary-fixed-dim/20 text-on-tertiary-container text-[10px] font-black rounded uppercase">Urgent</span>
+</div>
+<div class="mt-6 flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-white bg-slate-200 overflow-hidden"><img class="w-full h-full object-cover" data-alt="avatar of female team member" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnOVjDJCP-SYOe-HtztBUMv6UjRyFlWg3OT1vh2RSfqVXKIlkyXSdWAp06LBbuu-ExDmFbi8vPw2iOGsYb7N-mr521J_yyEUlHO-5in0Aj4LADBhdRbZC8-Ofbu2cHp91Sz4eLwAJK6CJjGbtUR1UoSGXyqTFVBssj8xKi1Snv4_mM2XSbeORaE4vQiKJ8zo532RS4OQQtXpd7TRf3qdPtzRCR9Tckr-2gVuIt_f3ewPyXi-gIh2IDNfgp0AGMcLld6hTIe_-YYII"/></div>
+<div class="w-8 h-8 rounded-full border-2 border-white bg-slate-300 overflow-hidden"><img class="w-full h-full object-cover" data-alt="avatar of male team member" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD407_X177h6S_PDRIopVr4pgGZoeN1xaq2Z6yjd5tVMSIEAWnmB7kUoPjbThIoamC0VA76vf3OlK9A11i_QvrTelu6YQ7WzOINh-xOX6ypQuXw2ycfzz2XiMIRzNqkmQehbuM6z-zvqncx1A1eBRDw7PLwwE4mkDx_yqU7XstrXUY6SkfBFFiNFTAR7bZS6Ek2FaZkK-3TLnkCEuR33ok50J6YHSpupwxn8FXtHYpfZM5vnZSOQfjyeDeBwh0VAlNmyhE1H1ryCGA"/></div>
+<div class="w-8 h-8 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-500">+5</div>
+</div>
+</div>
+<div class="bg-gradient-to-br from-tertiary-fixed-dim to-[#e5ac00] p-8 rounded-2xl ambient-shadow text-on-tertiary-fixed">
+<p class="text-xs font-bold text-on-tertiary-fixed/60 uppercase tracking-widest mb-2">Total Documents</p>
+<div class="flex items-baseline gap-3">
+<span class="text-5xl font-black leading-none">1,248</span>
+</div>
+<p class="mt-6 text-sm font-medium opacity-80">Synced with Google Drive Enterprise</p>
+</div>
+</div>
+<!-- Two Column Layout: Documents and Activity -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Recent Documents (2/3 width) -->
+<div class="lg:col-span-2 space-y-6">
+<div class="flex justify-between items-center px-2">
+<h3 class="text-xl font-bold text-primary">Recent Documents</h3>
+<button class="text-sm font-bold text-secondary-container hover:text-primary transition-colors flex items-center gap-1">
+                        View Archive <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<div class="bg-surface-container-low rounded-3xl overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="text-[10px] uppercase tracking-widest text-slate-400">
+<th class="px-8 py-5 font-bold">Document Name</th>
+<th class="px-8 py-5 font-bold text-center">Owner</th>
+<th class="px-8 py-5 font-bold text-right">Last Modified</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100">
+<tr class="group hover:bg-white transition-colors cursor-pointer">
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+</div>
+<div>
+<p class="font-bold text-primary">RFP_Q3_Laptop_Fleet_Final.docx</p>
+<p class="text-xs text-slate-400">Google Drive / Procurement / 2024</p>
+</div>
+</div>
+</td>
+<td class="px-8 py-6 text-center">
+<div class="flex justify-center">
+<div class="w-8 h-8 rounded-full bg-slate-200 overflow-hidden ring-2 ring-white">
+<img class="w-full h-full object-cover" data-alt="headshot of procurement manager" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAssg6yas3Bbh0ZDG9F96gSbXnsKFMQ9zcVAID3mqZvtd8rPla78985gmk3DKdVjnU9ZfV8M4XNwNncf_dp4AyRnFN18B-2EGwYt6UATYBNp_fWwGHvNOKg7-8e14tmwLiHq-Ktz49eEDc0wYLJELf8WXPFyrr-5hfySV7tcg3BqERIU-Vsu8eHeht2wbelqoCfyIz9lQ1HTOjBsPzJ68HUX_YoVgcHLXfOEbe0wmlrjz6NKY7mmIt4gvZOeMcLYFgtZlqGJ7dr8_E"/>
+</div>
+</div>
+</td>
+<td class="px-8 py-6 text-right">
+<p class="text-sm font-bold text-primary">2 hours ago</p>
+<p class="text-[10px] text-slate-400">by Marcus Thorne</p>
+</td>
+</tr>
+<tr class="group hover:bg-white transition-colors cursor-pointer">
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600">
+<span class="material-symbols-outlined" data-icon="table_chart">table_chart</span>
+</div>
+<div>
+<p class="font-bold text-primary">Vendor_Comparison_Matrix_v4.xlsx</p>
+<p class="text-xs text-slate-400">Google Drive / Analysis</p>
+</div>
+</div>
+</td>
+<td class="px-8 py-6 text-center">
+<div class="flex justify-center">
+<div class="w-8 h-8 rounded-full bg-slate-200 overflow-hidden ring-2 ring-white">
+<img class="w-full h-full object-cover" data-alt="headshot of data analyst" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAltCCN7hm3oFkj2-tpr17yZXbTTE6CKNANVYyCYrVJOv8RSMg3b8gRaysq8OI6F6z1-ZBUsAn7J70p0_RWdJx3dvTymSM3YViaJo-sZRFfKX6tNBIa7hWIGKIoQHEQkunBahDu-A4Dnfud8BU2neTvn942G8quzGQQX1VlqUbCRxL212WgKQZ9Ws2cf_MZVGb1UJCyZ1bSc5U_1sr_Pzhe6qflWE89WmIVeOCckPaLUBeoXSOmia30eNcZ3BAkCbpWCa6dLVI1o4I"/>
+</div>
+</div>
+</td>
+<td class="px-8 py-6 text-right">
+<p class="text-sm font-bold text-primary">5 hours ago</p>
+<p class="text-[10px] text-slate-400">by Sarah Jenkins</p>
+</td>
+</tr>
+<tr class="group hover:bg-white transition-colors cursor-pointer">
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center text-red-600">
+<span class="material-symbols-outlined" data-icon="picture_as_pdf">picture_as_pdf</span>
+</div>
+<div>
+<p class="font-bold text-primary">Standard_Compliance_Guidelines.pdf</p>
+<p class="text-xs text-slate-400">Google Drive / Legal</p>
+</div>
+</div>
+</td>
+<td class="px-8 py-6 text-center">
+<div class="flex justify-center">
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-[10px] text-white font-bold">LD</div>
+</div>
+</td>
+<td class="px-8 py-6 text-right">
+<p class="text-sm font-bold text-primary">Yesterday</p>
+<p class="text-[10px] text-slate-400">by Legal Dept.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Activity Feed (1/3 width) -->
+<div class="space-y-6">
+<div class="flex justify-between items-center px-2">
+<h3 class="text-xl font-bold text-primary">Integration Activity</h3>
+<span class="material-symbols-outlined text-slate-300" data-icon="hub">hub</span>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-3xl ambient-shadow">
+<div class="space-y-8 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-slate-100">
+<!-- Activity Item -->
+<div class="relative pl-8">
+<div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center ring-4 ring-white z-10">
+<span class="material-symbols-outlined text-[14px] text-blue-600" data-icon="chat_bubble" style="font-variation-settings: 'FILL' 1;">chat_bubble</span>
+</div>
+<div>
+<p class="text-sm font-bold text-primary leading-tight mb-1">RFP for Laptop Fleet posted to Slack</p>
+<p class="text-xs text-on-surface-variant mb-2">Automated notification sent to #procurement-global channel.</p>
+<span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">12 mins ago</span>
+</div>
+</div>
+<!-- Activity Item -->
+<div class="relative pl-8">
+<div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center ring-4 ring-white z-10">
+<span class="material-symbols-outlined text-[14px] text-amber-600" data-icon="cloud_upload" style="font-variation-settings: 'FILL' 1;">cloud_upload</span>
+</div>
+<div>
+<p class="text-sm font-bold text-primary leading-tight mb-1">Vendor A bid uploaded to Drive</p>
+<p class="text-xs text-on-surface-variant mb-2">Competitive bid from Dell Technologies received and synced to "Bids 2024" folder.</p>
+<span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">45 mins ago</span>
+</div>
+</div>
+<!-- Activity Item -->
+<div class="relative pl-8">
+<div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-primary-container flex items-center justify-center ring-4 ring-white z-10">
+<span class="material-symbols-outlined text-[14px] text-white" data-icon="auto_awesome" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<div>
+<p class="text-sm font-bold text-primary leading-tight mb-1">RFP Draft v2 generated</p>
+<p class="text-xs text-on-surface-variant mb-2">AI Engine completed technical specification draft for Data Center Services.</p>
+<span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">2 hours ago</span>
+</div>
+</div>
+<!-- Activity Item -->
+<div class="relative pl-8">
+<div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center ring-4 ring-white z-10">
+<span class="material-symbols-outlined text-[14px] text-emerald-600" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div>
+<p class="text-sm font-bold text-primary leading-tight mb-1">Approval Workflow Started</p>
+<p class="text-xs text-on-surface-variant mb-2">Finance Department initiated review for HVAC Services RFP.</p>
+<span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Yesterday</span>
+</div>
+</div>
+</div>
+<button class="w-full mt-8 py-3 text-xs font-black text-slate-400 uppercase tracking-widest border-t border-slate-50 hover:text-primary transition-colors">
+                        View Full Audit Log
+                    </button>
+</div>
+</div>
+</div>
+<!-- Bottom Feature Callout -->
+<footer class="mt-20 rounded-3xl bg-primary overflow-hidden relative min-h-[200px] flex items-center">
+<div class="absolute inset-0 bg-gradient-to-r from-primary to-transparent z-10"></div>
+<img class="absolute inset-0 w-full h-full object-cover opacity-30" data-alt="abstract architectural lines in deep navy and glowing gold representing network and structure" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFfwCIH1mTqVlO0n0_jYsweKJQD5GHFZSKOVdWat4VV95bC6ylfxt7b9MiXlGFKoXBtpUYNCCMc0DSZDMXXtN4XD2wRWOEn-UgbPUqvT8WcTG0H_Q0-uVzx_94ab9vhjqN7gK3sc8NvW70iOKWXBBfPClyXQL25crmg8msxtGNX-0HaOpudOHRE-6X6Z77bx5DgQxhMs012jxT6erLla4KcuAcmOw8P8cgHVJjs4NlXnUp3KeODtOI-_Nvi8lCYdDvjM_wj_l2OuY"/>
+<div class="relative z-20 px-12 py-10 flex flex-col md:flex-row justify-between items-center w-full gap-8">
+<div class="max-w-xl">
+<span class="px-2 py-1 bg-tertiary-fixed-dim text-on-tertiary-fixed text-[10px] font-black rounded uppercase mb-4 inline-block">New Feature</span>
+<h4 class="text-2xl font-extrabold text-white mb-2">Advanced Vendor Analytics is now live.</h4>
+<p class="text-slate-400 font-medium">Identify cost-saving opportunities and historical vendor performance with our new proprietary scoring engine.</p>
+</div>
+<button class="whitespace-nowrap bg-white text-primary px-8 py-4 rounded-xl font-bold hover:bg-tertiary-fixed-dim hover:text-on-tertiary-fixed transition-all">
+                    Explore Analytics
+                </button>
+</div>
+</footer>
+</main>
+</body></html>

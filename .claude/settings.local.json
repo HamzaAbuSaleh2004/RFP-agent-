@@ -3,7 +3,11 @@
     "allow": [
       "Bash(uv run:*)",
       "Bash(adk web:*)",
-      "Bash(curl -s http://localhost:8000)"
+      "Bash(curl -s http://localhost:8000)",
+      "Bash(.venv/Scripts/pip list:*)",
+      "Bash(.venv/Scripts/pip install:*)",
+      "Bash(.venv/Scripts/python -c \"import fitz; print\\('PyMuPDF OK:', fitz.version\\)\")",
+      "Bash(python -c \"import os; print\\(os.path.exists\\(r'c:\\\\Users\\\\hamza\\\\Desktop\\\\LiverX\\\\RFP\\\\output\\\\test_rfp.pdf'\\)\\)\")"
     ]
   }
 }

@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bid Evaluator Comparison View - RFP Director</title>
+<!-- Google Fonts: Manrope & Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-on-surface": "#f0f1f2",
+                    "inverse-surface": "#2e3132",
+                    "tertiary-fixed-dim": "#fbbc00",
+                    "on-surface": "#191c1d",
+                    "on-tertiary-fixed-variant": "#5c4300",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "surface-container": "#edeeef",
+                    "on-tertiary": "#ffffff",
+                    "surface": "#f8f9fa",
+                    "tertiary-fixed": "#ffdfa0",
+                    "background": "#f8f9fa",
+                    "on-tertiary-container": "#ae8100",
+                    "tertiary-container": "#2d1f00",
+                    "surface-bright": "#f8f9fa",
+                    "surface-container-high": "#e7e8e9",
+                    "primary-fixed-dim": "#aec7f6",
+                    "secondary-fixed": "#d5e3ff",
+                    "on-surface-variant": "#44474e",
+                    "surface-tint": "#465f88",
+                    "secondary-fixed-dim": "#a7c8ff",
+                    "surface-container-highest": "#e1e3e4",
+                    "on-secondary-fixed-variant": "#1f477b",
+                    "outline": "#74777f",
+                    "error": "#ba1a1a",
+                    "outline-variant": "#c4c6cf",
+                    "on-background": "#191c1d",
+                    "surface-dim": "#d9dadb",
+                    "on-error": "#ffffff",
+                    "on-secondary-container": "#294f83",
+                    "error-container": "#ffdad6",
+                    "surface-variant": "#e1e3e4",
+                    "on-primary-container": "#708ab5",
+                    "on-error-container": "#93000a",
+                    "on-primary-fixed": "#001b3d",
+                    "on-secondary-fixed": "#001b3c",
+                    "on-tertiary-fixed": "#261a00",
+                    "primary": "#000a1e",
+                    "secondary": "#3a5f94",
+                    "surface-container-low": "#f3f4f5",
+                    "tertiary": "#100900",
+                    "inverse-primary": "#aec7f6",
+                    "primary-fixed": "#d6e3ff",
+                    "secondary-container": "#9fc2fe",
+                    "primary-container": "#002147",
+                    "on-primary-fixed-variant": "#2d476f",
+                    "on-secondary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .glass-effect {
+        background: rgba(243, 244, 245, 0.7);
+        backdrop-filter: blur(24px);
+      }
+      .hero-gradient {
+        background: linear-gradient(135deg, #002147 0%, #000a1e 100%);
+      }
+      .ghost-border {
+        border: 1px solid rgba(196, 198, 207, 0.15);
+      }
+      .amber-glow:focus-within {
+        border-bottom: 2px solid #fbbc00;
+      }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface antialiased">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full flex flex-col p-6 bg-slate-50 dark:bg-slate-950 font-['Manrope'] antialiased h-screen w-64 border-r-0 z-50">
+<div class="mb-10 flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg hero-gradient flex items-center justify-center text-white">
+<span class="material-symbols-outlined">analytics</span>
+</div>
+<div>
+<h1 class="text-xl font-bold tracking-tight text-blue-900 dark:text-blue-50">RFP Director</h1>
+<p class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold">Enterprise Procurement</p>
+</div>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-blue-900 dark:hover:text-blue-200 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors rounded-lg" href="/">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-blue-900 dark:hover:text-blue-200 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors rounded-lg" href="/documents">
+<span class="material-symbols-outlined">description</span>
+<span class="font-medium">Documents</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-blue-950 dark:text-white font-semibold bg-white dark:bg-blue-900/30 rounded-lg shadow-sm" href="/evaluations">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-medium">Evaluations</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-blue-900 dark:hover:text-blue-200 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-medium">Settings</span>
+</a>
+</nav>
+<div class="mt-auto">
+<button class="w-full py-4 hero-gradient text-white font-bold rounded-xl shadow-lg flex items-center justify-center gap-2 Active: scale-95 transition-transform duration-150">
+<span class="material-symbols-outlined">add</span>
+                Create RFP
+            </button>
+</div>
+</aside>
+<!-- TopNavBar -->
+<header class="flex justify-between items-center w-full px-8 py-4 sticky top-0 z-40 ml-64 bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl font-['Inter'] text-sm tracking-wide">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative w-full max-w-md group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-full focus:ring-2 focus:ring-tertiary-fixed-dim transition-all" placeholder="Search evaluations or vendors..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="text-slate-400 dark:text-slate-500 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-300">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-slate-400 dark:text-slate-500 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-300">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<div class="h-8 w-px bg-outline-variant/20 mx-2"></div>
+<div class="flex items-center gap-3">
+<span class="font-semibold text-primary">Executive User</span>
+<img alt="Executive User Profile" class="w-10 h-10 rounded-full object-cover" data-alt="professional portrait of a senior male executive in a dark blue suit with a soft office background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3WyTpaW2CKwFCdQkoHt-dg-wl8LrYaSK7NqEQe_MDEWk0KAXxf1Bx_yf6PoKiEL6U02isoVlgjvu_zwpggcDqzFCU6hrJfIwbEHhA9vm5E6vE5ZeVNJYaGOjlsqGDj0lXEwFzYZLlirNRx9k79ULziHwsBsmbKRkTQPSE5f-JTuJvJc0bZWmspAapSzxKvXcaBt4yCcAlm8gh8dlRpZniNimGPNi-Am4kOpbd1eW05uucoYq_v0asugNHNkj7Ut39RYi3-KKvpFQ"/>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="ml-64 p-8">
+<!-- Editorial Header -->
+<div class="mb-12 max-w-5xl">
+<div class="flex items-center gap-2 text-primary-container font-medium mb-2">
+<span class="material-symbols-outlined text-sm">arrow_back</span>
+<span class="label-md tracking-wider">PROJECT #842-DELTA</span>
+</div>
+<h2 class="font-headline text-5xl font-extrabold text-primary tracking-tight mb-4">Cloud Infrastructure Migration</h2>
+<p class="font-body text-on-surface-variant text-lg max-w-2xl leading-relaxed">Comparative analysis of technical feasibility, commercial compliance, and long-term financial viability for the Q4 Enterprise Core upgrade.</p>
+</div>
+<!-- AI Recommendation Section (Asymmetric / Glassmorphism) -->
+<section class="mb-12 grid grid-cols-12 gap-8">
+<div class="col-span-12 lg:col-span-8 glass-effect p-8 rounded-xl border border-white/40 shadow-xl relative overflow-hidden">
+<div class="absolute top-0 right-0 p-6 opacity-10">
+<span class="material-symbols-outlined text-8xl" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<div class="flex items-start gap-6 relative z-10">
+<div class="w-16 h-16 rounded-full bg-tertiary-fixed-dim flex items-center justify-center shadow-lg">
+<span class="material-symbols-outlined text-on-tertiary-fixed text-3xl">lightbulb</span>
+</div>
+<div>
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-tertiary-container/10 text-on-tertiary-container rounded-full label-sm font-bold mb-4">
+<span class="material-symbols-outlined text-[14px]">auto_awesome</span>
+                            AI RECOMMENDATION
+                        </div>
+<h3 class="font-headline text-3xl font-bold text-primary mb-3">Vendor Y: Global Systems Ltd.</h3>
+<p class="font-body text-on-surface-variant text-lg leading-relaxed mb-6">
+                            Vendor Y demonstrates the highest Technical Score (94) while maintaining strict adherence to Legal and Financial requirements. Their proposed architecture offers a 22% better scalability index compared to Vendor X, justifying the marginal premium in commercial pass-through costs.
+                        </p>
+<div class="flex gap-4">
+<button class="px-6 py-3 bg-tertiary-fixed-dim text-on-tertiary-fixed font-bold rounded-lg hover:brightness-105 transition-all">Award RFP</button>
+<button class="px-6 py-3 bg-surface-container-high text-primary font-bold rounded-lg hover:bg-surface-container-highest transition-all">Download Full Brief</button>
+</div>
+</div>
+</div>
+</div>
+<div class="col-span-12 lg:col-span-4 flex flex-col gap-4">
+<div class="bg-primary-container p-6 rounded-xl text-white flex-1 flex flex-col justify-center">
+<span class="label-sm text-on-primary-container font-bold tracking-widest block mb-1">TOTAL CONTRACT VALUE</span>
+<span class="font-headline text-4xl font-extrabold tracking-tight">$4.2M <span class="text-lg font-normal opacity-60">est.</span></span>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-xl ghost-border flex-1 flex flex-col justify-center">
+<span class="label-sm text-slate-400 font-bold tracking-widest block mb-1">EVALUATION STATUS</span>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-tertiary-fixed-dim"></span>
+<span class="font-headline text-2xl font-bold text-primary">Final Comparison</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Comparison Matrix -->
+<section class="bg-surface-container-low rounded-2xl p-1 overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-transparent">
+<th class="p-8 font-headline text-sm font-bold text-slate-400 tracking-widest uppercase w-1/4">Criteria</th>
+<th class="p-8 w-1/4">
+<div class="flex flex-col items-center">
+<div class="w-12 h-12 rounded-full bg-slate-200 mb-4 flex items-center justify-center text-slate-500 font-bold">X</div>
+<span class="font-headline text-xl font-extrabold text-primary">Vendor X</span>
+<span class="label-sm text-slate-500">TechSolutions Inc.</span>
+</div>
+</th>
+<th class="p-8 w-1/4 bg-surface-container-lowest shadow-2xl relative">
+<div class="absolute top-0 left-1/2 -translate-x-1/2 bg-tertiary-fixed-dim px-4 py-1 rounded-b-lg label-sm font-bold text-on-tertiary-fixed">OPTIMAL CHOICE</div>
+<div class="flex flex-col items-center">
+<div class="w-12 h-12 rounded-full hero-gradient mb-4 flex items-center justify-center text-white font-bold">Y</div>
+<span class="font-headline text-xl font-extrabold text-primary">Vendor Y</span>
+<span class="label-sm text-slate-500">Global Systems Ltd.</span>
+</div>
+</th>
+<th class="p-8 w-1/4">
+<div class="flex flex-col items-center">
+<div class="w-12 h-12 rounded-full bg-slate-200 mb-4 flex items-center justify-center text-slate-500 font-bold">Z</div>
+<span class="font-headline text-xl font-extrabold text-primary">Vendor Z</span>
+<span class="label-sm text-slate-500">CloudFrontier</span>
+</div>
+</th>
+</tr>
+</thead>
+<tbody class="font-body">
+<!-- Legal Row -->
+<tr class="hover:bg-white/40 transition-colors">
+<td class="p-8 border-t border-outline-variant/10">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400">gavel</span>
+<div>
+<div class="font-bold text-primary">Legal Compliance</div>
+<div class="label-sm text-slate-500">GDPR &amp; ISO Compliance</div>
+</div>
+</div>
+</td>
+<td class="p-8 border-t border-outline-variant/10 text-center">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-green-100/50 text-green-700 rounded-lg font-bold text-xs">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+                                    PASS
+                                </div>
+</td>
+<td class="p-8 border-t border-outline-variant/10 text-center bg-surface-container-lowest">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-green-100/50 text-green-700 rounded-lg font-bold text-xs">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+                                    PASS
+                                </div>
+</td>
+<td class="p-8 border-t border-outline-variant/10 text-center">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-red-100/50 text-red-700 rounded-lg font-bold text-xs">
+<span class="material-symbols-outlined text-sm">cancel</span>
+                                    FAIL
+                                </div>
+</td>
+</tr>
+<!-- Commercial Row -->
+<tr class="hover:bg-white/40 transition-colors">
+<td class="p-8 border-t border-outline-variant/10">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400">handshake</span>
+<div>
+<div class="font-bold text-primary">Commercial Terms</div>
+<div class="label-sm text-slate-500">MSAs &amp; SLAs</div>
+</div>
+</div>
+</td>
+<td class="p-8 border-t border-outline-variant/10 text-center">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-green-100/50 text-green-700 rounded-lg font-bold text-xs">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+                                    PASS
+                                </div>
+</td>
+<td class="p-8 border-t border-outline-variant/10 text-center bg-surface-container-lowest">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-green-100/50 text-green-700 rounded-lg font-bold text-xs">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+                                    PASS
+                                </div>
+</td>
+<td class="p-8 border-t border-outline-variant/10 text-center">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-green-100/50 text-green-700 rounded-lg font-bold text-xs">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+                                    PASS
+                                </div>
+</td>
+</tr>
+<!-- Technical Row -->
+<tr class="hover:bg-white/40 transition-colors">
+<td class="p-8 border-t border-outline-variant/10">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400">settings_suggest</span>
+<div>
+<div class="font-bold text-primary">Technical Capability</div>
+<div class="label-sm text-slate-500">Performance Score (0-100)</div>
+</div>
+</div>
+</td>
+<td class="p-8 border-t border-outline-variant/10 text-center">
+<div class="flex flex-col items-center gap-2">
+<div class="text-3xl font-headline font-bold text-primary">82</div>
+<div class="w-full max-w-[100px] h-1.5 bg-slate-200 rounded-full overflow-hidden">
+<div class="bg-primary-container h-full" style="width: 82%"></div>
+</div>
+</div>
+</td>
+<td class="p-8 border-t border-outline-variant/10 text-center bg-surface-container-lowest">
+<div class="flex flex-col items-center gap-2">
+<div class="text-3xl font-headline font-bold text-primary">94</div>
+<div class="w-full max-w-[100px] h-1.5 bg-slate-200 rounded-full overflow-hidden">
+<div class="bg-tertiary-fixed-dim h-full" style="width: 94%"></div>
+</div>
+</div>
+</td>
+<td class="p-8 border-t border-outline-variant/10 text-center">
+<div class="flex flex-col items-center gap-2">
+<div class="text-3xl font-headline font-bold text-slate-400">68</div>
+<div class="w-full max-w-[100px] h-1.5 bg-slate-200 rounded-full overflow-hidden">
+<div class="bg-slate-300 h-full" style="width: 68%"></div>
+</div>
+</div>
+</td>
+</tr>
+<!-- Financial Row -->
+<tr class="hover:bg-white/40 transition-colors">
+<td class="p-8 border-t border-outline-variant/10">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400">monetization_on</span>
+<div>
+<div class="font-bold text-primary">Financial Stability</div>
+<div class="label-sm text-slate-500">Credit &amp; Revenue Check</div>
+</div>
+</div>
+</td>
+<td class="p-8 border-t border-outline-variant/10 text-center">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-green-100/50 text-green-700 rounded-lg font-bold text-xs">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+                                    PASS
+                                </div>
+</td>
+<td class="p-8 border-t border-outline-variant/10 text-center bg-surface-container-lowest">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-green-100/50 text-green-700 rounded-lg font-bold text-xs">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+                                    PASS
+                                </div>
+</td>
+<td class="p-8 border-t border-outline-variant/10 text-center">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-green-100/50 text-green-700 rounded-lg font-bold text-xs">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+                                    PASS
+                                </div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Bento Analysis Grid -->
+<div class="mt-12 grid grid-cols-12 gap-6">
+<div class="col-span-12 md:col-span-4 bg-white p-6 rounded-xl ghost-border">
+<h4 class="font-headline font-bold text-primary mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-blue-600">trending_up</span>
+                    Risk Exposure
+                </h4>
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<span class="text-sm text-on-surface-variant">Vendor X</span>
+<span class="text-xs font-bold text-amber-600">MODERATE</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-sm text-on-surface-variant">Vendor Y</span>
+<span class="text-xs font-bold text-green-600">LOW</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-sm text-on-surface-variant">Vendor Z</span>
+<span class="text-xs font-bold text-red-600">CRITICAL</span>
+</div>
+</div>
+</div>
+<div class="col-span-12 md:col-span-8 bg-primary-container p-6 rounded-xl flex items-center justify-between">
+<div class="flex items-center gap-6">
+<div class="w-16 h-16 rounded-lg bg-white/10 flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-3xl">insights</span>
+</div>
+<div>
+<h4 class="font-headline font-bold text-white text-lg">Predictive Score Trend</h4>
+<p class="text-on-primary-container text-sm">Historical performance indicates Vendor Y's reliability index has grown 14% YoY.</p>
+</div>
+</div>
+<button class="px-6 py-2 border border-white/20 text-white rounded-lg hover:bg-white/5 transition-all font-semibold">View History</button>
+</div>
+</div>
+</main>
+<!-- Contextual FAB (Suppressed on details, but for comparison we show 'Export') -->
+<div class="fixed bottom-10 right-10">
+<button class="w-16 h-16 hero-gradient text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">ios_share</span>
+</button>
+</div>
+</body></html>
