@@ -1,5 +1,4 @@
 import os
-import asyncio
 from dotenv import load_dotenv
 load_dotenv()
 from mcp import ClientSession, StdioServerParameters
@@ -96,19 +95,13 @@ async def linear_create_issue(title: str, description: str, team_id: str) -> str
         arguments={"title": title, "description": description, "teamId": team_id}
     )
 
-def gdrive_read_file(file_name: str) -> str:
-    """
-    Download a file from Google Drive by name and return its full text content.
-    Works with Google Docs, DOCX, and PDF files.
-    Use this to read and analyze the contents of any Drive document.
-    """
+def _read_single_file(file_name: str) -> str:
+    """Internal: fetch one Drive file by name and return its text content."""
     import tempfile
     try:
         from .drive_api import _get_service, download_file
 
         service = _get_service()
-
-        # Find the file by name
         results = service.files().list(
             q=f"name contains '{file_name}' and trashed=false",
             fields="files(id, name, mimeType)",
@@ -125,27 +118,23 @@ def gdrive_read_file(file_name: str) -> str:
         mime      = file_meta["mimeType"]
         name      = file_meta["name"]
 
-        # Choose export format based on mime type
         if mime == "application/vnd.google-apps.document":
-            # Export Google Doc as plain text
             data = service.files().export_media(
                 fileId=file_id, mimeType="text/plain"
             ).execute()
             return f"Content of '{name}':\n\n{data.decode('utf-8', errors='replace')}"
 
-        # For DOCX and PDF, download then extract text
         suffix = ".pdf" if "pdf" in mime else ".docx"
         tmp = tempfile.NamedTemporaryFile(suffix=suffix, delete=False)
         tmp.close()
-        download_file(file_id, tmp.name)
+        download_file(file_id, tmp.name, known_mime=mime)  # skip extra metadata GET
 
         if suffix == ".pdf":
             import fitz
             doc  = fitz.open(tmp.name)
             text = "\n\n".join(page.get_text() for page in doc)
             doc.close()
-
-        else:  # .docx
+        else:
             import docx
             doc  = docx.Document(tmp.name)
             text = "\n".join(p.text for p in doc.paragraphs if p.text.strip())
@@ -155,14 +144,22 @@ def gdrive_read_file(file_name: str) -> str:
         if not text.strip():
             return f"File '{name}' was downloaded but appears to contain no readable text."
 
-        # Cap at ~12 000 chars so the context window isn't overwhelmed
         cap = 12_000
-        suffix_note = f"\n\n[Truncated — showing first {cap} characters]" if len(text) > cap else ""
-        return f"Content of '{name}':\n\n{text[:cap]}{suffix_note}"
+        note = f"\n\n[Truncated — showing first {cap} characters]" if len(text) > cap else ""
+        return f"Content of '{name}':\n\n{text[:cap]}{note}"
 
     except Exception as e:
         import traceback
-        return f"Error reading file '{file_name}' from Drive: {e}\n{traceback.format_exc()}"
+        return f"Error reading '{file_name}' from Drive: {e}\n{traceback.format_exc()}"
+
+
+def gdrive_read_file(file_name: str) -> str:
+    """
+    Download a file from Google Drive by name and return its full text content.
+    Works with Google Docs, DOCX, and PDF files.
+    """
+    return _read_single_file(file_name)
+
 
 
 def gdrive_search(query: str) -> str:
@@ -198,95 +195,9 @@ def gdrive_search(query: str) -> str:
         return f"Google Drive search error: {e}\n{traceback.format_exc()}"
 
 # ═══════════════════════════════════════════════════════
-# FIRECRAWL — Deep web reading via direct REST API
-# ═══════════════════════════════════════════════════════
-
-def _firecrawl_attempt(api_key: str, url: str, options: dict) -> tuple[bool, str]:
-    """Single Firecrawl attempt. Returns (success, content_or_error)."""
-    import requests
-    try:
-        resp = requests.post(
-            "https://api.firecrawl.dev/v1/scrape",
-            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-            json={"url": url, "formats": ["markdown"], **options},
-            timeout=90,
-        )
-        resp.raise_for_status()
-        data = resp.json()
-        if not data.get("success"):
-            return False, f"success=false: {data.get('error', data)}"
-        content = data.get("data", {}).get("markdown", "").strip()
-        if not content:
-            return False, "no readable content extracted"
-        cap = 15_000
-        note = f"\n\n[Truncated — showing first {cap} of {len(content)} chars]" if len(content) > cap else ""
-        return True, f"Scraped content from {url}:\n\n{content[:cap]}{note}"
-    except Exception as e:
-        return False, str(e)
-
-
-async def firecrawl_scrape(url: str) -> str:
-    """
-    Deeply scrape a URL and return its full content as clean markdown.
-
-    Use cases:
-    - Competitor Intelligence: scrape a vendor's website to extract capabilities,
-      pricing tiers, client list, and technology stack in one call.
-    - Legal Compliance: crawl a country's official regulatory authority website
-      (e.g. Saudi SDAIA, UK ICO, UAE TDRA) to extract the *current* rules.
-    - Due Diligence: read a vendor's published case studies or certifications page.
-
-    If the primary URL is blocked or times out, try an alternative URL for the
-    same topic (e.g. IAPP, DataGuidance, or Wikipedia for regulatory summaries).
-    The tool will automatically retry with more permissive settings before failing.
-
-    Args:
-        url: The full URL to scrape.
-    """
-    api_key = os.environ.get("FIRECRAWL_API_KEY")
-    if not api_key:
-        return "ERROR: FIRECRAWL_API_KEY must be set in your .env file. Sign up at firecrawl.dev."
-
-    # Attempt 1: standard — main content only (fastest, works on most sites)
-    ok, result = _firecrawl_attempt(api_key, url, {"onlyMainContent": True})
-    if ok:
-        return result
-
-    first_error = result
-
-    # Attempt 2: full page — government sites often render content outside <main>
-    ok, result = _firecrawl_attempt(api_key, url, {"onlyMainContent": False})
-    if ok:
-        return result
-
-    # Both attempts failed — return a soft-fail so the agent can fall back to
-    # internal knowledge rather than blocking the entire workflow.
-    return (
-        f"SCRAPE_UNAVAILABLE: Could not retrieve live content from {url}.\n"
-        f"Attempt 1 (main content): {first_error}\n"
-        f"Attempt 2 (full page): {result}\n\n"
-        "Fallback instruction: Use your internal knowledge for this topic, "
-        "clearly note in the document that regulations were sourced from training "
-        "data (cutoff August 2025) and recommend the client verify against the "
-        "current official source before signing."
-    )
-
-
-# ═══════════════════════════════════════════════════════
 # MOCK / COMMUNITY MCP BRIDGES (Pending Official URLs)
 # ═══════════════════════════════════════════════════════
-
-def notion_search_pages(query: str) -> str:
-    """Retrieve templates, evaluation matrices, or past proposals from Notion."""
-    key = os.environ.get("NOTION_API_KEY")
-    if not key:
-        return f"ERROR: NOTION_API_KEY must be set in your .env file. (Mock Search: {query})"
-    return f"Retrieved Notion Corporate Template for '{query}'"
 
 def airtable_add_vendor_record(vendor_name: str, score: int) -> str:
     """Store vendor comparison matrices and scores into Airtable."""
     return f"Mock Airtable: Vendor {vendor_name} added with score {score}."
-
-def asana_create_task(task_name: str) -> str:
-    """Create a project flow task in Asana."""
-    return f"Mock Asana: Task '{task_name}' created."

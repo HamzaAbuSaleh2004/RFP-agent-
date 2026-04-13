@@ -7,8 +7,10 @@ from dotenv import load_dotenv
 load_dotenv(dotenv_path=Path(__file__).parent / ".env", override=True)
 
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, StreamingResponse
+from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
+
+OUTPUT_DIR = Path(__file__).parent.parent / "output"
 
 from rfp_agent.agent import root_agent
 from google.adk import Runner
@@ -40,6 +42,10 @@ async def get_documents(request: Request):
 @app.get("/evaluations", response_class=HTMLResponse)
 async def get_evaluations(request: Request):
     return templates.TemplateResponse("evaluations.html", {"request": request})
+
+@app.get("/flowchart", response_class=HTMLResponse)
+async def get_flowchart(request: Request):
+    return templates.TemplateResponse("flowchart.html", {"request": request})
 
 
 @app.post("/api/chat")
@@ -89,6 +95,47 @@ async def api_chat(request: Request):
             yield f"data: {json.dumps({'type': 'error', 'text': str(e)})}\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
+
+
+@app.get("/api/evaluations")
+async def api_get_evaluations():
+    path = OUTPUT_DIR / "evaluations.json"
+    if not path.exists():
+        return JSONResponse(content=None, status_code=204)
+    try:
+        return JSONResponse(content=json.loads(path.read_text(encoding="utf-8")))
+    except Exception as e:
+        logging.error("Failed to read evaluations.json", exc_info=True)
+        return JSONResponse(content={"error": str(e)}, status_code=500)
+
+
+@app.get("/api/risk-heatmap")
+async def api_get_risk_heatmap():
+    path = OUTPUT_DIR / "risk_heatmap.json"
+    if not path.exists():
+        return JSONResponse(content=None, status_code=204)
+    try:
+        return JSONResponse(content=json.loads(path.read_text(encoding="utf-8")))
+    except Exception as e:
+        logging.error("Failed to read risk_heatmap.json", exc_info=True)
+        return JSONResponse(content={"error": str(e)}, status_code=500)
+
+
+@app.get("/api/stats")
+async def api_get_stats():
+    stats = {"active_rfps": 0, "pending_evaluations": 0, "total_documents": 0}
+    eval_path = OUTPUT_DIR / "evaluations.json"
+    if eval_path.exists():
+        try:
+            data = json.loads(eval_path.read_text(encoding="utf-8"))
+            stats["pending_evaluations"] = len(data.get("vendors", []))
+            stats["active_rfps"] = 1
+        except Exception:
+            pass
+    # Count any PDFs in output dir as generated documents
+    if OUTPUT_DIR.exists():
+        stats["total_documents"] = len(list(OUTPUT_DIR.glob("*.pdf")))
+    return JSONResponse(content=stats)
 
 
 if __name__ == "__main__":

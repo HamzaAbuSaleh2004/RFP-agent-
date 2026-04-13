@@ -24,11 +24,24 @@ SCOPES = [
     "https://www.googleapis.com/auth/drive.readonly",
 ]
 
+# Module-level service cache — rebuilt only when credentials expire
+_cached_service = None
+
 
 def _get_service():
-    """Return an authenticated Drive v3 service with read+write scope."""
-    creds = None
+    """Return a cached authenticated Drive v3 service, refreshing only when needed."""
+    global _cached_service
 
+    # Return cached service if credentials are still valid
+    if _cached_service is not None:
+        try:
+            creds = _cached_service._http.credentials  # type: ignore[attr-defined]
+            if creds.valid:
+                return _cached_service
+        except Exception:
+            pass
+
+    creds = None
     if WRITE_TOKEN_PATH.exists():
         with open(WRITE_TOKEN_PATH) as f:
             token_data = json.load(f)
@@ -51,7 +64,6 @@ def _get_service():
             flow = InstalledAppFlow.from_client_secrets_file(str(CREDENTIALS_PATH), SCOPES)
             creds = flow.run_local_server(port=0)
 
-        # Save updated token
         with open(WRITE_TOKEN_PATH, "w") as f:
             json.dump(
                 {
@@ -66,7 +78,8 @@ def _get_service():
                 indent=2,
             )
 
-    return build("drive", "v3", credentials=creds)
+    _cached_service = build("drive", "v3", credentials=creds)
+    return _cached_service
 
 
 def search_file(name_query: str) -> list[dict]:
@@ -84,13 +97,19 @@ def search_file(name_query: str) -> list[dict]:
     return results.get("files", [])
 
 
-def download_file(file_id: str, dest_path: str) -> str:
-    """Download a Drive file by ID to dest_path. Handles Google Docs → PDF export."""
+def download_file(file_id: str, dest_path: str, known_mime: str = "") -> str:
+    """Download a Drive file by ID to dest_path. Handles Google Docs → PDF export.
+
+    Pass known_mime to skip the extra metadata API call when the caller already
+    has the MIME type (e.g. from a prior files().list() response).
+    """
     service = _get_service()
 
-    # Check mime type to decide export vs direct download
-    meta = service.files().get(fileId=file_id, fields="mimeType,name").execute()
-    mime = meta.get("mimeType", "")
+    if known_mime:
+        mime = known_mime
+    else:
+        meta = service.files().get(fileId=file_id, fields="mimeType,name").execute()
+        mime = meta.get("mimeType", "")
 
     if mime == "application/vnd.google-apps.document":
         # Export Google Doc as PDF

@@ -5,7 +5,8 @@
       "Bash(\"/c/Users/hamza/Desktop/LiverX/RFP/.venv/Scripts/python\" -c \"import docx; print\\('python-docx OK'\\)\")",
       "Bash(pip show:*)",
       "Bash(.venv/Scripts/python -c \"from rfp_agent.main import app; print\\('Import OK'\\)\")",
-      "Bash(.venv/Scripts/python -c \"from rfp_agent.main import app; print\\('OK'\\)\")"
+      "Bash(.venv/Scripts/python -c \"from rfp_agent.main import app; print\\('OK'\\)\")",
+      "Read(//c/c/Users/hamza/Desktop/LiverX/RFP/**)"
     ]
   }
 }

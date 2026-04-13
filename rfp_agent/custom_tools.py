@@ -1,9 +1,87 @@
 import os
-import tempfile
 from datetime import datetime
 from pathlib import Path
 
-OUTPUT_DIR = Path(r"c:\Users\hamza\Desktop\LiverX\RFP\output")
+OUTPUT_DIR    = Path(r"c:\Users\hamza\Desktop\LiverX\RFP\output")
+TEMPLATES_DIR = Path(r"c:\Users\hamza\Desktop\LiverX\RFP\company_templates")
+
+
+# ═══════════════════════════════════════════════════════
+# LOCAL TEMPLATE READER
+# ═══════════════════════════════════════════════════════
+
+def _extract_file_text(path: Path, cap: int = 12_000) -> str:
+    """Extract readable text from PDF, DOCX, TXT, or MD file."""
+    suffix = path.suffix.lower()
+    try:
+        if suffix in (".txt", ".md"):
+            text = path.read_text(encoding="utf-8", errors="replace")
+        elif suffix == ".pdf":
+            import fitz
+            doc  = fitz.open(str(path))
+            text = "\n\n".join(page.get_text() for page in doc)
+            doc.close()
+        elif suffix == ".docx":
+            import docx as _docx
+            doc  = _docx.Document(str(path))
+            text = "\n".join(p.text for p in doc.paragraphs if p.text.strip())
+        else:
+            return ""
+        note = f"\n[Truncated — first {cap} of {len(text)} chars]" if len(text) > cap else ""
+        return text[:cap] + note
+    except Exception as e:
+        return f"Error reading {path.name}: {e}"
+
+
+def read_local_templates() -> str:
+    """
+    Read all company templates from the local company_templates/ folder and
+    return their combined content in one call.
+
+    Template matching is by filename keyword (case-insensitive):
+      - "design"                    → Design Template  (branding, layout)
+      - "legal"                     → Legal Template   (clauses, NDA, IP, jurisdiction)
+      - "economic"/"economy"/"finance" → Economic Template (budget, payment, penalties)
+      - "compliance"/"regulatory"   → Compliance Template (certifications, regulations)
+
+    Supported formats: PDF, DOCX, TXT, MD.
+    Missing templates are silently skipped.
+    """
+    SLOT_KEYWORDS = {
+        "Design Template":     ["design"],
+        "Legal Template":      ["legal"],
+        "Economic Template":   ["economic", "economy", "finance"],
+        "Compliance Template": ["compliance", "regulatory"],
+    }
+
+    if not TEMPLATES_DIR.exists():
+        return (
+            "company_templates/ folder not found. "
+            f"Create it at {TEMPLATES_DIR} and place your template files inside."
+        )
+
+    all_files = [f for f in TEMPLATES_DIR.iterdir() if f.is_file()]
+
+    sections = []
+    for label, keywords in SLOT_KEYWORDS.items():
+        match = next(
+            (f for f in all_files if any(kw in f.stem.lower() for kw in keywords)),
+            None,
+        )
+        if not match:
+            continue
+        content = _extract_file_text(match)
+        if content:
+            sections.append(f"=== {label} ({match.name}) ===\n{content}")
+
+    if not sections:
+        return (
+            "No templates found in company_templates/. "
+            "Add files whose names contain 'design', 'legal', 'economic', or 'compliance' "
+            "(PDF, DOCX, TXT, or MD)."
+        )
+
+    return "\n\n".join(sections)
 
 
 # ═══════════════════════════════════════════════════════
@@ -141,16 +219,126 @@ def calculate_pwin(vendor_data: str) -> float:
     return 75.0
 
 def risk_heatmap(compliance_results: str) -> str:
-    """Generate ASCII risk matrix"""
-    return "[Low Risk]"
+    """
+    Compute a risk heatmap from vendor compliance results and save it for dashboard display.
 
-def generate_qa_scenarios(rfp_content: str) -> list[str]:
-    """Simulate vendor questions"""
-    return ["What is the expected timeline?", "What is the budget ceiling?"]
+    Args:
+        compliance_results: JSON string mapping vendor names to their evaluation dimensions.
+            Format: {"VendorName": {"legal": "PASS"|"FAIL", "commercial": "PASS"|"FAIL",
+                                    "technical": 0-100, "financial": "PASS"|"FAIL"}, ...}
 
-def gmail(to: str, subject: str) -> str:
-    """Email final RFP to procurement team or vendors."""
-    return f"Email sent to {to}"
+    Returns:
+        JSON string with per-vendor risk levels per dimension plus an overall risk rating.
+        Levels: LOW | MODERATE | HIGH | CRITICAL
+    """
+    import json
+
+    try:
+        data = json.loads(compliance_results)
+    except (json.JSONDecodeError, TypeError):
+        return json.dumps({"error": "Invalid input. Expected JSON mapping vendor names to dimension results."})
+
+    def _dim_risk(status: str) -> str:
+        return "LOW" if str(status).upper() == "PASS" else "HIGH"
+
+    def _tech_risk(score) -> str:
+        try:
+            s = float(score)
+        except (TypeError, ValueError):
+            return "UNKNOWN"
+        if s >= 80:
+            return "LOW"
+        if s >= 60:
+            return "MODERATE"
+        return "HIGH"
+
+    def _overall(legal, commercial, technical, financial) -> str:
+        fail_count = sum(1 for v in [legal, commercial, financial] if v == "HIGH")
+        tech = _tech_risk(technical)
+        if fail_count >= 2:
+            return "CRITICAL"
+        if fail_count == 1:
+            return "HIGH" if tech == "HIGH" else "MODERATE"
+        if tech == "LOW":
+            return "LOW"
+        return "MODERATE"
+
+    result = {}
+    for vendor, dims in data.items():
+        legal_r      = _dim_risk(dims.get("legal", "FAIL"))
+        commercial_r = _dim_risk(dims.get("commercial", "FAIL"))
+        tech_r       = _tech_risk(dims.get("technical", 0))
+        financial_r  = _dim_risk(dims.get("financial", "FAIL"))
+        result[vendor] = {
+            "legal":      legal_r,
+            "commercial": commercial_r,
+            "technical":  tech_r,
+            "financial":  financial_r,
+            "overall":    _overall(legal_r, commercial_r, dims.get("technical", 0), financial_r),
+        }
+
+    heatmap_json = json.dumps(result, indent=2)
+
+    # Persist so the /api/risk-heatmap endpoint can serve it
+    try:
+        OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+        with open(OUTPUT_DIR / "risk_heatmap.json", "w") as f:
+            f.write(heatmap_json)
+    except Exception:
+        pass
+
+    return heatmap_json
+
+
+def store_evaluation_results(results_json: str) -> str:
+    """
+    Persist bid evaluation results so the /evaluations dashboard can display them.
+
+    Call this at the end of every bid evaluation with a JSON summary.
+    Format:
+      {
+        "project":              "Project Name",
+        "evaluated_at":         "ISO-8601 timestamp (use date_time tool)",
+        "recommendation":       "Vendor Name",
+        "recommendation_reason":"One paragraph justification",
+        "contract_value":       "$X.XM  (optional)",
+        "vendors": [
+          {
+            "name":            "Vendor X",
+            "company":         "Company Inc.",
+            "legal":           "PASS" | "FAIL",
+            "commercial":      "PASS" | "FAIL",
+            "technical_score": 0-100,
+            "financial":       "PASS" | "FAIL",
+            "flags":           ["optional flag strings"]
+          }
+        ]
+      }
+
+    Returns confirmation with the file path on success, or an error string.
+    """
+    import json
+
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    path = OUTPUT_DIR / "evaluations.json"
+
+    try:
+        data = json.loads(results_json)
+    except (json.JSONDecodeError, TypeError) as e:
+        return f"ERROR: results_json is not valid JSON — {e}"
+
+    try:
+        with open(path, "w") as f:
+            json.dump(data, f, indent=2)
+    except Exception as e:
+        return f"ERROR saving evaluation results: {e}"
+
+    vendor_count = len(data.get("vendors", []))
+    return (
+        f"Evaluation results saved ({vendor_count} vendor(s)). "
+        f"Dashboard will reflect the update at /evaluations."
+    )
+
 
 def code_execution(code: str) -> str:
     """Run Python to calculate cost breakdowns, weighted scoring models."""
@@ -161,16 +349,13 @@ def date_time() -> str:
     return datetime.now().isoformat()
 
 
-COMPANY_TEMPLATE_NAME = "Company Templet"
-
-
 def create_rfp_pdf(
     rfp_content: str,
     output_filename: str,
 ) -> str:
     """
     Generate a professionally styled PDF RFP using the company template from
-    Google Drive ("company template"), then upload the result back to Drive.
+    Google Drive, then upload the result back to Drive.
 
     Args:
         rfp_content:     The complete RFP text in markdown format.
@@ -181,8 +366,8 @@ def create_rfp_pdf(
         A message with the Google Drive link where the PDF was saved,
         or an error description.
     """
-    from .pdf_engine  import parse_template, generate_rfp_pdf
-    from .drive_api   import search_file, download_file, upload_file
+    from .pdf_engine import parse_template, generate_rfp_pdf
+    from .drive_api  import upload_file
 
     if not output_filename.endswith(".pdf"):
         output_filename += ".pdf"
@@ -190,24 +375,28 @@ def create_rfp_pdf(
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     output_path = str(OUTPUT_DIR / output_filename)
 
-    # ── 1. Always fetch the company template from Drive ────────────────────
-    template_info = {"primary": (10, 60, 120), "secondary": (240, 245, 250),
-                     "accent": (220, 100, 0), "logo_path": None, "company_name": ""}
+    # ── 1. Load design template from local company_templates/ folder ─────────
+    DEFAULT_TEMPLATE = {"primary": (10, 60, 120), "secondary": (240, 245, 250),
+                        "accent": (220, 100, 0), "logo_path": None, "company_name": "OurCompany"}
+    template_info  = DEFAULT_TEMPLATE.copy()
+    template_warning = ""
+
     try:
-        files = search_file(COMPANY_TEMPLATE_NAME)
-        if not files:
-            return (
-                f"ERROR: No file named '{COMPANY_TEMPLATE_NAME}' found in Google Drive. "
-                "Please upload your company template PDF to Drive with that exact name."
+        design_file = next(
+            (f for f in TEMPLATES_DIR.iterdir()
+             if f.is_file() and "design" in f.stem.lower() and f.suffix.lower() == ".pdf"),
+            None,
+        ) if TEMPLATES_DIR.exists() else None
+
+        if design_file:
+            template_info = parse_template(str(design_file))
+        else:
+            template_warning = (
+                "\nNote: No design_template.pdf found in company_templates/ — "
+                "PDF generated with default branding."
             )
-        file_id = files[0]["id"]
-        tmp = tempfile.NamedTemporaryFile(suffix=".pdf", delete=False)
-        tmp.close()
-        download_file(file_id, tmp.name)
-        template_info = parse_template(tmp.name)
-        os.unlink(tmp.name)
     except Exception as e:
-        return f"ERROR loading company template from Drive: {e}"
+        template_warning = f"\nNote: Could not load design template ({e}) — using default branding."
 
     # ── 2. Generate PDF ────────────────────────────────────────────────────
     try:
@@ -219,7 +408,7 @@ def create_rfp_pdf(
     try:
         link = upload_file(output_path, output_filename)
         return (
-            f"PDF created and uploaded to Google Drive.\n"
+            f"PDF created and uploaded to Google Drive.{template_warning}\n"
             f"File: {output_filename}\n"
             f"Link: {link}\n"
             f"Local copy: {output_path}"
@@ -227,6 +416,6 @@ def create_rfp_pdf(
     except Exception as e:
         # Return local path as fallback so content is not lost
         return (
-            f"PDF created locally at {output_path}, but Drive upload failed: {e}\n"
+            f"PDF created locally at {output_path}, but Drive upload failed: {e}{template_warning}\n"
             f"You can upload it manually."
         )

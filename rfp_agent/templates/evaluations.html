@@ -1,415 +1,555 @@
 <!DOCTYPE html>
-
-<html class="light" lang="en"><head>
+<html class="light" lang="en">
+<head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Bid Evaluator Comparison View - RFP Director</title>
-<!-- Google Fonts: Manrope & Inter -->
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<!-- Material Symbols -->
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<title>Bid Evaluator - RFP Director</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script id="tailwind-config">
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            "colors": {
-                    "inverse-on-surface": "#f0f1f2",
-                    "inverse-surface": "#2e3132",
-                    "tertiary-fixed-dim": "#fbbc00",
-                    "on-surface": "#191c1d",
-                    "on-tertiary-fixed-variant": "#5c4300",
-                    "surface-container-lowest": "#ffffff",
-                    "on-primary": "#ffffff",
-                    "surface-container": "#edeeef",
-                    "on-tertiary": "#ffffff",
-                    "surface": "#f8f9fa",
-                    "tertiary-fixed": "#ffdfa0",
-                    "background": "#f8f9fa",
-                    "on-tertiary-container": "#ae8100",
-                    "tertiary-container": "#2d1f00",
-                    "surface-bright": "#f8f9fa",
-                    "surface-container-high": "#e7e8e9",
-                    "primary-fixed-dim": "#aec7f6",
-                    "secondary-fixed": "#d5e3ff",
-                    "on-surface-variant": "#44474e",
-                    "surface-tint": "#465f88",
-                    "secondary-fixed-dim": "#a7c8ff",
-                    "surface-container-highest": "#e1e3e4",
-                    "on-secondary-fixed-variant": "#1f477b",
-                    "outline": "#74777f",
-                    "error": "#ba1a1a",
-                    "outline-variant": "#c4c6cf",
-                    "on-background": "#191c1d",
-                    "surface-dim": "#d9dadb",
-                    "on-error": "#ffffff",
-                    "on-secondary-container": "#294f83",
-                    "error-container": "#ffdad6",
-                    "surface-variant": "#e1e3e4",
-                    "on-primary-container": "#708ab5",
-                    "on-error-container": "#93000a",
-                    "on-primary-fixed": "#001b3d",
-                    "on-secondary-fixed": "#001b3c",
-                    "on-tertiary-fixed": "#261a00",
-                    "primary": "#000a1e",
-                    "secondary": "#3a5f94",
-                    "surface-container-low": "#f3f4f5",
-                    "tertiary": "#100900",
-                    "inverse-primary": "#aec7f6",
-                    "primary-fixed": "#d6e3ff",
-                    "secondary-container": "#9fc2fe",
-                    "primary-container": "#002147",
-                    "on-primary-fixed-variant": "#2d476f",
-                    "on-secondary": "#ffffff"
-            },
-            "borderRadius": {
-                    "DEFAULT": "0.125rem",
-                    "lg": "0.25rem",
-                    "xl": "0.5rem",
-                    "full": "0.75rem"
-            },
-            "fontFamily": {
-                    "headline": ["Manrope"],
-                    "body": ["Inter"],
-                    "label": ["Inter"]
-            }
-          },
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "inverse-on-surface": "#f0f1f2", "inverse-surface": "#2e3132",
+          "tertiary-fixed-dim": "#fbbc00", "on-surface": "#191c1d",
+          "on-tertiary-fixed-variant": "#5c4300", "surface-container-lowest": "#ffffff",
+          "on-primary": "#ffffff", "surface-container": "#edeeef",
+          "on-tertiary": "#ffffff", "surface": "#f8f9fa",
+          "tertiary-fixed": "#ffdfa0", "background": "#f8f9fa",
+          "on-tertiary-container": "#ae8100", "tertiary-container": "#2d1f00",
+          "surface-bright": "#f8f9fa", "surface-container-high": "#e7e8e9",
+          "primary-fixed-dim": "#aec7f6", "secondary-fixed": "#d5e3ff",
+          "on-surface-variant": "#44474e", "surface-tint": "#465f88",
+          "secondary-fixed-dim": "#a7c8ff", "surface-container-highest": "#e1e3e4",
+          "on-secondary-fixed-variant": "#1f477b", "outline": "#74777f",
+          "error": "#ba1a1a", "outline-variant": "#c4c6cf",
+          "on-background": "#191c1d", "surface-dim": "#d9dadb",
+          "on-error": "#ffffff", "on-secondary-container": "#294f83",
+          "error-container": "#ffdad6", "surface-variant": "#e1e3e4",
+          "on-primary-container": "#708ab5", "on-error-container": "#93000a",
+          "on-primary-fixed": "#001b3d", "on-secondary-fixed": "#001b3c",
+          "on-tertiary-fixed": "#261a00", "primary": "#000a1e",
+          "secondary": "#3a5f94", "surface-container-low": "#f3f4f5",
+          "tertiary": "#100900", "inverse-primary": "#aec7f6",
+          "primary-fixed": "#d6e3ff", "secondary-container": "#9fc2fe",
+          "primary-container": "#002147", "on-primary-fixed-variant": "#2d476f",
+          "on-secondary": "#ffffff"
         },
+        borderRadius: { DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem" },
+        fontFamily: { headline: ["Manrope"], body: ["Inter"], label: ["Inter"] }
       }
-    </script>
+    }
+  }
+</script>
 <style>
-      .material-symbols-outlined {
-        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-      }
-      .glass-effect {
-        background: rgba(243, 244, 245, 0.7);
-        backdrop-filter: blur(24px);
-      }
-      .hero-gradient {
-        background: linear-gradient(135deg, #002147 0%, #000a1e 100%);
-      }
-      .ghost-border {
-        border: 1px solid rgba(196, 198, 207, 0.15);
-      }
-      .amber-glow:focus-within {
-        border-bottom: 2px solid #fbbc00;
-      }
-    </style>
+  body { font-family: 'Inter', sans-serif; }
+  h1,h2,h3,h4 { font-family: 'Manrope', sans-serif; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .hero-gradient { background: linear-gradient(135deg, #002147 0%, #000a1e 100%); }
+  .ghost-border { border: 1px solid rgba(196,198,207,0.15); }
+  .glass-effect { background: rgba(243,244,245,0.7); backdrop-filter: blur(24px); }
+
+  /* Risk level colours */
+  .risk-low      { background:#dcfce7; color:#166534; }
+  .risk-moderate { background:#fef9c3; color:#854d0e; }
+  .risk-high     { background:#fee2e2; color:#991b1b; }
+  .risk-critical { background:#fce7f3; color:#9d174d; }
+  .risk-unknown  { background:#f1f5f9; color:#64748b; }
+
+  /* Pulse animation for the live-update dot */
+  @keyframes pulse-ring { 0%{transform:scale(.8);opacity:1} 100%{transform:scale(2);opacity:0} }
+  .pulse-dot::before {
+    content:''; position:absolute; inset:0; border-radius:9999px;
+    background:inherit; animation:pulse-ring 1.8s ease-out infinite;
+  }
+
+  /* Skeleton shimmer */
+  @keyframes shimmer { 0%{background-position:-400px 0} 100%{background-position:400px 0} }
+  .skeleton {
+    background: linear-gradient(90deg,#e2e8f0 25%,#f1f5f9 50%,#e2e8f0 75%);
+    background-size: 800px 100%;
+    animation: shimmer 1.4s infinite linear;
+    border-radius: 6px;
+  }
+</style>
 </head>
-<body class="bg-surface font-body text-on-surface antialiased">
-<!-- SideNavBar -->
-<aside class="fixed left-0 top-0 h-full flex flex-col p-6 bg-slate-50 dark:bg-slate-950 font-['Manrope'] antialiased h-screen w-64 border-r-0 z-50">
-<div class="mb-10 flex items-center gap-3">
-<div class="w-10 h-10 rounded-lg hero-gradient flex items-center justify-center text-white">
-<span class="material-symbols-outlined">analytics</span>
-</div>
-<div>
-<h1 class="text-xl font-bold tracking-tight text-blue-900 dark:text-blue-50">RFP Director</h1>
-<p class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold">Enterprise Procurement</p>
-</div>
-</div>
-<nav class="flex-1 space-y-2">
-<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-blue-900 dark:hover:text-blue-200 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors rounded-lg" href="/">
-<span class="material-symbols-outlined">dashboard</span>
-<span class="font-medium">Dashboard</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-blue-900 dark:hover:text-blue-200 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors rounded-lg" href="/documents">
-<span class="material-symbols-outlined">description</span>
-<span class="font-medium">Documents</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 text-blue-950 dark:text-white font-semibold bg-white dark:bg-blue-900/30 rounded-lg shadow-sm" href="/evaluations">
-<span class="material-symbols-outlined">analytics</span>
-<span class="font-medium">Evaluations</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-blue-900 dark:hover:text-blue-200 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors rounded-lg" href="#">
-<span class="material-symbols-outlined">settings</span>
-<span class="font-medium">Settings</span>
-</a>
-</nav>
-<div class="mt-auto">
-<button class="w-full py-4 hero-gradient text-white font-bold rounded-xl shadow-lg flex items-center justify-center gap-2 Active: scale-95 transition-transform duration-150">
-<span class="material-symbols-outlined">add</span>
-                Create RFP
-            </button>
-</div>
+<body class="bg-surface text-on-surface antialiased">
+
+<!-- ── Side Nav ─────────────────────────────────────────── -->
+<aside class="fixed left-0 top-0 h-full flex flex-col p-6 bg-slate-50 dark:bg-slate-950 font-['Manrope'] antialiased w-64 z-50">
+  <div class="mb-10 flex items-center gap-3">
+    <div class="w-10 h-10 rounded-lg hero-gradient flex items-center justify-center text-white">
+      <span class="material-symbols-outlined">analytics</span>
+    </div>
+    <div>
+      <h1 class="text-xl font-bold tracking-tight text-blue-900 dark:text-blue-50">RFP Director</h1>
+      <p class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold">Enterprise Procurement</p>
+    </div>
+  </div>
+  <nav class="flex-1 space-y-2">
+    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/">
+      <span class="material-symbols-outlined">dashboard</span><span class="font-medium">Dashboard</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/documents">
+      <span class="material-symbols-outlined">description</span><span class="font-medium">Documents</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 text-blue-950 font-semibold bg-white rounded-lg shadow-sm" href="/evaluations">
+      <span class="material-symbols-outlined">analytics</span><span class="font-medium">Evaluations</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="#">
+      <span class="material-symbols-outlined">settings</span><span class="font-medium">Settings</span>
+    </a>
+  </nav>
+  <div class="mt-auto">
+    <a href="/chat" class="w-full py-4 hero-gradient text-white font-bold rounded-xl shadow-lg flex items-center justify-center gap-2 transition-transform active:scale-95">
+      <span class="material-symbols-outlined">add</span>Create RFP
+    </a>
+  </div>
 </aside>
-<!-- TopNavBar -->
-<header class="flex justify-between items-center w-full px-8 py-4 sticky top-0 z-40 ml-64 bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl font-['Inter'] text-sm tracking-wide">
-<div class="flex items-center gap-4 flex-1">
-<div class="relative w-full max-w-md group">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-full focus:ring-2 focus:ring-tertiary-fixed-dim transition-all" placeholder="Search evaluations or vendors..." type="text"/>
-</div>
-</div>
-<div class="flex items-center gap-6">
-<button class="text-slate-400 dark:text-slate-500 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-300">
-<span class="material-symbols-outlined">notifications</span>
-</button>
-<button class="text-slate-400 dark:text-slate-500 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-300">
-<span class="material-symbols-outlined">help_outline</span>
-</button>
-<div class="h-8 w-px bg-outline-variant/20 mx-2"></div>
-<div class="flex items-center gap-3">
-<span class="font-semibold text-primary">Executive User</span>
-<img alt="Executive User Profile" class="w-10 h-10 rounded-full object-cover" data-alt="professional portrait of a senior male executive in a dark blue suit with a soft office background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3WyTpaW2CKwFCdQkoHt-dg-wl8LrYaSK7NqEQe_MDEWk0KAXxf1Bx_yf6PoKiEL6U02isoVlgjvu_zwpggcDqzFCU6hrJfIwbEHhA9vm5E6vE5ZeVNJYaGOjlsqGDj0lXEwFzYZLlirNRx9k79ULziHwsBsmbKRkTQPSE5f-JTuJvJc0bZWmspAapSzxKvXcaBt4yCcAlm8gh8dlRpZniNimGPNi-Am4kOpbd1eW05uucoYq_v0asugNHNkj7Ut39RYi3-KKvpFQ"/>
-</div>
-</div>
+
+<!-- ── Top Nav ─────────────────────────────────────────── -->
+<header class="flex justify-between items-center w-full px-8 py-4 sticky top-0 z-40 ml-64 bg-white/70 backdrop-blur-xl">
+  <div class="flex items-center gap-4 flex-1">
+    <div class="relative w-full max-w-md">
+      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+      <input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-full focus:ring-2 focus:ring-tertiary-fixed-dim transition-all" placeholder="Search evaluations or vendors..." type="text"/>
+    </div>
+  </div>
+  <div class="flex items-center gap-6">
+    <button class="text-slate-400 hover:text-blue-700 transition-all">
+      <span class="material-symbols-outlined">notifications</span>
+    </button>
+    <div class="h-8 w-px bg-outline-variant/20 mx-2"></div>
+    <!-- Live indicator -->
+    <div class="flex items-center gap-2 text-xs font-bold text-slate-400">
+      <span class="relative w-2 h-2 rounded-full bg-emerald-400 pulse-dot"></span>
+      <span id="live-status">Live</span>
+    </div>
+    <button id="refresh-btn" onclick="loadEvaluation()" title="Refresh"
+      class="p-2 rounded-full hover:bg-surface-container-high transition-colors text-slate-400 hover:text-primary">
+      <span class="material-symbols-outlined text-lg">refresh</span>
+    </button>
+  </div>
 </header>
-<!-- Main Content -->
-<main class="ml-64 p-8">
-<!-- Editorial Header -->
-<div class="mb-12 max-w-5xl">
-<div class="flex items-center gap-2 text-primary-container font-medium mb-2">
-<span class="material-symbols-outlined text-sm">arrow_back</span>
-<span class="label-md tracking-wider">PROJECT #842-DELTA</span>
-</div>
-<h2 class="font-headline text-5xl font-extrabold text-primary tracking-tight mb-4">Cloud Infrastructure Migration</h2>
-<p class="font-body text-on-surface-variant text-lg max-w-2xl leading-relaxed">Comparative analysis of technical feasibility, commercial compliance, and long-term financial viability for the Q4 Enterprise Core upgrade.</p>
-</div>
-<!-- AI Recommendation Section (Asymmetric / Glassmorphism) -->
-<section class="mb-12 grid grid-cols-12 gap-8">
-<div class="col-span-12 lg:col-span-8 glass-effect p-8 rounded-xl border border-white/40 shadow-xl relative overflow-hidden">
-<div class="absolute top-0 right-0 p-6 opacity-10">
-<span class="material-symbols-outlined text-8xl" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
-</div>
-<div class="flex items-start gap-6 relative z-10">
-<div class="w-16 h-16 rounded-full bg-tertiary-fixed-dim flex items-center justify-center shadow-lg">
-<span class="material-symbols-outlined text-on-tertiary-fixed text-3xl">lightbulb</span>
-</div>
-<div>
-<div class="inline-flex items-center gap-2 px-3 py-1 bg-tertiary-container/10 text-on-tertiary-container rounded-full label-sm font-bold mb-4">
-<span class="material-symbols-outlined text-[14px]">auto_awesome</span>
-                            AI RECOMMENDATION
-                        </div>
-<h3 class="font-headline text-3xl font-bold text-primary mb-3">Vendor Y: Global Systems Ltd.</h3>
-<p class="font-body text-on-surface-variant text-lg leading-relaxed mb-6">
-                            Vendor Y demonstrates the highest Technical Score (94) while maintaining strict adherence to Legal and Financial requirements. Their proposed architecture offers a 22% better scalability index compared to Vendor X, justifying the marginal premium in commercial pass-through costs.
-                        </p>
-<div class="flex gap-4">
-<button class="px-6 py-3 bg-tertiary-fixed-dim text-on-tertiary-fixed font-bold rounded-lg hover:brightness-105 transition-all">Award RFP</button>
-<button class="px-6 py-3 bg-surface-container-high text-primary font-bold rounded-lg hover:bg-surface-container-highest transition-all">Download Full Brief</button>
-</div>
-</div>
-</div>
-</div>
-<div class="col-span-12 lg:col-span-4 flex flex-col gap-4">
-<div class="bg-primary-container p-6 rounded-xl text-white flex-1 flex flex-col justify-center">
-<span class="label-sm text-on-primary-container font-bold tracking-widest block mb-1">TOTAL CONTRACT VALUE</span>
-<span class="font-headline text-4xl font-extrabold tracking-tight">$4.2M <span class="text-lg font-normal opacity-60">est.</span></span>
-</div>
-<div class="bg-surface-container-lowest p-6 rounded-xl ghost-border flex-1 flex flex-col justify-center">
-<span class="label-sm text-slate-400 font-bold tracking-widest block mb-1">EVALUATION STATUS</span>
-<div class="flex items-center gap-2">
-<span class="w-3 h-3 rounded-full bg-tertiary-fixed-dim"></span>
-<span class="font-headline text-2xl font-bold text-primary">Final Comparison</span>
-</div>
-</div>
-</div>
-</section>
-<!-- Comparison Matrix -->
-<section class="bg-surface-container-low rounded-2xl p-1 overflow-hidden">
-<div class="overflow-x-auto">
-<table class="w-full text-left border-collapse">
-<thead>
-<tr class="bg-transparent">
-<th class="p-8 font-headline text-sm font-bold text-slate-400 tracking-widest uppercase w-1/4">Criteria</th>
-<th class="p-8 w-1/4">
-<div class="flex flex-col items-center">
-<div class="w-12 h-12 rounded-full bg-slate-200 mb-4 flex items-center justify-center text-slate-500 font-bold">X</div>
-<span class="font-headline text-xl font-extrabold text-primary">Vendor X</span>
-<span class="label-sm text-slate-500">TechSolutions Inc.</span>
-</div>
-</th>
-<th class="p-8 w-1/4 bg-surface-container-lowest shadow-2xl relative">
-<div class="absolute top-0 left-1/2 -translate-x-1/2 bg-tertiary-fixed-dim px-4 py-1 rounded-b-lg label-sm font-bold text-on-tertiary-fixed">OPTIMAL CHOICE</div>
-<div class="flex flex-col items-center">
-<div class="w-12 h-12 rounded-full hero-gradient mb-4 flex items-center justify-center text-white font-bold">Y</div>
-<span class="font-headline text-xl font-extrabold text-primary">Vendor Y</span>
-<span class="label-sm text-slate-500">Global Systems Ltd.</span>
-</div>
-</th>
-<th class="p-8 w-1/4">
-<div class="flex flex-col items-center">
-<div class="w-12 h-12 rounded-full bg-slate-200 mb-4 flex items-center justify-center text-slate-500 font-bold">Z</div>
-<span class="font-headline text-xl font-extrabold text-primary">Vendor Z</span>
-<span class="label-sm text-slate-500">CloudFrontier</span>
-</div>
-</th>
-</tr>
-</thead>
-<tbody class="font-body">
-<!-- Legal Row -->
-<tr class="hover:bg-white/40 transition-colors">
-<td class="p-8 border-t border-outline-variant/10">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-slate-400">gavel</span>
-<div>
-<div class="font-bold text-primary">Legal Compliance</div>
-<div class="label-sm text-slate-500">GDPR &amp; ISO Compliance</div>
-</div>
-</div>
-</td>
-<td class="p-8 border-t border-outline-variant/10 text-center">
-<div class="inline-flex items-center gap-2 px-3 py-1 bg-green-100/50 text-green-700 rounded-lg font-bold text-xs">
-<span class="material-symbols-outlined text-sm">check_circle</span>
-                                    PASS
-                                </div>
-</td>
-<td class="p-8 border-t border-outline-variant/10 text-center bg-surface-container-lowest">
-<div class="inline-flex items-center gap-2 px-3 py-1 bg-green-100/50 text-green-700 rounded-lg font-bold text-xs">
-<span class="material-symbols-outlined text-sm">check_circle</span>
-                                    PASS
-                                </div>
-</td>
-<td class="p-8 border-t border-outline-variant/10 text-center">
-<div class="inline-flex items-center gap-2 px-3 py-1 bg-red-100/50 text-red-700 rounded-lg font-bold text-xs">
-<span class="material-symbols-outlined text-sm">cancel</span>
-                                    FAIL
-                                </div>
-</td>
-</tr>
-<!-- Commercial Row -->
-<tr class="hover:bg-white/40 transition-colors">
-<td class="p-8 border-t border-outline-variant/10">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-slate-400">handshake</span>
-<div>
-<div class="font-bold text-primary">Commercial Terms</div>
-<div class="label-sm text-slate-500">MSAs &amp; SLAs</div>
-</div>
-</div>
-</td>
-<td class="p-8 border-t border-outline-variant/10 text-center">
-<div class="inline-flex items-center gap-2 px-3 py-1 bg-green-100/50 text-green-700 rounded-lg font-bold text-xs">
-<span class="material-symbols-outlined text-sm">check_circle</span>
-                                    PASS
-                                </div>
-</td>
-<td class="p-8 border-t border-outline-variant/10 text-center bg-surface-container-lowest">
-<div class="inline-flex items-center gap-2 px-3 py-1 bg-green-100/50 text-green-700 rounded-lg font-bold text-xs">
-<span class="material-symbols-outlined text-sm">check_circle</span>
-                                    PASS
-                                </div>
-</td>
-<td class="p-8 border-t border-outline-variant/10 text-center">
-<div class="inline-flex items-center gap-2 px-3 py-1 bg-green-100/50 text-green-700 rounded-lg font-bold text-xs">
-<span class="material-symbols-outlined text-sm">check_circle</span>
-                                    PASS
-                                </div>
-</td>
-</tr>
-<!-- Technical Row -->
-<tr class="hover:bg-white/40 transition-colors">
-<td class="p-8 border-t border-outline-variant/10">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-slate-400">settings_suggest</span>
-<div>
-<div class="font-bold text-primary">Technical Capability</div>
-<div class="label-sm text-slate-500">Performance Score (0-100)</div>
-</div>
-</div>
-</td>
-<td class="p-8 border-t border-outline-variant/10 text-center">
-<div class="flex flex-col items-center gap-2">
-<div class="text-3xl font-headline font-bold text-primary">82</div>
-<div class="w-full max-w-[100px] h-1.5 bg-slate-200 rounded-full overflow-hidden">
-<div class="bg-primary-container h-full" style="width: 82%"></div>
-</div>
-</div>
-</td>
-<td class="p-8 border-t border-outline-variant/10 text-center bg-surface-container-lowest">
-<div class="flex flex-col items-center gap-2">
-<div class="text-3xl font-headline font-bold text-primary">94</div>
-<div class="w-full max-w-[100px] h-1.5 bg-slate-200 rounded-full overflow-hidden">
-<div class="bg-tertiary-fixed-dim h-full" style="width: 94%"></div>
-</div>
-</div>
-</td>
-<td class="p-8 border-t border-outline-variant/10 text-center">
-<div class="flex flex-col items-center gap-2">
-<div class="text-3xl font-headline font-bold text-slate-400">68</div>
-<div class="w-full max-w-[100px] h-1.5 bg-slate-200 rounded-full overflow-hidden">
-<div class="bg-slate-300 h-full" style="width: 68%"></div>
-</div>
-</div>
-</td>
-</tr>
-<!-- Financial Row -->
-<tr class="hover:bg-white/40 transition-colors">
-<td class="p-8 border-t border-outline-variant/10">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-slate-400">monetization_on</span>
-<div>
-<div class="font-bold text-primary">Financial Stability</div>
-<div class="label-sm text-slate-500">Credit &amp; Revenue Check</div>
-</div>
-</div>
-</td>
-<td class="p-8 border-t border-outline-variant/10 text-center">
-<div class="inline-flex items-center gap-2 px-3 py-1 bg-green-100/50 text-green-700 rounded-lg font-bold text-xs">
-<span class="material-symbols-outlined text-sm">check_circle</span>
-                                    PASS
-                                </div>
-</td>
-<td class="p-8 border-t border-outline-variant/10 text-center bg-surface-container-lowest">
-<div class="inline-flex items-center gap-2 px-3 py-1 bg-green-100/50 text-green-700 rounded-lg font-bold text-xs">
-<span class="material-symbols-outlined text-sm">check_circle</span>
-                                    PASS
-                                </div>
-</td>
-<td class="p-8 border-t border-outline-variant/10 text-center">
-<div class="inline-flex items-center gap-2 px-3 py-1 bg-green-100/50 text-green-700 rounded-lg font-bold text-xs">
-<span class="material-symbols-outlined text-sm">check_circle</span>
-                                    PASS
-                                </div>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
-<!-- Bento Analysis Grid -->
-<div class="mt-12 grid grid-cols-12 gap-6">
-<div class="col-span-12 md:col-span-4 bg-white p-6 rounded-xl ghost-border">
-<h4 class="font-headline font-bold text-primary mb-4 flex items-center gap-2">
-<span class="material-symbols-outlined text-blue-600">trending_up</span>
-                    Risk Exposure
-                </h4>
-<div class="space-y-4">
-<div class="flex justify-between items-center">
-<span class="text-sm text-on-surface-variant">Vendor X</span>
-<span class="text-xs font-bold text-amber-600">MODERATE</span>
-</div>
-<div class="flex justify-between items-center">
-<span class="text-sm text-on-surface-variant">Vendor Y</span>
-<span class="text-xs font-bold text-green-600">LOW</span>
-</div>
-<div class="flex justify-between items-center">
-<span class="text-sm text-on-surface-variant">Vendor Z</span>
-<span class="text-xs font-bold text-red-600">CRITICAL</span>
-</div>
-</div>
-</div>
-<div class="col-span-12 md:col-span-8 bg-primary-container p-6 rounded-xl flex items-center justify-between">
-<div class="flex items-center gap-6">
-<div class="w-16 h-16 rounded-lg bg-white/10 flex items-center justify-center text-white">
-<span class="material-symbols-outlined text-3xl">insights</span>
-</div>
-<div>
-<h4 class="font-headline font-bold text-white text-lg">Predictive Score Trend</h4>
-<p class="text-on-primary-container text-sm">Historical performance indicates Vendor Y's reliability index has grown 14% YoY.</p>
-</div>
-</div>
-<button class="px-6 py-2 border border-white/20 text-white rounded-lg hover:bg-white/5 transition-all font-semibold">View History</button>
-</div>
-</div>
+
+<!-- ── Main ────────────────────────────────────────────── -->
+<main class="ml-64 p-8 min-h-screen">
+
+  <!-- Empty / loading state -->
+  <div id="empty-state" class="hidden flex flex-col items-center justify-center min-h-[60vh] text-center gap-6">
+    <div class="w-20 h-20 rounded-2xl bg-surface-container-high flex items-center justify-center">
+      <span class="material-symbols-outlined text-4xl text-slate-300">inbox</span>
+    </div>
+    <div>
+      <h3 class="text-2xl font-extrabold text-primary mb-2">No evaluations yet</h3>
+      <p class="text-on-surface-variant max-w-sm">Run a bid evaluation in the chat and the results will appear here automatically.</p>
+    </div>
+    <a href="/chat" class="px-8 py-3 hero-gradient text-white font-bold rounded-xl shadow-lg hover:scale-[1.02] transition-transform">
+      Start Evaluation
+    </a>
+  </div>
+
+  <!-- Skeleton loader -->
+  <div id="skeleton-state">
+    <div class="mb-10"><div class="skeleton h-8 w-96 mb-3"></div><div class="skeleton h-4 w-2/3"></div></div>
+    <div class="grid grid-cols-12 gap-8 mb-10">
+      <div class="col-span-8 skeleton h-48 rounded-xl"></div>
+      <div class="col-span-4 flex flex-col gap-4">
+        <div class="skeleton h-20 rounded-xl flex-1"></div>
+        <div class="skeleton h-20 rounded-xl flex-1"></div>
+      </div>
+    </div>
+    <div class="skeleton h-96 rounded-2xl"></div>
+  </div>
+
+  <!-- Loaded content (hidden until data arrives) -->
+  <div id="eval-content" class="hidden">
+
+    <!-- Header -->
+    <div class="mb-10 flex items-start justify-between">
+      <div>
+        <div class="flex items-center gap-2 text-primary-container font-medium mb-2 text-sm">
+          <span class="material-symbols-outlined text-sm">arrow_back</span>
+          <span id="eval-project-tag" class="tracking-wider"></span>
+        </div>
+        <h2 id="eval-project-title" class="text-5xl font-extrabold text-primary tracking-tight mb-3"></h2>
+        <p class="text-on-surface-variant text-base max-w-2xl leading-relaxed">
+          Evaluated on <span id="eval-timestamp" class="font-semibold text-primary"></span>
+        </p>
+      </div>
+      <button onclick="window.location.href='/chat'"
+        class="px-6 py-3 hero-gradient text-white font-bold rounded-xl flex items-center gap-2 hover:scale-[1.02] transition-transform">
+        <span class="material-symbols-outlined">add</span>New Evaluation
+      </button>
+    </div>
+
+    <!-- AI Recommendation + stats -->
+    <section class="mb-10 grid grid-cols-12 gap-6">
+      <div class="col-span-12 lg:col-span-8 glass-effect p-8 rounded-xl border border-white/40 shadow-xl relative overflow-hidden">
+        <div class="absolute top-0 right-0 p-6 opacity-10">
+          <span class="material-symbols-outlined text-8xl" style="font-variation-settings:'FILL' 1;">auto_awesome</span>
+        </div>
+        <div class="flex items-start gap-6 relative z-10">
+          <div class="w-16 h-16 rounded-full bg-tertiary-fixed-dim flex items-center justify-center shadow-lg flex-shrink-0">
+            <span class="material-symbols-outlined text-on-tertiary-fixed text-3xl">lightbulb</span>
+          </div>
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 bg-tertiary-container/10 text-on-tertiary-container rounded-full text-xs font-bold mb-4">
+              <span class="material-symbols-outlined text-[14px]">auto_awesome</span>AI RECOMMENDATION
+            </div>
+            <h3 id="rec-name" class="text-3xl font-bold text-primary mb-3"></h3>
+            <p id="rec-reason" class="text-on-surface-variant text-base leading-relaxed mb-6"></p>
+            <div class="flex gap-4">
+              <button class="px-6 py-3 bg-tertiary-fixed-dim text-on-tertiary-fixed font-bold rounded-lg hover:brightness-105 transition-all">Award RFP</button>
+              <button class="px-6 py-3 bg-surface-container-high text-primary font-bold rounded-lg hover:bg-surface-container-highest transition-all">Download Brief</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-span-12 lg:col-span-4 flex flex-col gap-4">
+        <div id="contract-value-card" class="hidden bg-primary-container p-6 rounded-xl text-white flex-1 flex flex-col justify-center">
+          <span class="text-on-primary-container font-bold tracking-widest text-xs block mb-1">TOTAL CONTRACT VALUE</span>
+          <span id="contract-value" class="text-4xl font-extrabold tracking-tight"></span>
+        </div>
+        <div class="bg-surface-container-lowest p-6 rounded-xl ghost-border flex-1 flex flex-col justify-center">
+          <span class="text-slate-400 font-bold tracking-widest text-xs block mb-1">EVALUATION STATUS</span>
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-tertiary-fixed-dim"></span>
+            <span class="text-2xl font-bold text-primary">Final Comparison</span>
+          </div>
+        </div>
+        <div class="bg-surface-container-lowest p-6 rounded-xl ghost-border flex items-center gap-4">
+          <span class="material-symbols-outlined text-primary-container text-3xl">groups</span>
+          <div>
+            <span id="vendor-count" class="text-3xl font-extrabold text-primary"></span>
+            <span class="text-sm text-slate-400 ml-1">vendors evaluated</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Comparison Matrix -->
+    <section class="bg-surface-container-low rounded-2xl p-1 overflow-hidden mb-10">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse" id="vendor-table">
+          <thead id="vendor-thead"></thead>
+          <tbody id="vendor-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Risk Heatmap -->
+    <section class="mb-10">
+      <div class="flex items-center justify-between mb-6 px-1">
+        <div>
+          <h3 class="text-xl font-bold text-primary">Risk Heatmap</h3>
+          <p class="text-sm text-on-surface-variant">Per-dimension risk exposure across all vendors</p>
+        </div>
+        <div class="flex gap-2 text-xs font-bold">
+          <span class="px-2 py-1 risk-low rounded">LOW</span>
+          <span class="px-2 py-1 risk-moderate rounded">MODERATE</span>
+          <span class="px-2 py-1 risk-high rounded">HIGH</span>
+          <span class="px-2 py-1 risk-critical rounded">CRITICAL</span>
+        </div>
+      </div>
+      <div id="risk-heatmap-container" class="overflow-x-auto">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- Bottom bento -->
+    <div class="grid grid-cols-12 gap-6">
+      <div class="col-span-12 md:col-span-4 bg-white p-6 rounded-xl ghost-border">
+        <h4 class="font-bold text-primary mb-4 flex items-center gap-2">
+          <span class="material-symbols-outlined text-blue-600">trending_up</span>Risk Exposure
+        </h4>
+        <div id="risk-summary-list" class="space-y-4"></div>
+      </div>
+      <div class="col-span-12 md:col-span-8 bg-primary-container p-6 rounded-xl flex items-center justify-between">
+        <div class="flex items-center gap-6">
+          <div class="w-16 h-16 rounded-lg bg-white/10 flex items-center justify-center text-white">
+            <span class="material-symbols-outlined text-3xl">insights</span>
+          </div>
+          <div>
+            <h4 class="font-bold text-white text-lg">Predictive Score Trend</h4>
+            <p id="trend-text" class="text-on-primary-container text-sm"></p>
+          </div>
+        </div>
+        <button class="px-6 py-2 border border-white/20 text-white rounded-lg hover:bg-white/5 transition-all font-semibold">View History</button>
+      </div>
+    </div>
+
+  </div><!-- /eval-content -->
 </main>
-<!-- Contextual FAB (Suppressed on details, but for comparison we show 'Export') -->
+
+<!-- FAB -->
 <div class="fixed bottom-10 right-10">
-<button class="w-16 h-16 hero-gradient text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform">
-<span class="material-symbols-outlined">ios_share</span>
-</button>
+  <button onclick="window.location.href='/chat'"
+    class="w-16 h-16 hero-gradient text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform">
+    <span class="material-symbols-outlined">ios_share</span>
+  </button>
 </div>
-</body></html>
+
+<script>
+// ── Helpers ─────────────────────────────────────────────────────────────────
+const RISK_CLASS = {
+  LOW:      'risk-low',
+  MODERATE: 'risk-moderate',
+  HIGH:     'risk-high',
+  CRITICAL: 'risk-critical',
+};
+
+function riskBadge(level) {
+  const cls = RISK_CLASS[level?.toUpperCase()] ?? 'risk-unknown';
+  return `<span class="px-2 py-0.5 rounded text-xs font-bold ${cls}">${level ?? 'N/A'}</span>`;
+}
+
+function passFail(status) {
+  const pass = String(status).toUpperCase() === 'PASS';
+  return pass
+    ? `<div class="inline-flex items-center gap-1 px-3 py-1 bg-green-100/50 text-green-700 rounded-lg font-bold text-xs">
+         <span class="material-symbols-outlined text-sm">check_circle</span>PASS</div>`
+    : `<div class="inline-flex items-center gap-1 px-3 py-1 bg-red-100/50 text-red-700 rounded-lg font-bold text-xs">
+         <span class="material-symbols-outlined text-sm">cancel</span>FAIL</div>`;
+}
+
+function techBar(score) {
+  const pct  = Math.min(Math.max(Number(score) || 0, 0), 100);
+  const color = pct >= 80 ? 'bg-tertiary-fixed-dim' : pct >= 60 ? 'bg-amber-400' : 'bg-red-400';
+  return `<div class="flex flex-col items-center gap-2">
+    <div class="text-3xl font-bold text-primary">${pct}</div>
+    <div class="w-full max-w-[100px] h-1.5 bg-slate-200 rounded-full overflow-hidden">
+      <div class="${color} h-full" style="width:${pct}%"></div>
+    </div>
+  </div>`;
+}
+
+function computeOverallRisk(vendor) {
+  const fails = ['legal','commercial','financial']
+    .filter(d => String(vendor[d]).toUpperCase() === 'FAIL').length;
+  const s = Number(vendor.technical_score || 0);
+  const tech = s >= 80 ? 'LOW' : s >= 60 ? 'MODERATE' : 'HIGH';
+  if (fails >= 2) return 'CRITICAL';
+  if (fails === 1) return tech === 'HIGH' ? 'HIGH' : 'MODERATE';
+  return tech;
+}
+
+// ── Render ──────────────────────────────────────────────────────────────────
+function renderEvaluation(data, heatmap) {
+  // Header
+  document.getElementById('eval-project-tag').textContent  = `PROJECT — ${data.project}`;
+  document.getElementById('eval-project-title').textContent = data.project;
+  document.getElementById('eval-timestamp').textContent =
+    data.evaluated_at ? new Date(data.evaluated_at).toLocaleString() : 'Unknown';
+
+  // Recommendation
+  document.getElementById('rec-name').textContent   = data.recommendation  ?? '—';
+  document.getElementById('rec-reason').textContent = data.recommendation_reason ?? '';
+
+  // Contract value
+  if (data.contract_value) {
+    document.getElementById('contract-value').textContent = data.contract_value;
+    document.getElementById('contract-value-card').classList.remove('hidden');
+  }
+
+  const vendors = data.vendors ?? [];
+  document.getElementById('vendor-count').textContent = vendors.length;
+
+  // ── Comparison table ───────────────────────────────────────────────────
+  const isWinner = (v) =>
+    v.name === data.recommendation || v.company === data.recommendation;
+
+  // thead
+  let thead = `<tr class="bg-transparent">
+    <th class="p-8 text-sm font-bold text-slate-400 tracking-widest uppercase w-1/5">Criteria</th>`;
+  vendors.forEach(v => {
+    const winner = isWinner(v);
+    thead += `<th class="p-8 w-1/${vendors.length + 1} ${winner ? 'bg-surface-container-lowest shadow-xl relative' : ''}">
+      ${winner ? `<div class="absolute top-0 left-1/2 -translate-x-1/2 bg-tertiary-fixed-dim px-4 py-1 rounded-b-lg text-xs font-bold text-on-tertiary-fixed">OPTIMAL CHOICE</div>` : ''}
+      <div class="flex flex-col items-center pt-4">
+        <div class="w-12 h-12 rounded-full ${winner ? 'hero-gradient' : 'bg-slate-200'} mb-4 flex items-center justify-center ${winner ? 'text-white' : 'text-slate-500'} font-bold text-lg">
+          ${v.name.charAt(0)}
+        </div>
+        <span class="text-xl font-extrabold text-primary">${v.name}</span>
+        <span class="text-sm text-slate-500">${v.company ?? ''}</span>
+      </div>
+    </th>`;
+  });
+  thead += '</tr>';
+  document.getElementById('vendor-thead').innerHTML = thead;
+
+  // tbody rows
+  const rows = [
+    { key: 'legal',      label: 'Legal Compliance',     sub: 'GDPR & ISO Compliance',       icon: 'gavel',           render: (v) => passFail(v.legal) },
+    { key: 'commercial', label: 'Commercial Terms',      sub: 'MSAs & SLAs',                 icon: 'handshake',       render: (v) => passFail(v.commercial) },
+    { key: 'technical',  label: 'Technical Capability',  sub: 'Performance Score (0-100)',    icon: 'settings_suggest',render: (v) => techBar(v.technical_score) },
+    { key: 'financial',  label: 'Financial Stability',   sub: 'Credit & Revenue Check',      icon: 'monetization_on', render: (v) => passFail(v.financial) },
+  ];
+
+  let tbody = '';
+  rows.forEach(row => {
+    tbody += `<tr class="hover:bg-white/40 transition-colors">
+      <td class="p-8 border-t border-outline-variant/10">
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-slate-400">${row.icon}</span>
+          <div>
+            <div class="font-bold text-primary">${row.label}</div>
+            <div class="text-xs text-slate-500">${row.sub}</div>
+          </div>
+        </div>
+      </td>`;
+    vendors.forEach(v => {
+      const winner = isWinner(v);
+      tbody += `<td class="p-8 border-t border-outline-variant/10 text-center ${winner ? 'bg-surface-container-lowest' : ''}">
+        ${row.render(v)}
+      </td>`;
+    });
+    tbody += '</tr>';
+  });
+
+  // Flags row
+  const hasFlags = vendors.some(v => v.flags?.length);
+  if (hasFlags) {
+    tbody += `<tr class="hover:bg-white/40 transition-colors">
+      <td class="p-8 border-t border-outline-variant/10">
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-slate-400">flag</span>
+          <div><div class="font-bold text-primary">Flags</div><div class="text-xs text-slate-500">Risk indicators</div></div>
+        </div>
+      </td>`;
+    vendors.forEach(v => {
+      const winner = isWinner(v);
+      const flags = v.flags ?? [];
+      tbody += `<td class="p-8 border-t border-outline-variant/10 text-center ${winner ? 'bg-surface-container-lowest' : ''}">
+        ${flags.length
+          ? flags.map(f => `<div class="text-xs text-amber-700 bg-amber-50 rounded px-2 py-1 mb-1">${f}</div>`).join('')
+          : `<span class="text-xs text-slate-300">—</span>`}
+      </td>`;
+    });
+    tbody += '</tr>';
+  }
+
+  document.getElementById('vendor-tbody').innerHTML = tbody;
+
+  // ── Risk heatmap grid ─────────────────────────────────────────────────
+  const dims = ['Legal', 'Commercial', 'Technical', 'Financial', 'Overall'];
+  const dimKeys = ['legal', 'commercial', 'technical', 'financial', 'overall'];
+
+  // Build per-vendor risk from heatmap data (preferred) or compute it
+  const riskData = {};
+  vendors.forEach(v => {
+    if (heatmap && heatmap[v.name]) {
+      riskData[v.name] = heatmap[v.name];
+    } else {
+      const overall = computeOverallRisk(v);
+      const s = Number(v.technical_score || 0);
+      riskData[v.name] = {
+        legal:      String(v.legal).toUpperCase() === 'PASS' ? 'LOW' : 'HIGH',
+        commercial: String(v.commercial).toUpperCase() === 'PASS' ? 'LOW' : 'HIGH',
+        technical:  s >= 80 ? 'LOW' : s >= 60 ? 'MODERATE' : 'HIGH',
+        financial:  String(v.financial).toUpperCase() === 'PASS' ? 'LOW' : 'HIGH',
+        overall,
+      };
+    }
+  });
+
+  let heatTable = `<table class="w-full text-sm border-collapse rounded-xl overflow-hidden">
+    <thead><tr>
+      <th class="p-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest bg-surface-container-low">Dimension</th>`;
+  vendors.forEach(v => {
+    heatTable += `<th class="p-4 text-center text-xs font-bold text-slate-500 uppercase bg-surface-container-low">${v.name}<br><span class="font-normal normal-case text-slate-400">${v.company ?? ''}</span></th>`;
+  });
+  heatTable += `</tr></thead><tbody>`;
+
+  dims.forEach((dim, i) => {
+    const dk = dimKeys[i];
+    const isOverall = dk === 'overall';
+    heatTable += `<tr class="${isOverall ? 'border-t-2 border-slate-200' : ''}">
+      <td class="p-4 font-semibold text-primary bg-surface-container-low/50 ${isOverall ? 'font-extrabold' : ''}">${dim}</td>`;
+    vendors.forEach(v => {
+      const level = (riskData[v.name]?.[dk] ?? 'UNKNOWN').toUpperCase();
+      const cls   = RISK_CLASS[level] ?? 'risk-unknown';
+      heatTable += `<td class="p-4 text-center">
+        <span class="inline-block px-3 py-1 rounded-lg text-xs font-bold ${cls} w-24">${level}</span>
+      </td>`;
+    });
+    heatTable += '</tr>';
+  });
+
+  heatTable += '</tbody></table>';
+  document.getElementById('risk-heatmap-container').innerHTML = heatTable;
+
+  // ── Risk summary sidebar ──────────────────────────────────────────────
+  const RISK_COLOR = { LOW:'text-green-600', MODERATE:'text-amber-600', HIGH:'text-red-600', CRITICAL:'text-pink-700' };
+  let summary = '';
+  vendors.forEach(v => {
+    const level = (riskData[v.name]?.overall ?? computeOverallRisk(v)).toUpperCase();
+    summary += `<div class="flex justify-between items-center">
+      <span class="text-sm text-on-surface-variant">${v.name}</span>
+      <span class="text-xs font-bold ${RISK_COLOR[level] ?? 'text-slate-400'}">${level}</span>
+    </div>`;
+  });
+  document.getElementById('risk-summary-list').innerHTML = summary;
+
+  // ── Trend blurb ───────────────────────────────────────────────────────
+  const best = vendors.reduce((a, b) =>
+    (Number(b.technical_score) > Number(a.technical_score) ? b : a), vendors[0]);
+  document.getElementById('trend-text').textContent = best
+    ? `${best.name} leads with a Technical Score of ${best.technical_score}. Historical performance and financial stability indicate strong delivery capacity.`
+    : '';
+}
+
+// ── Fetch & update ───────────────────────────────────────────────────────────
+async function loadEvaluation() {
+  // Spin the refresh button
+  const btn = document.getElementById('refresh-btn');
+  btn.querySelector('span').classList.add('animate-spin');
+
+  try {
+    const [evalRes, hmRes] = await Promise.all([
+      fetch('/api/evaluations'),
+      fetch('/api/risk-heatmap'),
+    ]);
+
+    btn.querySelector('span').classList.remove('animate-spin');
+
+    if (evalRes.status === 204 || !evalRes.ok) {
+      showEmpty();
+      return;
+    }
+
+    const data    = await evalRes.json();
+    const heatmap = hmRes.ok && hmRes.status !== 204 ? await hmRes.json() : null;
+
+    if (!data || !data.vendors?.length) { showEmpty(); return; }
+
+    document.getElementById('skeleton-state').classList.add('hidden');
+    document.getElementById('empty-state').classList.add('hidden');
+    document.getElementById('eval-content').classList.remove('hidden');
+
+    renderEvaluation(data, heatmap);
+    document.getElementById('live-status').textContent =
+      'Updated ' + new Date().toLocaleTimeString();
+
+  } catch (err) {
+    btn.querySelector('span').classList.remove('animate-spin');
+    console.error('Failed to load evaluation:', err);
+    showEmpty();
+  }
+}
+
+function showEmpty() {
+  document.getElementById('skeleton-state').classList.add('hidden');
+  document.getElementById('eval-content').classList.add('hidden');
+  document.getElementById('empty-state').classList.remove('hidden');
+}
+
+// Initial load + poll every 10 s while page is visible
+loadEvaluation();
+setInterval(() => { if (!document.hidden) loadEvaluation(); }, 10000);
+</script>
+</body>
+</html>

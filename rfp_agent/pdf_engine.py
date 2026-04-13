@@ -372,9 +372,9 @@ def _build_story(content: str, tmpl: dict) -> list:
 
     story = []
 
-    # Cover page: the canvas callback draws all artwork.
-    # We just need to advance past it.
-    story.append(Spacer(1, PAGE_H - MARGIN_T - MARGIN_B))
+    # Cover page: the canvas callback draws all artwork on page 1.
+    # A single PageBreak is enough — no spacer needed (and a full-frame spacer
+    # would trigger "Flowable too large on page" in ReportLab).
     story.append(PageBreak())
 
     # TOC page
@@ -439,17 +439,29 @@ def _build_story(content: str, tmpl: dict) -> list:
                 rows  = [r + [""] * (col_n - len(r)) for r in rows]
                 widths = _smart_col_widths(rows, USABLE_W)
 
+                # Cap cell text so no single cell can exceed one page height.
+                # ~600 chars at 9pt ≈ 40 lines ≈ safe upper bound per cell.
+                MAX_CELL = 600
+                capped_rows = []
+                for row in rows:
+                    capped_rows.append([
+                        (str(c)[:MAX_CELL] + "…" if len(str(c)) > MAX_CELL else str(c))
+                        for c in row
+                    ])
+
                 # Wrap every cell in a Paragraph for automatic word-wrap
                 para_rows = []
-                for ridx, row in enumerate(rows):
+                for ridx, row in enumerate(capped_rows):
                     st = s["cell_hdr"] if ridx == 0 else s["cell"]
                     para_rows.append([
-                        Paragraph(_inline(str(cell)), st)
+                        Paragraph(_inline(cell), st)
                         for cell in row
                     ])
 
+                # splitByRow=True (default) lets the table break across pages;
+                # repeatRows=1 repeats the header row on continuation pages.
                 tbl = Table(para_rows, colWidths=widths, repeatRows=1,
-                            hAlign="LEFT")
+                            hAlign="LEFT", splitByRow=True)
                 tbl.setStyle(TableStyle([
                     ("BACKGROUND",    (0, 0), (-1,  0), pri),
                     ("ROWBACKGROUNDS",(0, 1), (-1, -1), [colors.white, sec]),
@@ -527,6 +539,66 @@ def generate_rfp_pdf(
 
     # multiBuild does two passes: first pass collects page numbers for headings,
     # second pass renders the TOC with correct page references.
-    doc.multiBuild(story)
+    try:
+        doc.multiBuild(story)
+    except Exception as first_err:
+        # Fallback: rebuild without KeepTogether blocks and without TOC.
+        # This handles "Flowable too large on page" on edge-case content.
+        import logging
+        logging.getLogger(__name__).warning(
+            "multiBuild failed (%s) — retrying with simplified layout.", first_err
+        )
+        story2 = _build_story_simple(content, template_info)
+        doc2 = _RFPDoc(
+            output_path,
+            page_cb,
+            pagesize=A4,
+            leftMargin=MARGIN_L,
+            rightMargin=MARGIN_R,
+            topMargin=MARGIN_T,
+            bottomMargin=MARGIN_B,
+            title=title,
+            author=template_info.get("company_name", ""),
+        )
+        doc2.multiBuild(story2)
 
     return output_path
+
+
+def _build_story_simple(content: str, tmpl: dict) -> list:
+    """
+    Minimal fallback story builder — no TOC, no KeepTogether, no tables.
+    Renders every line as plain paragraphs so the PDF always succeeds.
+    """
+    s   = _make_styles(tmpl)
+    pri = _rl(tmpl["primary"])
+
+    story = [PageBreak()]   # cover page
+
+    for raw in content.split("\n"):
+        line = raw.strip()
+        if not line:
+            story.append(Spacer(1, 6))
+        elif line.startswith("# "):
+            story.append(Paragraph(line[2:].strip(), s["h1"]))
+            story.append(HRFlowable(width="100%", thickness=2, color=pri, spaceAfter=4))
+        elif line.startswith("## "):
+            story.append(Paragraph(line[3:].strip(), s["h2"]))
+        elif line.startswith("### "):
+            story.append(Paragraph(line[4:].strip(), s["h3"]))
+        elif re.match(r"^-{3,}$", line):
+            story.append(PageBreak())
+        elif line.startswith("|"):
+            # Render table rows as plain bullet lines instead of a Table flowable
+            cells = [c.strip() for c in line.strip("|").split("|") if c.strip()]
+            if cells and not re.match(r"^[-: ]+$", cells[0]):
+                story.append(Paragraph("  |  ".join(_inline(c) for c in cells), s["bullet"]))
+        elif line.startswith(("- ", "• ", "* ")):
+            story.append(Paragraph(f"• &nbsp; {_inline(line[2:])}", s["bullet"]))
+        elif re.match(r"^(\d+)\.\s+(.*)", line):
+            m = re.match(r"^(\d+)\.\s+(.*)", line)
+            story.append(Paragraph(f"<b>{m.group(1)}.</b> &nbsp; {_inline(m.group(2))}", s["bullet"]))
+        else:
+            story.append(Paragraph(_inline(line), s["body"]))
+
+    return story

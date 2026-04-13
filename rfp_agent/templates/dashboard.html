@@ -188,36 +188,51 @@
 <div class="bg-surface-container-lowest p-8 rounded-2xl ambient-shadow">
 <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Active RFPs</p>
 <div class="flex items-baseline gap-3">
-<span class="text-5xl font-black text-primary leading-none">12</span>
+<span id="stat-rfps" class="text-5xl font-black text-primary leading-none">—</span>
 <span class="text-sm font-bold text-emerald-600 flex items-center">
 <span class="material-symbols-outlined text-sm" data-icon="trending_up">trending_up</span>
-                        +2
-                    </span>
+</span>
 </div>
 <div class="mt-6 w-full bg-surface-container-low h-1 rounded-full overflow-hidden">
-<div class="bg-primary-container h-full w-2/3"></div>
+<div id="stat-rfps-bar" class="bg-primary-container h-full w-0 transition-all duration-700"></div>
 </div>
 </div>
 <div class="bg-surface-container-lowest p-8 rounded-2xl ambient-shadow">
 <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Pending Evaluations</p>
 <div class="flex items-baseline gap-3">
-<span class="text-5xl font-black text-primary leading-none">07</span>
-<span class="px-2 py-0.5 bg-tertiary-fixed-dim/20 text-on-tertiary-container text-[10px] font-black rounded uppercase">Urgent</span>
+<span id="stat-evals" class="text-5xl font-black text-primary leading-none">—</span>
+<span id="stat-evals-badge" class="hidden px-2 py-0.5 bg-tertiary-fixed-dim/20 text-on-tertiary-container text-[10px] font-black rounded uppercase">Pending</span>
 </div>
-<div class="mt-6 flex -space-x-2">
-<div class="w-8 h-8 rounded-full border-2 border-white bg-slate-200 overflow-hidden"><img class="w-full h-full object-cover" data-alt="avatar of female team member" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnOVjDJCP-SYOe-HtztBUMv6UjRyFlWg3OT1vh2RSfqVXKIlkyXSdWAp06LBbuu-ExDmFbi8vPw2iOGsYb7N-mr521J_yyEUlHO-5in0Aj4LADBhdRbZC8-Ofbu2cHp91Sz4eLwAJK6CJjGbtUR1UoSGXyqTFVBssj8xKi1Snv4_mM2XSbeORaE4vQiKJ8zo532RS4OQQtXpd7TRf3qdPtzRCR9Tckr-2gVuIt_f3ewPyXi-gIh2IDNfgp0AGMcLld6hTIe_-YYII"/></div>
-<div class="w-8 h-8 rounded-full border-2 border-white bg-slate-300 overflow-hidden"><img class="w-full h-full object-cover" data-alt="avatar of male team member" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD407_X177h6S_PDRIopVr4pgGZoeN1xaq2Z6yjd5tVMSIEAWnmB7kUoPjbThIoamC0VA76vf3OlK9A11i_QvrTelu6YQ7WzOINh-xOX6ypQuXw2ycfzz2XiMIRzNqkmQehbuM6z-zvqncx1A1eBRDw7PLwwE4mkDx_yqU7XstrXUY6SkfBFFiNFTAR7bZS6Ek2FaZkK-3TLnkCEuR33ok50J6YHSpupwxn8FXtHYpfZM5vnZSOQfjyeDeBwh0VAlNmyhE1H1ryCGA"/></div>
-<div class="w-8 h-8 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-500">+5</div>
+<div class="mt-6">
+<a href="/evaluations" class="text-xs font-bold text-secondary hover:text-primary transition-colors flex items-center gap-1">
+  View evaluations <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
 </div>
 </div>
 <div class="bg-gradient-to-br from-tertiary-fixed-dim to-[#e5ac00] p-8 rounded-2xl ambient-shadow text-on-tertiary-fixed">
-<p class="text-xs font-bold text-on-tertiary-fixed/60 uppercase tracking-widest mb-2">Total Documents</p>
+<p class="text-xs font-bold text-on-tertiary-fixed/60 uppercase tracking-widest mb-2">Generated Documents</p>
 <div class="flex items-baseline gap-3">
-<span class="text-5xl font-black leading-none">1,248</span>
+<span id="stat-docs" class="text-5xl font-black leading-none">—</span>
 </div>
-<p class="mt-6 text-sm font-medium opacity-80">Synced with Google Drive Enterprise</p>
+<p class="mt-6 text-sm font-medium opacity-80">PDFs created and uploaded to Drive</p>
 </div>
 </div>
+<script>
+(async function loadStats() {
+  try {
+    const res = await fetch('/api/stats');
+    if (!res.ok) return;
+    const s = await res.json();
+    document.getElementById('stat-rfps').textContent  = s.active_rfps ?? 0;
+    document.getElementById('stat-evals').textContent = s.pending_evaluations ?? 0;
+    document.getElementById('stat-docs').textContent  = s.total_documents ?? 0;
+    const pct = Math.min((s.active_rfps ?? 0) * 10, 100);
+    document.getElementById('stat-rfps-bar').style.width = pct + '%';
+    if ((s.pending_evaluations ?? 0) > 0)
+      document.getElementById('stat-evals-badge').classList.remove('hidden');
+  } catch(e) { console.warn('Stats fetch failed', e); }
+})();
+</script>
 <!-- Two Column Layout: Documents and Activity -->
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 <!-- Recent Documents (2/3 width) -->
