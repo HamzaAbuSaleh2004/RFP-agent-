@@ -7,7 +7,9 @@
       "Bash(.venv/Scripts/python -c \"from rfp_agent.main import app; print\\('Import OK'\\)\")",
       "Bash(.venv/Scripts/python -c \"from rfp_agent.main import app; print\\('OK'\\)\")",
       "Read(//c/c/Users/hamza/Desktop/LiverX/RFP/**)",
-      "Bash(start \"\" \"c:\\\\Users\\\\hamza\\\\Desktop\\\\LiverX\\\\RFP\\\\output\\\\test_overlay.pdf\")"
+      "Bash(start \"\" \"c:\\\\Users\\\\hamza\\\\Desktop\\\\LiverX\\\\RFP\\\\output\\\\test_overlay.pdf\")",
+      "Read(//c/Users/hamza/Desktop/LiverX/RFP/rfp_agent/**)",
+      "Read(//c/Users/hamza/Desktop/LiverX/RFP/**)"
     ]
   }
 }
