@@ -176,8 +176,8 @@
 <!-- Input Area -->
 <div class="mt-8 pt-6 border-t border-slate-100">
 <div class="relative">
-<input id="chat-input" class="w-full bg-surface-container-low border-none rounded-2xl py-5 px-6 {% if rtl %}pl-16{% else %}pr-16{% endif %} text-primary focus:ring-2 focus:ring-tertiary-fixed-dim transition-all" placeholder="{{ t('chat.placeholder', locale) }}" type="text" {% if rtl %}dir="rtl"{% endif %}/>
-<button id="send-button" class="absolute {% if rtl %}left-3{% else %}right-3{% endif %} top-1/2 -translate-y-1/2 w-10 h-10 bg-primary text-white rounded-xl flex items-center justify-center shadow-lg hover:scale-95 transition-transform">
+<textarea id="chat-input" rows="1" class="w-full bg-surface-container-low border-none rounded-2xl py-4 px-6 {% if rtl %}pl-16{% else %}pr-16{% endif %} text-primary focus:ring-2 focus:ring-tertiary-fixed-dim transition-all resize-none overflow-y-auto leading-relaxed" placeholder="{{ t('chat.placeholder', locale) }}" style="min-height:58px;max-height:200px;" {% if rtl %}dir="rtl"{% endif %}></textarea>
+<button id="send-button" class="absolute {% if rtl %}left-3{% else %}right-3{% endif %} bottom-3 w-10 h-10 bg-primary text-white rounded-xl flex items-center justify-center shadow-lg hover:scale-95 transition-transform">
 <span class="material-symbols-outlined">send</span>
 </button>
 </div>
@@ -350,6 +350,7 @@
     // ── RFP context injected from server ─────────────────────────────────────
     const RFP_ID   = {{ rfp_id | tojson }};
     const RFP_DATA = {{ rfp | tojson }};
+    const CHAT_MODE = {{ mode | tojson }};  // "create" or "evaluate"
 
     chatInput.focus();
 
@@ -360,8 +361,25 @@
             ? 'chat-agent-msg flex flex-col items-end gap-4 ml-12'
             : 'flex flex-col items-start gap-4 mr-12';
 
-        if (RFP_DATA) {
-            // Context-aware welcome when opened from /create
+        if (RFP_DATA && CHAT_MODE === 'evaluate') {
+            // Evaluate mode — opened from evaluations page
+            container.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-tertiary-fixed-dim rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings:'FILL' 1;">auto_awesome</span>
+                    </div>
+                    <span class="text-[10px] uppercase tracking-widest text-primary font-bold">Bid Evaluator • Ready</span>
+                </div>
+                <div class="bg-surface-container-low p-8 rounded-3xl rounded-tl-none w-full">
+                    <div class="text-primary leading-relaxed font-medium space-y-3">
+                        <p class="font-bold text-base">Evaluation mode for: ${escapeHtml(RFP_DATA.title)}</p>
+                        <p class="text-sm text-on-surface-variant">Paste the vendor bids below and hit <strong class="text-primary">Enter</strong> or click <strong class="text-primary">Send</strong>. I'll evaluate them across Legal, Commercial, Technical, and Financial dimensions.</p>
+                        <p class="text-xs text-slate-400">Tip: Use <kbd class="px-1.5 py-0.5 bg-white rounded border text-[10px]">Shift + Enter</kbd> for new lines.</p>
+                    </div>
+                </div>
+            `;
+        } else if (RFP_DATA) {
+            // Create mode — opened from /create
             const langLabel = RFP_DATA.language === 'ar' ? 'Arabic (العربية)' : 'English';
             const inviteStr = RFP_DATA.invited_users && RFP_DATA.invited_users.length
                 ? RFP_DATA.invited_users.join(', ')
@@ -411,8 +429,9 @@
     }
     showWelcome();
 
-    // ── Auto-send RFP context when opened from /create ────────────────────────
-    if (RFP_DATA) {
+    // ── Auto-send context on page load ─────────────────────────────────────────
+    if (RFP_DATA && CHAT_MODE === 'create') {
+        // Create mode: auto-send RFP creation context
         const langName = RFP_DATA.language === 'ar' ? 'Arabic' : 'English';
         const contextMsg = `I want to draft a new RFP. Here is the project context:\n\n` +
             `- **Title**: ${RFP_DATA.title}\n` +
@@ -422,7 +441,15 @@
             `(scope, vendor requirements, evaluation criteria, budget, and submission details). ` +
             `Do not ask about the title or description again.`;
 
-        // Small delay so the welcome message renders first
+        setTimeout(() => {
+            chatInput.value = contextMsg;
+            sendMessage();
+        }, 400);
+    } else if (RFP_DATA && CHAT_MODE === 'evaluate') {
+        // Evaluate mode: auto-send evaluation context so agent knows to expect bids
+        const contextMsg = `I want to evaluate vendor bids for the RFP titled "${RFP_DATA.title}". ` +
+            `I will paste the vendor bids in my next message. Please wait for them.`;
+
         setTimeout(() => {
             chatInput.value = contextMsg;
             sendMessage();
@@ -482,6 +509,7 @@
 
         appendUserMessage(text);
         chatInput.value = '';
+        chatInput.style.height = '58px';
         chatInput.disabled = true;
         sendButton.disabled = true;
 
@@ -582,7 +610,16 @@
     }
 
     sendButton.addEventListener('click', sendMessage);
-    chatInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
+    chatInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+    chatInput.addEventListener('input', () => {
+        chatInput.style.height = 'auto';
+        chatInput.style.height = Math.min(chatInput.scrollHeight, 200) + 'px';
+    });
 </script>
 <script>
 function setLang(locale) {

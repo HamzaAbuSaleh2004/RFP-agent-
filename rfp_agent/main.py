@@ -100,11 +100,12 @@ async def get_create(request: Request):
 
 
 @app.get("/chat", response_class=HTMLResponse)
-async def get_chat(request: Request, rfp_id: Optional[str] = None):
+async def get_chat(request: Request, rfp_id: Optional[str] = None, mode: Optional[str] = None):
     locale = _locale(request)
     rfp    = get_rfp(rfp_id) if rfp_id else None
     return templates.TemplateResponse("rfp_creator.html", {
         "request": request, "rfp": rfp, "rfp_id": rfp_id,
+        "mode": mode or "create",
         "locale": locale, "rtl": is_rtl(locale),
     })
 

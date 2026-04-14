@@ -170,7 +170,7 @@
       <p class="text-on-surface-variant max-w-sm">{{ t('eval.no_bids', locale) }}</p>
     </div>
     <div class="flex gap-4">
-      <a id="start-eval-link" href="/chat"
+      <a id="start-eval-link" href="/chat?mode=evaluate"
          class="px-8 py-3 hero-gradient text-white font-bold rounded-xl shadow-lg hover:scale-[1.02] transition-transform">
         {{ t('eval.start_evaluation', locale) }}
       </a>
@@ -205,7 +205,7 @@
           Evaluated on <span id="eval-timestamp" class="font-semibold text-primary"></span>
         </p>
       </div>
-      <a id="new-eval-btn" href="/chat"
+      <a id="new-eval-btn" href="/chat?mode=evaluate"
         class="px-6 py-3 hero-gradient text-white font-bold rounded-xl flex items-center gap-2 hover:scale-[1.02] transition-transform">
         <span class="material-symbols-outlined">add</span>New Evaluation
       </a>
@@ -408,8 +408,8 @@ function onRfpSelect() {
   }
 
   // Update the chat link
-  document.getElementById('start-eval-link').href = `/chat?rfp_id=${selectedRfpId}`;
-  document.getElementById('new-eval-btn').href = `/chat?rfp_id=${selectedRfpId}`;
+  document.getElementById('start-eval-link').href = `/chat?rfp_id=${selectedRfpId}&mode=evaluate`;
+  document.getElementById('new-eval-btn').href = `/chat?rfp_id=${selectedRfpId}&mode=evaluate`;
 
   // Check if RFP is already done (awarded)
   const rfp = RFPS.find(r => r.id === selectedRfpId);

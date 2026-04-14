@@ -171,7 +171,7 @@
         <div class="flex items-center gap-3">
           <button onclick="togglePreview()" id="preview-btn"
                   class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold text-secondary bg-surface-container-low hover:bg-surface-container-high transition-all">
-            <span class="material-symbols-outlined text-sm">preview</span>Preview
+            <span class="material-symbols-outlined text-sm">edit</span>Edit
           </button>
           <button onclick="saveGuideline()"
                   class="flex items-center gap-1.5 px-5 py-2 rounded-lg text-xs font-bold text-white bg-primary-container hover:brightness-110 transition-all">
@@ -180,15 +180,15 @@
         </div>
       </div>
 
-      <!-- Textarea -->
-      <div id="editor-pane" class="p-4">
+      <!-- Textarea (hidden by default — opens in view mode) -->
+      <div id="editor-pane" class="hidden p-4">
         <textarea id="guide-textarea"
                   class="w-full min-h-[560px] p-4 font-mono text-sm bg-surface-container-low rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/30 resize-y transition-all"
                   placeholder="Loading content…" spellcheck="false"></textarea>
       </div>
 
-      <!-- Preview pane (hidden by default) -->
-      <div id="preview-pane" class="hidden px-8 py-6 min-h-[560px] border-t border-slate-100">
+      <!-- Preview pane (visible by default) -->
+      <div id="preview-pane" class="px-8 py-6 min-h-[560px] border-t border-slate-100">
         <div id="md-output" class="md-preview text-sm text-on-surface"></div>
       </div>
     </div>
@@ -350,7 +350,7 @@ const GUIDE_LABELS = {
   financial:  'Financial Guidelines',
 };
 let currentGuide = 'legal';
-let showingPreview = false;
+let showingPreview = true;
 const guideCache = {};
 
 // ── Tab switchers ────────────────────────────────────────────────────────────
@@ -366,10 +366,10 @@ function switchMain(tab) {
 
 function switchGuide(cat) {
   currentGuide = cat;
-  showingPreview = false;
-  document.getElementById('editor-pane').classList.remove('hidden');
-  document.getElementById('preview-pane').classList.add('hidden');
-  document.getElementById('preview-btn').innerHTML = '<span class="material-symbols-outlined text-sm">preview</span>Preview';
+  showingPreview = true;
+  document.getElementById('editor-pane').classList.add('hidden');
+  document.getElementById('preview-pane').classList.remove('hidden');
+  document.getElementById('preview-btn').innerHTML = '<span class="material-symbols-outlined text-sm">edit</span>Edit';
 
   document.querySelectorAll('.guide-tab').forEach((el, i) => {
     if (CATEGORIES[i] === cat) {
@@ -393,6 +393,7 @@ async function loadGuideline(cat) {
   if (guideCache[cat]) {
     ta.value = guideCache[cat].content;
     meta.textContent = guideCache[cat].meta;
+    if (showingPreview) document.getElementById('md-output').innerHTML = marked.parse(ta.value);
     return;
   }
 
@@ -409,6 +410,7 @@ async function loadGuideline(cat) {
     guideCache[cat] = { content: data.content, meta: `Last modified: ${ts}` };
     ta.value        = data.content;
     meta.textContent = `Last modified: ${ts}`;
+    if (showingPreview) document.getElementById('md-output').innerHTML = marked.parse(data.content);
   } catch (e) {
     ta.value = '';
     meta.textContent = 'Failed to load';

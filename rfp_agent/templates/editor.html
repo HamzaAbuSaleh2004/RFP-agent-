@@ -115,7 +115,7 @@
       {{ rfp.status }}
     </span>
     {% if rfp.language == 'ar' %}
-    <span class="text-[10px] font-bold text-slate-400 shrink-0">🇸🇦 AR</span>
+    <span class="text-[10px] font-bold text-slate-400 shrink-0">AR</span>
     {% endif %}
   </div>
 
@@ -170,8 +170,18 @@
   {% endif %}
 
   <!-- Right: live preview -->
-  <div class="pane pane-preview">
+  <div class="pane pane-preview flex flex-col">
+    {% if rfp.status != 'draft' and not rfp.rfp_content %}
+    <div class="flex flex-col items-center justify-center flex-1 text-center py-20">
+        <div class="w-16 h-16 rounded-2xl bg-surface-container-highest flex items-center justify-center mb-4">
+            <span class="material-symbols-outlined text-outline text-3xl">description</span>
+        </div>
+        <h3 class="font-bold text-lg text-primary font-['Manrope'] mb-1">No content available</h3>
+        <p class="text-sm text-on-surface-variant max-w-sm">This RFP was approved or locked before any content was generated.</p>
+    </div>
+    {% else %}
     <div id="md-preview" class="md-preview text-sm text-on-surface"></div>
+    {% endif %}
   </div>
 </div>
 
@@ -212,7 +222,9 @@ const IS_RTL     = {{ (rfp.language == 'ar') | tojson }};
 const preview = document.getElementById('md-preview');
 
 function renderPreview(md) {
-  preview.innerHTML = marked.parse(md || '');
+  if (preview) {
+    preview.innerHTML = marked.parse(md || '');
+  }
 }
 
 // Initial render from server-supplied content
@@ -222,10 +234,12 @@ renderPreview({{ (rfp.rfp_content or '') | tojson }});
 if (IS_DRAFT) {
   const ta = document.getElementById('md-editor');
   let debounce;
-  ta.addEventListener('input', () => {
-    clearTimeout(debounce);
-    debounce = setTimeout(() => renderPreview(ta.value), 300);
-  });
+  if (ta) {
+    ta.addEventListener('input', () => {
+      clearTimeout(debounce);
+      debounce = setTimeout(() => renderPreview(ta.value), 300);
+    });
+  }
 }
 
 // ── Save draft ───────────────────────────────────────────────────────────────
