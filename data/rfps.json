@@ -1,0 +1,18 @@
+[
+  {
+    "id": "1770e3c7-8066-42e2-9fdb-59b2f428e4ee",
+    "title": "Cloud Infrastructure Upgrade 2025Cloud Infrastructure Upgrade 2025",
+    "description": "Upgrade our on-prem servers to a hybrid Upgrade our on-prem servers to a hybrid cloud architecture.cloud architecture.",
+    "language": "en",
+    "created_by": "user",
+    "invited_users": [
+      "alice@co.com",
+      "bob@co.com"
+    ],
+    "status": "approved",
+    "assigned_vendor": null,
+    "rfp_content": null,
+    "created_at": "2026-04-14T09:15:51.588584+00:00",
+    "updated_at": "2026-04-14T09:16:59.003693+00:00"
+  }
+]

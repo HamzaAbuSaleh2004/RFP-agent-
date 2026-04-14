@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RFP Director | New RFP</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "inverse-on-surface": "#f0f1f2",
+          "inverse-surface": "#2e3132",
+          "tertiary-fixed-dim": "#fbbc00",
+          "on-surface": "#191c1d",
+          "on-tertiary-fixed-variant": "#5c4300",
+          "surface-container-lowest": "#ffffff",
+          "on-primary": "#ffffff",
+          "surface-container": "#edeeef",
+          "on-tertiary": "#ffffff",
+          "surface": "#f8f9fa",
+          "tertiary-fixed": "#ffdfa0",
+          "background": "#f8f9fa",
+          "on-tertiary-container": "#ae8100",
+          "tertiary-container": "#2d1f00",
+          "surface-bright": "#f8f9fa",
+          "surface-container-high": "#e7e8e9",
+          "primary-fixed-dim": "#aec7f6",
+          "secondary-fixed": "#d5e3ff",
+          "on-surface-variant": "#44474e",
+          "surface-tint": "#465f88",
+          "secondary-fixed-dim": "#a7c8ff",
+          "surface-container-highest": "#e1e3e4",
+          "on-secondary-fixed-variant": "#1f477b",
+          "outline": "#74777f",
+          "error": "#ba1a1a",
+          "outline-variant": "#c4c6cf",
+          "on-background": "#191c1d",
+          "surface-dim": "#d9dadb",
+          "on-error": "#ffffff",
+          "on-secondary-container": "#294f83",
+          "error-container": "#ffdad6",
+          "surface-variant": "#e1e3e4",
+          "on-primary-container": "#708ab5",
+          "on-error-container": "#93000a",
+          "on-primary-fixed": "#001b3d",
+          "on-secondary-fixed": "#001b3c",
+          "on-tertiary-fixed": "#261a00",
+          "primary": "#000a1e",
+          "secondary": "#3a5f94",
+          "surface-container-low": "#f3f4f5",
+          "tertiary": "#100900",
+          "inverse-primary": "#aec7f6",
+          "primary-fixed": "#d6e3ff",
+          "secondary-container": "#9fc2fe",
+          "primary-container": "#002147",
+          "on-primary-fixed-variant": "#2d476f",
+          "on-secondary": "#ffffff"
+        },
+        borderRadius: {
+          DEFAULT: "0.125rem",
+          lg: "0.25rem",
+          xl: "0.5rem",
+          full: "0.75rem"
+        },
+        fontFamily: {
+          headline: ["Manrope"],
+          body: ["Inter"],
+          label: ["Inter"]
+        }
+      }
+    }
+  }
+</script>
+<style>
+  body { font-family: 'Inter', sans-serif; }
+  h1, h2, h3 { font-family: 'Manrope', sans-serif; }
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  .ambient-shadow { box-shadow: 0 12px 32px rgba(25,28,29,0.06); }
+  /* Language toggle */
+  .lang-btn { transition: all 0.15s ease; }
+  .lang-btn.active {
+    background: #002147;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0,33,71,0.25);
+  }
+</style>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+
+<!-- Sidebar -->
+<aside class="fixed left-0 top-0 h-screen w-64 flex flex-col p-6 bg-slate-50 z-50">
+  <div class="flex flex-col mb-10">
+    <div class="flex items-center gap-3 mb-1">
+      <div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
+        <span class="material-symbols-outlined text-white text-sm" style="font-variation-settings:'FILL' 1">description</span>
+      </div>
+      <h1 class="text-xl font-bold tracking-tight text-blue-900">RFP Director</h1>
+    </div>
+    <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold ml-1">Enterprise Procurement</p>
+  </div>
+  <nav class="flex-1 space-y-2">
+    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/">
+      <span class="material-symbols-outlined">dashboard</span>
+      <span class="text-sm font-medium">Dashboard</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/documents">
+      <span class="material-symbols-outlined">description</span>
+      <span class="text-sm font-medium">Documents</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/evaluations">
+      <span class="material-symbols-outlined">analytics</span>
+      <span class="text-sm font-medium">Evaluations</span>
+    </a>
+    <!-- Active: Create RFP -->
+    <a class="flex items-center gap-3 px-4 py-3 text-blue-950 font-semibold bg-white rounded-lg shadow-sm" href="/create">
+      <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">add_circle</span>
+      <span class="text-sm font-medium">New RFP</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="#">
+      <span class="material-symbols-outlined">settings</span>
+      <span class="text-sm font-medium">Settings</span>
+    </a>
+  </nav>
+</aside>
+
+<!-- Top bar -->
+<header class="fixed top-0 left-64 right-0 z-40 flex items-center justify-between px-10 py-4 bg-white/80 backdrop-blur-xl border-b border-slate-100">
+  <div class="flex items-center gap-2 text-sm text-slate-400">
+    <a href="/" class="hover:text-primary transition-colors">Dashboard</a>
+    <span class="material-symbols-outlined text-xs">chevron_right</span>
+    <span class="font-semibold text-primary">New RFP</span>
+  </div>
+  <div class="flex items-center gap-3">
+    <button class="text-slate-400 hover:text-blue-700 transition-all">
+      <span class="material-symbols-outlined">notifications</span>
+    </button>
+    <div class="w-9 h-9 rounded-full bg-primary-container flex items-center justify-center text-white text-xs font-bold">HA</div>
+  </div>
+</header>
+
+<!-- Main content -->
+<main class="ml-64 pt-20 min-h-screen px-10 pb-16 flex items-start justify-center">
+  <div class="w-full max-w-2xl mt-10">
+
+    <!-- Page header -->
+    <div class="mb-10">
+      <h2 class="text-3xl font-extrabold tracking-tight text-primary mb-2">Create New RFP</h2>
+      <p class="text-on-surface-variant text-sm">Fill in the basics. The AI agent will handle the rest — asking deeper questions and drafting the full document.</p>
+    </div>
+
+    <!-- Form card -->
+    <div class="bg-surface-container-lowest rounded-3xl p-10 ambient-shadow space-y-8">
+
+      <!-- Title -->
+      <div class="space-y-2">
+        <label class="text-sm font-bold text-primary flex items-center gap-1.5" for="title">
+          <span class="material-symbols-outlined text-base text-secondary">title</span>
+          Project Title
+        </label>
+        <input
+          id="title"
+          type="text"
+          placeholder="e.g. Cloud Infrastructure Upgrade 2025"
+          class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary-container focus:border-transparent transition-all"
+        />
+        <p id="title-err" class="hidden text-xs text-error font-medium">Title is required.</p>
+      </div>
+
+      <!-- Description -->
+      <div class="space-y-2">
+        <label class="text-sm font-bold text-primary flex items-center gap-1.5" for="description">
+          <span class="material-symbols-outlined text-base text-secondary">notes</span>
+          Project Description
+        </label>
+        <textarea
+          id="description"
+          rows="4"
+          placeholder="Brief overview of the project objectives, scope, and any key constraints…"
+          class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 text-sm text-on-surface resize-none focus:ring-2 focus:ring-primary-container focus:border-transparent transition-all"
+        ></textarea>
+        <p id="desc-err" class="hidden text-xs text-error font-medium">Description is required.</p>
+      </div>
+
+      <!-- Invite Users -->
+      <div class="space-y-2">
+        <label class="text-sm font-bold text-primary flex items-center gap-1.5" for="invited_users">
+          <span class="material-symbols-outlined text-base text-secondary">group_add</span>
+          Invite Collaborators
+          <span class="text-on-surface-variant font-normal">(optional)</span>
+        </label>
+        <input
+          id="invited_users"
+          type="text"
+          placeholder="alice@company.com, bob@company.com"
+          class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary-container focus:border-transparent transition-all"
+        />
+        <p class="text-xs text-on-surface-variant">Separate multiple emails or names with commas.</p>
+      </div>
+
+      <!-- Language -->
+      <div class="space-y-3">
+        <label class="text-sm font-bold text-primary flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-base text-secondary">translate</span>
+          Document Language
+        </label>
+        <div class="flex gap-3">
+          <button
+            type="button"
+            data-lang="en"
+            class="lang-btn active flex items-center gap-2 px-5 py-2.5 rounded-xl border border-outline-variant text-sm font-semibold"
+            onclick="selectLang(this)"
+          >
+            <span class="text-base">🇬🇧</span> English
+          </button>
+          <button
+            type="button"
+            data-lang="ar"
+            class="lang-btn flex items-center gap-2 px-5 py-2.5 rounded-xl border border-outline-variant text-sm font-semibold text-on-surface-variant"
+            onclick="selectLang(this)"
+          >
+            <span class="text-base">🇸🇦</span> Arabic
+          </button>
+        </div>
+        <input type="hidden" id="language" value="en"/>
+      </div>
+
+      <!-- Divider -->
+      <hr class="border-outline-variant/40"/>
+
+      <!-- Submit -->
+      <div class="flex items-center justify-between pt-2">
+        <a href="/" class="text-sm font-semibold text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1">
+          <span class="material-symbols-outlined text-base">arrow_back</span>
+          Back to Dashboard
+        </a>
+        <button
+          id="submit-btn"
+          onclick="handleSubmit()"
+          class="flex items-center gap-2 bg-gradient-to-br from-primary-container to-primary text-white px-8 py-3 rounded-xl font-bold text-sm shadow-lg hover:scale-[1.02] transition-transform"
+        >
+          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">smart_toy</span>
+          Start AI Session
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Info callout -->
+    <div class="mt-6 flex items-start gap-3 bg-primary-fixed/40 rounded-2xl px-5 py-4">
+      <span class="material-symbols-outlined text-secondary text-base mt-0.5" style="font-variation-settings:'FILL' 1">info</span>
+      <p class="text-xs text-on-surface-variant leading-relaxed">
+        The AI agent will ask follow-up questions about scope, evaluation criteria, budget, and vendor requirements before drafting the full RFP. Your answers here give it a head-start.
+      </p>
+    </div>
+
+  </div>
+</main>
+
+<script>
+  let selectedLang = 'en';
+
+  function selectLang(btn) {
+    document.querySelectorAll('.lang-btn').forEach(b => {
+      b.classList.remove('active');
+      b.classList.add('text-on-surface-variant');
+    });
+    btn.classList.add('active');
+    btn.classList.remove('text-on-surface-variant');
+    selectedLang = btn.dataset.lang;
+    document.getElementById('language').value = selectedLang;
+  }
+
+  async function handleSubmit() {
+    const titleEl  = document.getElementById('title');
+    const descEl   = document.getElementById('description');
+    const titleErr = document.getElementById('title-err');
+    const descErr  = document.getElementById('desc-err');
+    const btn      = document.getElementById('submit-btn');
+
+    // Validate
+    let valid = true;
+    if (!titleEl.value.trim()) {
+      titleErr.classList.remove('hidden');
+      valid = false;
+    } else {
+      titleErr.classList.add('hidden');
+    }
+    if (!descEl.value.trim()) {
+      descErr.classList.remove('hidden');
+      valid = false;
+    } else {
+      descErr.classList.add('hidden');
+    }
+    if (!valid) return;
+
+    // Parse invited users
+    const rawUsers = document.getElementById('invited_users').value;
+    const invitedUsers = rawUsers
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean);
+
+    // Disable button and show loading
+    btn.disabled = true;
+    btn.innerHTML = `
+      <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+      </svg>
+      Creating…
+    `;
+
+    try {
+      const res = await fetch('/api/rfps', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title:         titleEl.value.trim(),
+          description:   descEl.value.trim(),
+          language:      selectedLang,
+          created_by:    'user',
+          invited_users: invitedUsers,
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || 'Failed to create RFP');
+      }
+
+      const rfp = await res.json();
+      window.location.href = `/chat?rfp_id=${rfp.id}`;
+    } catch (err) {
+      btn.disabled = false;
+      btn.innerHTML = `
+        <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">smart_toy</span>
+        Start AI Session
+      `;
+      alert('Error: ' + err.message);
+    }
+  }
+
+  // Allow Enter key on title to move to description
+  document.getElementById('title').addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      document.getElementById('description').focus();
+    }
+  });
+</script>
+</body>
+</html>

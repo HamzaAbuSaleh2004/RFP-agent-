@@ -242,6 +242,10 @@
     const chatInput = document.getElementById('chat-input');
     const sendButton = document.getElementById('send-button');
 
+    function escapeHtml(str) {
+        return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
     // ── Sidebar refs ─────────────────────────────────────────────────────────
     const activeAgentLabel = document.getElementById('active-agent-label');
     const activeAgentSub   = document.getElementById('active-agent-sub');
@@ -324,35 +328,85 @@
         flashCapability(meta.capId);
     }
 
+    // ── RFP context injected from server ─────────────────────────────────────
+    const RFP_ID   = {{ rfp_id | tojson }};
+    const RFP_DATA = {{ rfp | tojson }};
+
     chatInput.focus();
 
-    // ── Welcome message ───────────────────────────────────────────────────────
+    // ── Welcome / context message ─────────────────────────────────────────────
     function showWelcome() {
         const container = document.createElement('div');
         container.className = 'flex flex-col items-start gap-4 mr-12';
-        container.innerHTML = `
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-tertiary-fixed-dim rounded-full flex items-center justify-center">
-                    <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings:'FILL' 1;">auto_awesome</span>
+
+        if (RFP_DATA) {
+            // Context-aware welcome when opened from /create
+            const langLabel = RFP_DATA.language === 'ar' ? 'Arabic (العربية)' : 'English';
+            const inviteStr = RFP_DATA.invited_users && RFP_DATA.invited_users.length
+                ? RFP_DATA.invited_users.join(', ')
+                : 'None';
+            container.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-tertiary-fixed-dim rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings:'FILL' 1;">auto_awesome</span>
+                    </div>
+                    <span class="text-[10px] uppercase tracking-widest text-primary font-bold">RFP Director • Ready</span>
                 </div>
-                <span class="text-[10px] uppercase tracking-widest text-primary font-bold">RFP Director • Ready</span>
-            </div>
-            <div class="bg-surface-container-low p-8 rounded-3xl rounded-tl-none w-full">
-                <div class="text-primary leading-relaxed font-medium space-y-3">
-                    <p class="font-bold text-base">Welcome. I'm your RFP Intelligence Agent.</p>
-                    <p class="text-sm text-on-surface-variant">I can help you with three things:</p>
-                    <ul class="text-sm text-on-surface-variant space-y-1 pl-4 list-disc">
-                        <li><strong class="text-primary">Create an RFP</strong> — draft a fully branded PDF with live regulatory intel and financial benchmarks</li>
-                        <li><strong class="text-primary">Evaluate vendor bids</strong> — score across Legal, Commercial, Technical, and Financial dimensions</li>
-                        <li><strong class="text-primary">Search past records</strong> — find files, templates, or past proposals in your Google Drive</li>
-                    </ul>
-                    <p class="text-sm text-on-surface-variant pt-2">What would you like to do?</p>
+                <div class="bg-surface-container-low p-8 rounded-3xl rounded-tl-none w-full">
+                    <div class="text-primary leading-relaxed font-medium space-y-3">
+                        <p class="font-bold text-base">RFP session loaded.</p>
+                        <div class="bg-white rounded-xl p-4 text-sm space-y-1 border border-outline-variant/30">
+                            <p><span class="text-slate-400 font-semibold w-28 inline-block">Title</span>${escapeHtml(RFP_DATA.title)}</p>
+                            <p><span class="text-slate-400 font-semibold w-28 inline-block">Language</span>${langLabel}</p>
+                            <p><span class="text-slate-400 font-semibold w-28 inline-block">Collaborators</span>${escapeHtml(inviteStr)}</p>
+                        </div>
+                        <p class="text-sm text-on-surface-variant">Sending project context to the agent…</p>
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
+        } else {
+            container.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-tertiary-fixed-dim rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings:'FILL' 1;">auto_awesome</span>
+                    </div>
+                    <span class="text-[10px] uppercase tracking-widest text-primary font-bold">RFP Director • Ready</span>
+                </div>
+                <div class="bg-surface-container-low p-8 rounded-3xl rounded-tl-none w-full">
+                    <div class="text-primary leading-relaxed font-medium space-y-3">
+                        <p class="font-bold text-base">Welcome. I'm your RFP Intelligence Agent.</p>
+                        <p class="text-sm text-on-surface-variant">I can help you with three things:</p>
+                        <ul class="text-sm text-on-surface-variant space-y-1 pl-4 list-disc">
+                            <li><strong class="text-primary">Create an RFP</strong> — draft a fully branded PDF with live regulatory intel and financial benchmarks</li>
+                            <li><strong class="text-primary">Evaluate vendor bids</strong> — score across Legal, Commercial, Technical, and Financial dimensions</li>
+                            <li><strong class="text-primary">Search past records</strong> — find files, templates, or past proposals in your Google Drive</li>
+                        </ul>
+                        <p class="text-sm text-on-surface-variant pt-2">What would you like to do?</p>
+                    </div>
+                </div>
+            `;
+        }
         chatMessages.appendChild(container);
     }
     showWelcome();
+
+    // ── Auto-send RFP context when opened from /create ────────────────────────
+    if (RFP_DATA) {
+        const langName = RFP_DATA.language === 'ar' ? 'Arabic' : 'English';
+        const contextMsg = `I want to draft a new RFP. Here is the project context:\n\n` +
+            `- **Title**: ${RFP_DATA.title}\n` +
+            `- **Description**: ${RFP_DATA.description}\n` +
+            `- **Language**: ${langName} — please conduct this entire conversation and draft the RFP in ${langName}.\n\n` +
+            `Please proceed with collecting the remaining details needed to draft the RFP ` +
+            `(scope, vendor requirements, evaluation criteria, budget, and submission details). ` +
+            `Do not ask about the title or description again.`;
+
+        // Small delay so the welcome message renders first
+        setTimeout(() => {
+            chatInput.value = contextMsg;
+            sendMessage();
+        }, 400);
+    }
 
     // ── Chat helpers ─────────────────────────────────────────────────────────
     function appendUserMessage(text) {
@@ -411,10 +465,12 @@
         let hasLogs = false;
 
         try {
+            const chatBody = { message: text, session_id: 'default' };
+            if (RFP_ID) chatBody.rfp_id = RFP_ID;
             const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: text, session_id: 'default' })
+                body: JSON.stringify(chatBody),
             });
 
             const reader  = response.body.getReader();
