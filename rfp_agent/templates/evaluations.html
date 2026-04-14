@@ -76,7 +76,7 @@
   #toast { transition: opacity .3s, transform .3s; }
 </style>
 </head>
-<body class="bg-surface text-on-surface antialiased">
+<body class="bg-surface text-on-surface antialiased overflow-x-hidden">
 
 <!-- Side Nav -->
 <aside class="side-nav fixed left-0 top-0 h-full flex flex-col p-6 bg-slate-50 dark:bg-slate-950 font-['Manrope'] antialiased w-64 z-50">
@@ -111,8 +111,8 @@
 </aside>
 
 <!-- Top Nav -->
-<header class="flex justify-between items-center w-full px-8 py-4 sticky top-0 z-40 ml-64 bg-white/70 backdrop-blur-xl">
-  <div class="flex items-center gap-4 flex-1">
+<header class="flex justify-between items-center px-8 py-4 sticky top-0 z-40 ml-64 bg-white/70 backdrop-blur-xl">
+  <div class="flex items-center gap-4 flex-1 min-w-0">
     <!-- RFP Selector -->
     <div class="flex items-center gap-3">
       <label class="text-xs font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">{{ t('eval.select_rfp', locale) }}</label>
