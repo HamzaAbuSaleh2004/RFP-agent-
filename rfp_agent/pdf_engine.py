@@ -281,7 +281,12 @@ def _make_page_cb(tmpl: dict, title: str):
 
             canv.setFont("Helvetica-Bold", 9)
             canv.setFillColor(colors.white)
-            canv.drawRightString(w - 18, h - 21, title.replace("_", " ").replace(".pdf",""))
+            # Truncate header title at word boundary so it never overflows the band
+            hdr_title = title.replace("_", " ").replace(".pdf", "")
+            max_hdr_w = w - 120  # reserve space for logo on the left
+            while canv.stringWidth(hdr_title) > max_hdr_w and " " in hdr_title:
+                hdr_title = hdr_title.rsplit(" ", 1)[0]
+            canv.drawRightString(w - 18, h - 21, hdr_title)
 
             # ── Running footer ────────────────────────────────────────────
             canv.setFillColor(primary)
@@ -297,13 +302,39 @@ def _make_page_cb(tmpl: dict, title: str):
 
 
 def _draw_centered_text(canv, text, page_w, y, max_w=None):
-    """Draw text centred on the page, shrinking font if too wide."""
-    if max_w and canv.stringWidth(text) > max_w:
-        # Truncate with ellipsis — simple approach for very long titles
-        while canv.stringWidth(text + "…") > max_w and len(text) > 10:
-            text = text[:-1]
-        text += "…"
-    canv.drawCentredString(page_w / 2, y, text)
+    """
+    Draw text centred on the page.
+    If the text exceeds max_w, split at the word boundary that best balances
+    the two lines and draw them stacked — never truncate with ellipsis.
+    """
+    if max_w is None or canv.stringWidth(text) <= max_w:
+        canv.drawCentredString(page_w / 2, y, text)
+        return
+
+    # Find the word-split that produces the most equal line widths
+    words = text.split()
+    if len(words) < 2:
+        # Single word — shrink font until it fits rather than breaking mid-word
+        cur = canv._fontsize
+        while canv.stringWidth(text) > max_w and cur > 10:
+            cur -= 1
+            canv.setFontSize(cur)
+        canv.drawCentredString(page_w / 2, y, text)
+        return
+
+    best_split = min(
+        range(1, len(words)),
+        key=lambda i: abs(
+            canv.stringWidth(" ".join(words[:i])) -
+            canv.stringWidth(" ".join(words[i:]))
+        ),
+    )
+
+    line1 = " ".join(words[:best_split])
+    line2 = " ".join(words[best_split:])
+    lh = canv._fontsize * 1.35
+    canv.drawCentredString(page_w / 2, y + lh / 2, line1)
+    canv.drawCentredString(page_w / 2, y - lh / 2, line2)
 
 
 def _make_minimal_page_cb(tmpl: dict, title: str):
@@ -487,12 +518,11 @@ def _make_styles(tmpl: dict) -> dict:
             spaceBefore=0, spaceAfter=10, alignment=TA_LEFT),
 
         "cell": ParagraphStyle("TblCell", parent=base["Normal"],
-            fontName="Helvetica", fontSize=9, leading=13,
-            wordWrap="CJK"),
+            fontName="Helvetica", fontSize=9, leading=13),
 
         "cell_hdr": ParagraphStyle("TblHdr", parent=base["Normal"],
             fontName="Helvetica-Bold", fontSize=9, leading=13,
-            textColor=colors.white, wordWrap="CJK"),
+            textColor=colors.white),
     }
 
 
@@ -534,7 +564,7 @@ def _smart_col_widths(rows: list, available: float) -> list:
         for j, cell in enumerate(row[:n]):
             lens[j] = max(lens[j], len(str(cell)))
     total = sum(lens) or n
-    min_w = available * 0.08
+    min_w = available * 0.12
     raw   = [max(min_w, (l / total) * available) for l in lens]
     scale = available / sum(raw)
     return [w * scale for w in raw]

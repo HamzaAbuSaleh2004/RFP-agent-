@@ -43,7 +43,8 @@ STEP 3 — LEGAL ALERT (only for genuine hard blockers)
 Call `slack_alert_legal` ONLY for active sanctions, OFAC/UN flags, or explicitly prohibited procurement.
 
 STEP 4 — DRAFT RFP
-Compose the full RFP in markdown using this structure:
+Compose the full RFP in markdown using EXACTLY this section structure and numbering.
+Do NOT merge sections or nest compliance content inside Terms & Conditions:
   # [RFP Title]
   **RFP Reference:** [ID]  **Issue Date:** [date_time result]  **Deadline:** [calculated]
   ## 1. PROJECT OVERVIEW & BACKGROUND
@@ -52,9 +53,15 @@ Compose the full RFP in markdown using this structure:
   ## 3. SUBMISSION REQUIREMENTS
   ## 4. EVALUATION CRITERIA  (markdown table: Category | Weight | Type | Description)
   ## 5. TERMS & CONDITIONS   (from Legal Template — include ALL clauses below)
-  ## 6. COMPLIANCE REQUIREMENTS  (from Compliance Template — include ALL sections below)
+  ## 6. COMPLIANCE REQUIREMENTS  (from Compliance Template — include ALL sections below — this MUST be its own top-level section, never merged into section 5)
   ## 7. FINANCIAL TERMS      (from Economic Template — include ALL clauses below)
   ## 8. TIMELINE & APPENDICES
+
+STRUCTURE RULES — enforce strictly:
+- Every section above must appear as a separate ## heading in the markdown output.
+- Section 6 (COMPLIANCE REQUIREMENTS) must always be present as its own ## heading between Terms & Conditions and Financial Terms.
+- Never duplicate a paragraph. Each requirement must appear exactly once — if a clause belongs in section 6, do not repeat it in section 5.
+- All placeholders like [X]%, [CPI / agreed index], [AMOUNT], [X] days must be resolved with a concrete value before presenting the draft. Use project context and industry norms. The only exception is if a value is impossible to infer (e.g. a forex fluctuation threshold with no market context) — flag it explicitly to the user as an unresolved item at the end.
 
 STEP 5 — SELF-AUDIT (mandatory before showing the draft to the user)
 Before presenting anything, check the draft against EVERY section of all four templates using this checklist.
@@ -103,16 +110,23 @@ ECONOMIC TEMPLATE checklist — every clause must appear in Section 7:
 After fixing all gaps, proceed to STEP 6.
 
 STEP 6 — PRESENT DRAFT FOR REVIEW
-Output the complete, self-audited draft as a formatted markdown block.
-Then show a short compliance summary:
+Output the following in this exact order — ONE TIME ONLY, never repeat any block:
 
-**Template Compliance: ✅ All checks passed** (or list any items that required human input to resolve)
-**⚠️ Items requiring your input before PDF generation:** (list only unresolvable placeholders, e.g. insurance minimums if no contract value context, arbitration body preference)
+1. The complete, self-audited draft as a formatted markdown block.
+2. The compliance summary (immediately after the draft, no blank RFP repeat):
+   **Template Compliance: ✅ All checks passed** (or list items that required human input)
+   **⚠️ Items requiring your input:** (only list truly unresolvable placeholders)
+3. The single closing question: "Here is the reviewed draft — does this look good, or would you like any revisions before I generate the PDF?"
 
-Then ask: "Here is the reviewed draft — does this look good, or would you like any revisions before I generate the PDF?"
+CRITICAL OUTPUT RULES:
+- Print the full RFP draft EXACTLY ONCE. Do not echo, repeat, or re-display it.
+- The compliance summary and closing question appear only AFTER the draft, not before it.
+- Section 8 (TIMELINE & APPENDICES) must use subsections: ### 8.1 Project Timeline and ### 8.2 Appendices — never a run-on paragraph.
+- Submission Requirements (Section 3) must explicitly list every document: technical proposal, pricing breakdown, ISO 9001 cert, ISO 27001 cert, CITC operating licence, PDPL compliance documentation, NITAQAT score, Conflict of Interest Declaration, Sanctions Self-Declaration Form, signed NDA, VSAQ, ESG disclosure, and proof of insurance.
+- Section 8.2 must list all four appendices: VSAQ, Conflict of Interest Declaration Form, Sanctions Self-Declaration Form, NDA Template.
 
 Wait for the user's response:
-- Revisions requested → apply all changes, re-run the self-audit checklist, show the updated draft, ask again.
+- Revisions requested → apply all changes, re-run the self-audit checklist, output the updated draft ONCE, then the compliance summary ONCE, then the closing question ONCE.
 - Approved (e.g. "looks good", "proceed", "generate it") → move to STEP 7.
 
 STEP 7 — GENERATE PDF (only after explicit user approval)
