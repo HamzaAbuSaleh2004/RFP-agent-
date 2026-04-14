@@ -20,7 +20,7 @@ from google.genai.types import Content, Part
 app = FastAPI()
 templates = Jinja2Templates(directory="rfp_agent/templates")
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 # Initialize once so session memory persists across requests
 session_service = InMemorySessionService()
@@ -73,20 +73,52 @@ async def api_chat(request: Request):
                 session_id=session_id,
                 new_message=message,
             ):
-                # ── Text chunks ──────────────────────────────────────────────
-                if event.content and event.content.parts:
-                    for part in event.content.parts:
-                        if part.text:
-                            yield f"data: {json.dumps({'type': 'chunk', 'text': part.text})}\n\n"
+                # ── Debug: log event structure ───────────────────────────────
+                author = getattr(event, "author", None)
+                logging.debug(
+                    "ADK event | author=%s | has_content=%s | "
+                    "parts=%s | is_final=%s",
+                    author,
+                    event.content is not None,
+                    (
+                        [(type(p).__name__, bool(getattr(p, "text", None)))
+                         for p in event.content.parts]
+                        if event.content and event.content.parts else "none"
+                    ),
+                    event.is_final_response() if hasattr(event, "is_final_response") else "n/a",
+                )
 
                 # ── Tool calls ───────────────────────────────────────────────
-                if event.get_function_calls():
-                    for call in event.get_function_calls():
+                try:
+                    fn_calls = event.get_function_calls()
+                except Exception:
+                    fn_calls = []
+                if fn_calls:
+                    for call in fn_calls:
                         yield f"data: {json.dumps({'type': 'status', 'text': f'Running tool: {call.name}'})}\n\n"
 
                 # ── Agent transfers ──────────────────────────────────────────
-                if hasattr(event, "author") and event.author and event.author != root_agent.name:
-                    yield f"data: {json.dumps({'type': 'status', 'text': f'Handed off to: {event.author}'})}\n\n"
+                if author and author != root_agent.name:
+                    yield f"data: {json.dumps({'type': 'status', 'text': f'Handed off to: {author}'})}\n\n"
+
+                # ── Text chunks (streaming partial tokens) ───────────────────
+                if event.content and event.content.parts:
+                    for part in event.content.parts:
+                        text = getattr(part, "text", None)
+                        if text:
+                            yield f"data: {json.dumps({'type': 'chunk', 'text': text})}\n\n"
+
+                # ── Final response fallback ──────────────────────────────────
+                # Some ADK versions only populate text on the is_final_response event.
+                elif (
+                    hasattr(event, "is_final_response")
+                    and event.is_final_response()
+                    and event.content
+                ):
+                    for part in (event.content.parts or []):
+                        text = getattr(part, "text", None)
+                        if text:
+                            yield f"data: {json.dumps({'type': 'chunk', 'text': text})}\n\n"
 
             yield f"data: {json.dumps({'type': 'done'})}\n\n"
 

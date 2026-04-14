@@ -366,7 +366,7 @@ def create_rfp_pdf(
         A message with the Google Drive link where the PDF was saved,
         or an error description.
     """
-    from .pdf_engine import parse_template, generate_rfp_pdf
+    from .pdf_engine import parse_template, parse_branding_guide, generate_rfp_pdf
     from .drive_api  import upload_file
 
     if not output_filename.endswith(".pdf"):
@@ -376,18 +376,23 @@ def create_rfp_pdf(
     output_path = str(OUTPUT_DIR / output_filename)
 
     # ── 1. Load design template from local company_templates/ folder ─────────
-    DEFAULT_TEMPLATE = {"primary": (10, 60, 120), "secondary": (240, 245, 250),
-                        "accent": (220, 100, 0), "logo_path": None, "company_name": "OurCompany"}
+    DEFAULT_TEMPLATE = {"primary": (14, 124, 163), "secondary": (240, 248, 252),
+                        "accent": (0, 163, 216), "logo_path": None, "company_name": "OurCompany"}
     template_info  = DEFAULT_TEMPLATE.copy()
     template_warning = ""
 
     try:
+        if not TEMPLATES_DIR.exists():
+            raise FileNotFoundError(f"{TEMPLATES_DIR} not found")
+
+        all_files = list(TEMPLATES_DIR.iterdir())
+
+        # Find the design template PDF (provides layout + logo)
         design_file = next(
-            (f for f in TEMPLATES_DIR.iterdir()
+            (f for f in all_files
              if f.is_file() and "design" in f.stem.lower() and f.suffix.lower() == ".pdf"),
             None,
-        ) if TEMPLATES_DIR.exists() else None
-
+        )
         if design_file:
             template_info = parse_template(str(design_file))
         else:
@@ -395,6 +400,26 @@ def create_rfp_pdf(
                 "\nNote: No design_template.pdf found in company_templates/ — "
                 "PDF generated with default branding."
             )
+
+        # Find the branding guideline PDF (provides the authoritative color palette)
+        branding_file = next(
+            (f for f in all_files
+             if f.is_file() and f.suffix.lower() == ".pdf"
+             and any(kw in f.stem.lower() for kw in ("brand", "guideline", "palette", "colour", "color"))
+             and f != design_file),
+            None,
+        )
+        if branding_file:
+            brand_palette = parse_branding_guide(str(branding_file))
+            # Override template colors with the authoritative brand palette
+            if brand_palette.get("primary"):
+                template_info["primary"] = brand_palette["primary"]
+            if brand_palette.get("accent"):
+                template_info["accent"] = brand_palette["accent"]
+            # Derive a soft secondary from the primary (light tint for table rows)
+            p = template_info["primary"]
+            template_info["secondary"] = tuple(int(c + (255 - c) * 0.88) for c in p)
+
     except Exception as e:
         template_warning = f"\nNote: Could not load design template ({e}) — using default branding."
 

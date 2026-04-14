@@ -41,9 +41,84 @@ MARGIN_T = 3.6 * cm          # space for running header
 MARGIN_B = 2.2 * cm
 USABLE_W = PAGE_W - MARGIN_L - MARGIN_R
 
-DEFAULT_PRIMARY   = (10,  60, 120)
-DEFAULT_SECONDARY = (240, 245, 250)
-DEFAULT_ACCENT    = (220, 100,   0)
+DEFAULT_PRIMARY   = (14, 124, 163)   # LiverX teal (fallback if branding guide absent)
+DEFAULT_SECONDARY = (240, 248, 252)  # light tint of primary
+DEFAULT_ACCENT    = (0,  163, 216)   # LiverX light cyan
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Branding guide parser
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _color_distance(a, b):
+    return ((a[0]-b[0])**2 + (a[1]-b[1])**2 + (a[2]-b[2])**2) ** 0.5
+
+
+def parse_branding_guide(pdf_path: str) -> dict:
+    """
+    Extract the brand color palette from a branding guideline PDF.
+
+    Strategy
+    --------
+    * Collect every fill color from drawing paths across all pages, weighted
+      by the bounding-box area of the element (large swatches dominate).
+    * Cluster colors that are within 25 RGB-distance of each other so that
+      near-identical shades count as one brand color.
+    * Filter out near-white (>235,235,235) and near-black (<20,20,20).
+    * Return the top three clustered colors as primary / accent / extra.
+
+    Returns a dict with keys ``primary``, ``accent``, ``extra`` (list).
+    An empty dict is returned on any error.
+    """
+    result: dict = {}
+    try:
+        doc = fitz.open(pdf_path)
+        raw: dict[tuple, float] = {}   # color → cumulative area
+
+        for page in doc:
+            for d in page.get_drawings():
+                fill = d.get("fill")
+                if not fill or len(fill) < 3:
+                    continue
+                r, g, b = int(fill[0]*255), int(fill[1]*255), int(fill[2]*255)
+                # skip near-white and near-black
+                if r > 235 and g > 235 and b > 235:
+                    continue
+                if r < 20 and g < 20 and b < 20:
+                    continue
+                # skip near-greys (all channels within 15 of each other)
+                if abs(r-g) < 15 and abs(g-b) < 15 and abs(r-b) < 15:
+                    continue
+                rect = d.get("rect")
+                area = float((rect[2]-rect[0]) * (rect[3]-rect[1])) if rect else 1.0
+                raw[(r, g, b)] = raw.get((r, g, b), 0.0) + area
+
+        doc.close()
+        if not raw:
+            return result
+
+        # Cluster similar colors (greedy — merge within 25 distance)
+        clusters: list[tuple[tuple, float]] = []   # [(representative_color, total_area), ...]
+        for color, area in sorted(raw.items(), key=lambda x: -x[1]):
+            for i, (rep, _) in enumerate(clusters):
+                if _color_distance(color, rep) < 25:
+                    clusters[i] = (rep, clusters[i][1] + area)
+                    break
+            else:
+                clusters.append((color, area))
+
+        clusters.sort(key=lambda x: -x[1])
+
+        if clusters:
+            result["primary"] = clusters[0][0]
+        if len(clusters) > 1:
+            result["accent"] = clusters[1][0]
+        if len(clusters) > 2:
+            result["extra"] = [c[0] for c in clusters[2:6]]
+
+    except Exception:
+        pass
+    return result
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -53,11 +128,12 @@ DEFAULT_ACCENT    = (220, 100,   0)
 def parse_template(pdf_path: str) -> dict:
     """Extract brand colours, logo, company name from the first page of a PDF."""
     info = {
-        "primary":      DEFAULT_PRIMARY,
-        "secondary":    DEFAULT_SECONDARY,
-        "accent":       DEFAULT_ACCENT,
-        "logo_path":    None,
-        "company_name": "",
+        "primary":           DEFAULT_PRIMARY,
+        "secondary":         DEFAULT_SECONDARY,
+        "accent":            DEFAULT_ACCENT,
+        "logo_path":         None,
+        "company_name":      "",
+        "template_pdf_path": pdf_path,   # keep the source PDF path for overlay
     }
     try:
         doc  = fitz.open(pdf_path)
@@ -230,6 +306,111 @@ def _draw_centered_text(canv, text, page_w, y, max_w=None):
     canv.drawCentredString(page_w / 2, y, text)
 
 
+def _make_minimal_page_cb(tmpl: dict, title: str):
+    """
+    Minimal page callback used when overlaying content on the actual company
+    template PDF.  It draws ONLY the dynamic text that the static template
+    cannot provide (RFP title / date on the cover, page number on inner pages).
+    It intentionally draws NO coloured bands or logo — those come from the
+    template PDF background layer.
+    """
+    primary   = _rl(tmpl["primary"])
+    accent    = _rl(tmpl["accent"])
+    today_str = date.today().strftime("%B %d, %Y")
+
+    def _draw(canv: pdfgen_canvas.Canvas, doc):
+        canv.saveState()
+        w, h = PAGE_W, PAGE_H
+
+        if doc.page == 1:
+            # Place RFP title and date in the mid-page content zone so they
+            # land on the white area of the template (below any letterhead).
+            title_y = h * 0.52
+
+            canv.setFont("Helvetica-Bold", 26)
+            canv.setFillColor(primary)
+            _draw_centered_text(canv,
+                                title.replace("_", " ").replace(".pdf", ""),
+                                w, title_y, max_w=w - 80)
+
+            canv.setFont("Helvetica", 13)
+            canv.setFillColor(accent)
+            _draw_centered_text(canv, "Request for Proposal", w, title_y - 28)
+
+            canv.setFont("Helvetica", 10)
+            canv.setFillColor(colors.black)
+            _draw_centered_text(canv, today_str, w, title_y - 52)
+
+        else:
+            # Inner pages: write page number in the footer zone.
+            # White text so it reads on dark template footers; black on light ones.
+            canv.setFont("Helvetica", 8)
+            canv.setFillColor(colors.white)
+            canv.drawRightString(w - 18, 7, f"Page {doc.page}")
+
+        canv.restoreState()
+
+    return _draw
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Template overlay (PyMuPDF-based)
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _overlay_content_on_template(content_path: str, template_path: str, output_path: str):
+    """
+    Composite every page of *content_path* on top of the company template PDF.
+
+    Strategy
+    --------
+    * The company template is rendered first as the background layer.
+    * The content page (text, tables — no explicit white fill) is drawn on top
+      as a Form XObject, so only the explicitly drawn elements appear; the
+      template's header/footer/branding shows through everywhere else.
+    * If the template has only one page (typical letterhead), that page is
+      reused as the background for every content page.
+    """
+    tmpl_doc    = fitz.open(template_path)
+    content_doc = fitz.open(content_path)
+    out_doc     = fitz.open()
+
+    n_tmpl = len(tmpl_doc)
+
+    for page_num in range(len(content_doc)):
+        # Reuse last template page once we run out (handles single-page letterheads)
+        tmpl_idx = min(page_num, n_tmpl - 1)
+        tmpl_page = tmpl_doc[tmpl_idx]
+
+        # New output page — same physical size as template
+        out_page = out_doc.new_page(
+            width=tmpl_page.rect.width,
+            height=tmpl_page.rect.height,
+        )
+
+        # Layer 1 — company template (background / branding)
+        out_page.show_pdf_page(
+            out_page.rect,
+            tmpl_doc,
+            tmpl_idx,
+            keep_proportion=False,
+            overlay=False,   # draw behind (background)
+        )
+
+        # Layer 2 — RFP content (foreground / text)
+        out_page.show_pdf_page(
+            out_page.rect,
+            content_doc,
+            page_num,
+            keep_proportion=False,
+            overlay=True,    # draw on top
+        )
+
+    out_doc.save(output_path, garbage=4, deflate=True)
+    out_doc.close()
+    content_doc.close()
+    tmpl_doc.close()
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Two-pass document template (required for functional TOC)
 # ─────────────────────────────────────────────────────────────────────────────
@@ -270,11 +451,11 @@ def _make_styles(tmpl: dict) -> dict:
     return {
         "h1": ParagraphStyle("RFP_H1", parent=base["Normal"],
             fontName="Helvetica-Bold", fontSize=15, textColor=primary,
-            spaceBefore=18, spaceAfter=4, leading=20, keepWithNext=1),
+            spaceBefore=10, spaceAfter=3, leading=20, keepWithNext=1),
 
         "h2": ParagraphStyle("RFP_H2", parent=base["Normal"],
             fontName="Helvetica-Bold", fontSize=12, textColor=primary,
-            spaceBefore=14, spaceAfter=3, leading=16, keepWithNext=1),
+            spaceBefore=8, spaceAfter=2, leading=16, keepWithNext=1),
 
         "h3": ParagraphStyle("RFP_H3", parent=base["Normal"],
             fontName="Helvetica-BoldOblique", fontSize=10, textColor=accent,
@@ -425,9 +606,13 @@ def _build_story(content: str, tmpl: dict) -> list:
             i += 1
             continue
 
-        # Explicit page break (---)
+        # Horizontal rule (---) — draw a divider, NOT a page break.
+        # Forcing a page break per section causes near-empty pages when
+        # sections are short; content should flow naturally across pages.
         if re.match(r"^-{3,}$", line):
-            story.append(PageBreak())
+            story.append(Spacer(1, 6))
+            story.append(HRFlowable(width="100%", thickness=1,
+                                    color=acc, spaceAfter=6))
             i += 1
             continue
 
@@ -517,40 +702,32 @@ def generate_rfp_pdf(
 ) -> str:
     """
     Build a styled, TOC-equipped PDF from RFP markdown and extracted branding.
+
+    When *template_info* contains a ``template_pdf_path`` pointing to an
+    existing file the function uses a two-step approach:
+
+    1. Generate a "content-only" PDF (no coloured header/footer bands —
+       those come from the actual template).
+    2. Use PyMuPDF to composite the content layer on top of the company
+       template PDF so the final document looks like it was written directly
+       on the company letterhead / design template.
+
+    Falls back to the original standalone approach when no template PDF is
+    available.
+
     Returns output_path on success.
     """
+    import tempfile
+    import logging
+
     os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
 
-    page_cb = _make_page_cb(template_info, title)
+    template_pdf = template_info.get("template_pdf_path")
+    use_overlay  = bool(template_pdf and os.path.exists(str(template_pdf)))
 
-    doc = _RFPDoc(
-        output_path,
-        page_cb,
-        pagesize=A4,
-        leftMargin=MARGIN_L,
-        rightMargin=MARGIN_R,
-        topMargin=MARGIN_T,
-        bottomMargin=MARGIN_B,
-        title=title,
-        author=template_info.get("company_name", ""),
-    )
-
-    story = _build_story(content, template_info)
-
-    # multiBuild does two passes: first pass collects page numbers for headings,
-    # second pass renders the TOC with correct page references.
-    try:
-        doc.multiBuild(story)
-    except Exception as first_err:
-        # Fallback: rebuild without KeepTogether blocks and without TOC.
-        # This handles "Flowable too large on page" on edge-case content.
-        import logging
-        logging.getLogger(__name__).warning(
-            "multiBuild failed (%s) — retrying with simplified layout.", first_err
-        )
-        story2 = _build_story_simple(content, template_info)
-        doc2 = _RFPDoc(
-            output_path,
+    def _build_doc(dest_path, page_cb):
+        d = _RFPDoc(
+            dest_path,
             page_cb,
             pagesize=A4,
             leftMargin=MARGIN_L,
@@ -560,7 +737,48 @@ def generate_rfp_pdf(
             title=title,
             author=template_info.get("company_name", ""),
         )
-        doc2.multiBuild(story2)
+        return d
+
+    if use_overlay:
+        # ── Step 1: generate content PDF to a temp file ────────────────────
+        # Use the minimal callback — no coloured bands, just dynamic text.
+        page_cb = _make_minimal_page_cb(template_info, title)
+
+        tmp_fd, tmp_path = tempfile.mkstemp(suffix=".pdf")
+        os.close(tmp_fd)
+        try:
+            doc   = _build_doc(tmp_path, page_cb)
+            story = _build_story(content, template_info)
+            try:
+                doc.multiBuild(story)
+            except Exception as err:
+                logging.getLogger(__name__).warning(
+                    "multiBuild failed (%s) — retrying with simplified layout.", err
+                )
+                story2 = _build_story_simple(content, template_info)
+                _build_doc(tmp_path, page_cb).multiBuild(story2)
+
+            # ── Step 2: overlay on company template PDF ────────────────────
+            _overlay_content_on_template(tmp_path, str(template_pdf), output_path)
+        finally:
+            try:
+                os.unlink(tmp_path)
+            except OSError:
+                pass
+
+    else:
+        # ── Original standalone approach (no template PDF) ─────────────────
+        page_cb = _make_page_cb(template_info, title)
+        doc     = _build_doc(output_path, page_cb)
+        story   = _build_story(content, template_info)
+        try:
+            doc.multiBuild(story)
+        except Exception as err:
+            logging.getLogger(__name__).warning(
+                "multiBuild failed (%s) — retrying with simplified layout.", err
+            )
+            story2 = _build_story_simple(content, template_info)
+            _build_doc(output_path, page_cb).multiBuild(story2)
 
     return output_path
 
@@ -587,7 +805,9 @@ def _build_story_simple(content: str, tmpl: dict) -> list:
         elif line.startswith("### "):
             story.append(Paragraph(line[4:].strip(), s["h3"]))
         elif re.match(r"^-{3,}$", line):
-            story.append(PageBreak())
+            story.append(Spacer(1, 6))
+            story.append(HRFlowable(width="100%", thickness=1,
+                                    color=pri, spaceAfter=6))
         elif line.startswith("|"):
             # Render table rows as plain bullet lines instead of a Table flowable
             cells = [c.strip() for c in line.strip("|").split("|") if c.strip()]

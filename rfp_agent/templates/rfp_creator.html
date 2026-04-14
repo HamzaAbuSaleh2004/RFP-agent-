@@ -143,16 +143,16 @@
 </div>
 </header>
 <!-- Main Content Canvas -->
-<main class="ml-64 p-12 min-h-[calc(100vh-80px)] flex gap-8">
+<main class="ml-64 px-12 pb-12 flex gap-8 overflow-hidden" style="height:calc(100vh - 88px); margin-top:88px;">
 <!-- Central Chat Area -->
-<section class="flex-grow flex flex-col gap-6 max-w-4xl">
-<header class="mb-4">
+<section class="flex-grow flex flex-col gap-6 max-w-4xl min-h-0 overflow-hidden">
+<header class="mb-4 shrink-0">
 <h1 class="text-4xl font-extrabold tracking-tight text-primary mb-2">RFP Intelligence Agent</h1>
 <p class="text-on-surface-variant max-w-xl">Accelerate your procurement workflow with context-aware AI drafting and compliance verification.</p>
 </header>
 <!-- Chat Interface -->
-<div class="flex-grow bg-surface-container-lowest rounded-3xl p-8 flex flex-col shadow-sm">
-<div id="chat-messages" class="flex-grow overflow-y-auto space-y-8 pr-4">
+<div class="flex-1 bg-surface-container-lowest rounded-3xl p-8 flex flex-col shadow-sm min-h-0 overflow-hidden">
+<div id="chat-messages" class="flex-1 overflow-y-auto space-y-8 pr-4 min-h-0">
 </div>
 <!-- Input Area -->
 <div class="mt-8 pt-6 border-t border-slate-100">
@@ -171,7 +171,7 @@
 </div>
 </section>
 <!-- Right Side Panel: Live Agent Activity -->
-<aside class="w-80 shrink-0 space-y-5">
+<aside class="w-80 shrink-0 space-y-5 overflow-y-auto">
 
   <!-- Active Agent Card -->
   <div class="bg-primary text-white p-6 rounded-3xl shadow-xl relative overflow-hidden">
@@ -419,58 +419,71 @@
 
             const reader  = response.body.getReader();
             const decoder = new TextDecoder('utf-8');
+            let sseBuffer = '';
+
+            function processSSEEvent(eventBlock) {
+                for (const line of eventBlock.split('\n')) {
+                    if (!line.startsWith('data: ')) continue;
+                    let data;
+                    try { data = JSON.parse(line.substring(6)); } catch(e) { continue; }
+
+                    if (data.type === 'chunk') {
+                        markdownBuffer += data.text;
+                        agentUI.contentDiv.innerHTML = marked.parse(markdownBuffer);
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                    } else if (data.type === 'status') {
+                        agentUI.statusSpan.innerText = 'RFP Agent • Processing';
+
+                        if (!hasLogs) {
+                            agentUI.logsDiv.classList.remove('hidden');
+                            agentUI.logsDiv.style.display = 'flex';
+                            hasLogs = true;
+                        }
+                        const logEntry = document.createElement('div');
+                        logEntry.className = 'flex items-center gap-2 text-xs font-medium text-on-surface-variant';
+                        logEntry.innerHTML = `<span class="material-symbols-outlined text-xs">chevron_right</span><span>${data.text}</span>`;
+                        agentUI.logsDiv.appendChild(logEntry);
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                        if (data.text.startsWith('Running tool:')) {
+                            addToolFeedEntry(data.text);
+                        } else if (data.text.startsWith('Handed off to:')) {
+                            const agentKey = data.text.replace('Handed off to:', '').trim();
+                            setAgentActive(agentKey);
+                        }
+
+                    } else if (data.type === 'done') {
+                        agentUI.statusSpan.innerText = 'RFP Agent • Completed';
+                        setAgentIdle();
+
+                    } else if (data.type === 'error') {
+                        markdownBuffer += '\n\n**Error:** ' + data.text;
+                        agentUI.contentDiv.innerHTML = marked.parse(markdownBuffer);
+                        setAgentIdle();
+                    }
+                }
+            }
 
             while (true) {
                 const { value, done } = await reader.read();
                 if (done) break;
 
-                const chunk = decoder.decode(value, { stream: true });
-                for (const line of chunk.split('\n')) {
-                    if (!line.startsWith('data: ')) continue;
-                    try {
-                        const data = JSON.parse(line.substring(6));
+                // Accumulate raw bytes decoded as UTF-8 stream
+                sseBuffer += decoder.decode(value, { stream: true });
 
-                        if (data.type === 'chunk') {
-                            markdownBuffer += data.text;
-                            agentUI.contentDiv.innerHTML = marked.parse(markdownBuffer);
-                            chatMessages.scrollTop = chatMessages.scrollHeight;
+                // SSE events are delimited by double newlines (\n\n).
+                // Split so each entry is one complete event block.
+                // The last element may be an incomplete event — keep it in the buffer.
+                const events = sseBuffer.split('\n\n');
+                sseBuffer = events.pop(); // hold the trailing incomplete fragment
 
-                        } else if (data.type === 'status') {
-                            // Update status span
-                            agentUI.statusSpan.innerText = 'RFP Agent • Processing';
-
-                            // Show inline log entry
-                            if (!hasLogs) {
-                                agentUI.logsDiv.classList.remove('hidden');
-                                agentUI.logsDiv.style.display = 'flex';
-                                hasLogs = true;
-                            }
-                            const logEntry = document.createElement('div');
-                            logEntry.className = 'flex items-center gap-2 text-xs font-medium text-on-surface-variant';
-                            logEntry.innerHTML = `<span class="material-symbols-outlined text-xs">chevron_right</span><span>${data.text}</span>`;
-                            agentUI.logsDiv.appendChild(logEntry);
-                            chatMessages.scrollTop = chatMessages.scrollHeight;
-
-                            // Check if it's a tool call or agent handoff
-                            if (data.text.startsWith('Running tool:')) {
-                                addToolFeedEntry(data.text);
-                            } else if (data.text.startsWith('Handed off to:')) {
-                                const agentKey = data.text.replace('Handed off to:', '').trim();
-                                setAgentActive(agentKey);
-                            }
-
-                        } else if (data.type === 'done') {
-                            agentUI.statusSpan.innerText = 'RFP Agent • Completed';
-                            setAgentIdle();
-
-                        } else if (data.type === 'error') {
-                            markdownBuffer += '\n\n**Error:** ' + data.text;
-                            agentUI.contentDiv.innerHTML = marked.parse(markdownBuffer);
-                            setAgentIdle();
-                        }
-                    } catch(e) { /* ignore parse errors on incomplete SSE frames */ }
+                for (const eventBlock of events) {
+                    if (eventBlock.trim()) processSSEEvent(eventBlock);
                 }
             }
+            // Flush any final buffered fragment (stream closed without trailing \n\n)
+            if (sseBuffer.trim()) processSSEEvent(sseBuffer);
         } catch (error) {
             console.error(error);
             agentUI.statusSpan.innerText = 'RFP Agent • Error';

@@ -32,8 +32,9 @@ rfp_creator = Agent(
 ═══ EXECUTION SEQUENCE ═══
 
 STEP 1 — LOAD TEMPLATES + DATE (call both simultaneously)
-- `read_local_templates` — loads the company's Design, Legal, Economic, and Compliance templates from the local folder. Extract all rules and clauses; they override any generic defaults.
+- `read_local_templates` — loads the company's Design, Legal, Economic, and Compliance templates.
 - `date_time` — needed for issue date and deadline calculations.
+Extract every rule, clause, threshold, and requirement from all four templates. They are the authoritative source — they override any generic defaults.
 
 STEP 2 — FINANCIAL BENCHMARKING (skip if company not publicly listed)
 Call `fmp_get_financials` with the issuing company name or ticker to validate budget range.
@@ -41,7 +42,7 @@ Call `fmp_get_financials` with the issuing company name or ticker to validate bu
 STEP 3 — LEGAL ALERT (only for genuine hard blockers)
 Call `slack_alert_legal` ONLY for active sanctions, OFAC/UN flags, or explicitly prohibited procurement.
 
-STEP 4 — DRAFT & PRESENT FOR REVIEW
+STEP 4 — DRAFT RFP
 Compose the full RFP in markdown using this structure:
   # [RFP Title]
   **RFP Reference:** [ID]  **Issue Date:** [date_time result]  **Deadline:** [calculated]
@@ -50,21 +51,74 @@ Compose the full RFP in markdown using this structure:
   ### 2.1 Deliverables  ### 2.2 Out-of-Scope  ### 2.3 Vendor Qualifications
   ## 3. SUBMISSION REQUIREMENTS
   ## 4. EVALUATION CRITERIA  (markdown table: Category | Weight | Type | Description)
-  ## 5. TERMS & CONDITIONS   (from Legal Template; if absent, tailor to target country)
-  ## 6. FINANCIAL TERMS      (from Economic Template: payment schedule, penalties, budget ceiling)
-  ## 7. TIMELINE & APPENDICES
+  ## 5. TERMS & CONDITIONS   (from Legal Template — include ALL clauses below)
+  ## 6. COMPLIANCE REQUIREMENTS  (from Compliance Template — include ALL sections below)
+  ## 7. FINANCIAL TERMS      (from Economic Template — include ALL clauses below)
+  ## 8. TIMELINE & APPENDICES
 
-Output the complete draft as a formatted markdown block in the chat.
-Then ask: "Here is the draft RFP — does this look good, or would you like any revisions before I generate the PDF?"
+STEP 5 — SELF-AUDIT (mandatory before showing the draft to the user)
+Before presenting anything, check the draft against EVERY section of all four templates using this checklist.
+Fix any gap found directly in the draft — do not flag it to the user, just fix it.
+
+LEGAL TEMPLATE checklist — every clause must appear in Section 5:
+  ☐ Governing law and jurisdiction (country + city named explicitly, no placeholders)
+  ☐ NDA: period in years stated (not [X])
+  ☐ IP: work-for-hire, no vendor portfolio use, IP infringement warranty
+  ☐ Liability cap = total contract value; indemnification; no consequential damages
+  ☐ Insurance: all four coverage types with ACTUAL minimum amounts (no "[To be specified]" — derive reasonable amounts from contract value and industry norms for the sector)
+  ☐ Conflict of Interest Declaration required in every bid
+  ☐ Anti-bribery: local law named (e.g. Saudi Anti-Corruption Law, FCPA if relevant)
+  ☐ Termination for convenience: notice days stated; termination for cause: remedy days stated
+  ☐ Dispute resolution: negotiation period → named mediation body → named arbitration body + rules (e.g. SCCA, ICC, DIAC) — no unnamed placeholders
+  ☐ Data Processing Agreement required before any personal data transfer; 72-hour breach notification
+
+COMPLIANCE TEMPLATE checklist — every section must appear in Section 6:
+  ☐ Mandatory certifications table (ISO 9001, ISO 27001, sector-specific certs, local licence) with "Must be current" validity
+  ☐ Data governance: applicable data protection law named; data residency region stated; data classification policy; AES-256 at rest, TLS 1.2+ in transit
+  ☐ Information security controls table: MFA on privileged accounts; critical patches within 72 hours; annual pen test by accredited party; documented IRP with RTO; daily backups with RPO/RTO
+  ☐ Security incident notification: 4 hours for any security incident affecting company data + full report within 72 hours
+  ☐ ESG requirements: carbon/GHG disclosure; Supplier Code of Conduct; no child/forced labour confirmation
+  ☐ Local content / Nationalisation: NITAQAT % threshold stated; vendors must disclose % local employees and locally sourced goods
+  ☐ AML & Sanctions: all screening lists named (OFAC SDN, UN, EU, local list); Sanctions Self-Declaration Form required; legal team notified within 1 hour of any flag
+  ☐ HSE (if on-site presence involved): HSE Management System cert; site-specific HSE plan before work; LTIFR threshold; site safety induction
+  ☐ Regulatory change: vendor must monitor regulations and notify company of changes; cost implications via Change Order
+
+ECONOMIC TEMPLATE checklist — every clause must appear in Section 7:
+  ☐ Budget ceiling stated; disqualification threshold % stated; finance sign-off obtained
+  ☐ Multi-year cost escalation cap % and index stated (e.g. CPI)
+  ☐ Mandatory pricing table (Line Item | Unit | Quantity | Unit Price | Total) with contingency max 5%
+  ☐ Currency stated; all prices exclusive of VAT/taxes (taxes paid separately)
+  ☐ Fixed-price preferred; T&M requires day rates + not-to-exceed cap
+  ☐ Price validity period stated (days from submission deadline)
+  ☐ All four payment milestones with % and trigger (signing, mid, final, retention release)
+  ☐ Net [X] days payment terms; invoice must reference PO number and itemise deliverables; incomplete invoices returned and payment clock restarted; LiverX may withhold payment for unaccepted deliverables
+  ☐ Late delivery penalty: % per week, capped at % of total contract value
+  ☐ Quality failure penalty: per additional revision cycle beyond [N]
+  ☐ Change Order process: all scope changes in writing before work begins; unreimbursed otherwise
+  ☐ Cost overrun early warning: vendor must flag when [X]% of budget is consumed
+  ☐ T&E policy: economy class threshold, hotel cap per night, receipt deadline
+  ☐ Financial qualification thresholds: annual revenue multiple (specific number ×), positive net income, 18-month cash runway, credit rating floor
+  ☐ Foreign currency: exchange rate locked at contract signing; forex adjustment clause if fluctuation exceeds [X]%
+
+After fixing all gaps, proceed to STEP 6.
+
+STEP 6 — PRESENT DRAFT FOR REVIEW
+Output the complete, self-audited draft as a formatted markdown block.
+Then show a short compliance summary:
+
+**Template Compliance: ✅ All checks passed** (or list any items that required human input to resolve)
+**⚠️ Items requiring your input before PDF generation:** (list only unresolvable placeholders, e.g. insurance minimums if no contract value context, arbitration body preference)
+
+Then ask: "Here is the reviewed draft — does this look good, or would you like any revisions before I generate the PDF?"
 
 Wait for the user's response:
-- Revisions requested → apply all changes, show the updated draft, ask again.
-- Approved (e.g. "looks good", "proceed", "generate it") → move to STEP 5.
+- Revisions requested → apply all changes, re-run the self-audit checklist, show the updated draft, ask again.
+- Approved (e.g. "looks good", "proceed", "generate it") → move to STEP 7.
 
-STEP 5 — GENERATE PDF (only after explicit user approval)
+STEP 7 — GENERATE PDF (only after explicit user approval)
 Call `create_rfp_pdf(rfp_content=<approved_markdown>, output_filename=<descriptive_name>.pdf)`.
 
-STEP 6 — SLACK UPDATE
+STEP 8 — SLACK UPDATE
 Call `slack_post_message` with: RFP title, reference, deadline, Drive link from create_rfp_pdf, budget range.
 
 ═══ FINAL REPLY ═══
@@ -150,7 +204,10 @@ Before routing to RFP creation, collect the following with clear bullet-point fo
 • Budget & Constraints: budget range, preferred contract terms.
 • Submission Details: submission method, point of contact.
 
-Wait for complete answers before handing off.""",
+ROUTING RULES — follow exactly, no exceptions:
+- As soon as the user provides ALL 5 sections above (Project Scope, Vendor Requirements, Evaluation Criteria, Budget & Constraints, Submission Details), you MUST immediately call `transfer_to_agent(agent_name="rfp_creator")`. Do NOT generate any text, acknowledgement, or summary — just call the transfer function.
+- If the user says "evaluate", "assess bids", or shares vendor bids, immediately call `transfer_to_agent(agent_name="bid_evaluator")`.
+- Never stay silent or return an empty response. If all information is present, transfer. If information is missing, ask for it.""",
     sub_agents=[rfp_creator, bid_evaluator],
     tools=[gdrive_search, gdrive_read_file, slack_post_message, date_time]
 )
