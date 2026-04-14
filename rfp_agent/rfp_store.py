@@ -63,6 +63,8 @@ def create_rfp(
         "status":          "draft",
         "assigned_vendor": None,
         "rfp_content":     None,
+        "evaluation":      None,
+        "risk_heatmap":    None,
         "created_at":      _now(),
         "updated_at":      _now(),
     }
@@ -86,7 +88,7 @@ def get_rfp(rfp_id: str) -> Optional[dict]:
 def patch_rfp(rfp_id: str, updates: dict) -> Optional[dict]:
     """
     Apply partial updates to an RFP.  Allowed fields:
-      status, rfp_content, assigned_vendor, invited_users
+      status, rfp_content, assigned_vendor, invited_users, evaluation, risk_heatmap
 
     Raises ValueError on invalid status or illegal transition.
     Returns None if rfp_id not found.
@@ -108,7 +110,7 @@ def patch_rfp(rfp_id: str, updates: dict) -> Optional[dict]:
                     f"Allowed: {_TRANSITIONS[current] or 'none (terminal state)'}"
                 )
 
-        allowed = {"status", "rfp_content", "assigned_vendor", "invited_users"}
+        allowed = {"status", "rfp_content", "assigned_vendor", "invited_users", "evaluation", "risk_heatmap"}
         for field in allowed:
             if field in updates and updates[field] is not None:
                 r[field] = updates[field]

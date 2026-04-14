@@ -182,7 +182,7 @@ def calculate_pwin(vendor_data: str) -> float:
     """Probability of Win calculator based on historical data"""
     return 75.0
 
-def risk_heatmap(compliance_results: str) -> str:
+def risk_heatmap(compliance_results: str, rfp_id: str = "") -> str:
     """
     Compute a risk heatmap from vendor compliance results and save it for dashboard display.
 
@@ -190,6 +190,7 @@ def risk_heatmap(compliance_results: str) -> str:
         compliance_results: JSON string mapping vendor names to their evaluation dimensions.
             Format: {"VendorName": {"legal": "PASS"|"FAIL", "commercial": "PASS"|"FAIL",
                                     "technical": 0-100, "financial": "PASS"|"FAIL"}, ...}
+        rfp_id: Optional RFP ID to associate the heatmap with a specific RFP record.
 
     Returns:
         JSON string with per-vendor risk levels per dimension plus an overall risk rating.
@@ -242,8 +243,17 @@ def risk_heatmap(compliance_results: str) -> str:
         }
 
     heatmap_json = json.dumps(result, indent=2)
+    heatmap_data = result
 
-    # Persist so the /api/risk-heatmap endpoint can serve it
+    # Persist to the specific RFP record if rfp_id is provided
+    if rfp_id:
+        try:
+            from .rfp_store import patch_rfp
+            patch_rfp(rfp_id, {"risk_heatmap": heatmap_data})
+        except Exception:
+            pass
+
+    # Also persist globally as fallback
     try:
         OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
         with open(OUTPUT_DIR / "risk_heatmap.json", "w") as f:
@@ -254,7 +264,7 @@ def risk_heatmap(compliance_results: str) -> str:
     return heatmap_json
 
 
-def store_evaluation_results(results_json: str) -> str:
+def store_evaluation_results(results_json: str, rfp_id: str = "") -> str:
     """
     Persist bid evaluation results so the /evaluations dashboard can display them.
 
@@ -279,6 +289,10 @@ def store_evaluation_results(results_json: str) -> str:
         ]
       }
 
+    Args:
+        results_json: JSON string with the evaluation results.
+        rfp_id: Optional RFP ID to associate the evaluation with a specific RFP record.
+
     Returns confirmation with the file path on success, or an error string.
     """
     import json
@@ -291,6 +305,15 @@ def store_evaluation_results(results_json: str) -> str:
     except (json.JSONDecodeError, TypeError) as e:
         return f"ERROR: results_json is not valid JSON — {e}"
 
+    # Persist to the specific RFP record if rfp_id is provided
+    if rfp_id:
+        try:
+            from .rfp_store import patch_rfp
+            patch_rfp(rfp_id, {"evaluation": data})
+        except Exception as e:
+            return f"ERROR saving evaluation to RFP {rfp_id}: {e}"
+
+    # Also persist globally as fallback
     try:
         with open(path, "w") as f:
             json.dump(data, f, indent=2)

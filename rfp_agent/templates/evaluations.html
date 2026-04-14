@@ -578,10 +578,17 @@ async function loadEvaluation() {
   document.getElementById('empty-state').classList.add('hidden');
   document.getElementById('eval-content').classList.add('hidden');
 
+  if (!selectedRfpId) {
+    btn.querySelector('span').classList.remove('animate-spin');
+    showEmpty();
+    return;
+  }
+
   try {
+    // Fetch evaluation data specific to the selected RFP
     const [evalRes, hmRes] = await Promise.all([
-      fetch('/api/evaluations'),
-      fetch('/api/risk-heatmap'),
+      fetch(`/api/rfps/${selectedRfpId}/evaluation`),
+      fetch(`/api/rfps/${selectedRfpId}/risk-heatmap`),
     ]);
     btn.querySelector('span').classList.remove('animate-spin');
 

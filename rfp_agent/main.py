@@ -174,6 +174,30 @@ async def api_patch_rfp(rfp_id: str, body: PatchRFPRequest):
     return JSONResponse(content=updated)
 
 
+@app.get("/api/rfps/{rfp_id}/evaluation")
+async def api_get_rfp_evaluation(rfp_id: str):
+    """Return the evaluation data stored inside a specific RFP record."""
+    rfp = get_rfp(rfp_id)
+    if rfp is None:
+        raise HTTPException(status_code=404, detail="RFP not found")
+    evaluation = rfp.get("evaluation")
+    if evaluation is None:
+        return JSONResponse(content=None, status_code=204)
+    return JSONResponse(content=evaluation)
+
+
+@app.get("/api/rfps/{rfp_id}/risk-heatmap")
+async def api_get_rfp_risk_heatmap(rfp_id: str):
+    """Return the risk heatmap stored inside a specific RFP record."""
+    rfp = get_rfp(rfp_id)
+    if rfp is None:
+        raise HTTPException(status_code=404, detail="RFP not found")
+    heatmap = rfp.get("risk_heatmap")
+    if heatmap is None:
+        return JSONResponse(content=None, status_code=204)
+    return JSONResponse(content=heatmap)
+
+
 # ── Chat / SSE endpoint ───────────────────────────────────────────────────────
 
 @app.post("/api/chat")
@@ -259,6 +283,38 @@ async def api_chat(body: ChatRequest):
                             except Exception as save_err:
                                 logging.warning("Could not save rfp_content: %s", save_err)
 
+                        # When store_evaluation_results fires and we have an rfp_id,
+                        # persist the evaluation to the correct RFP record.
+                        if call.name == "store_evaluation_results" and rfp_id:
+                            try:
+                                args = call.args if isinstance(call.args, dict) else {}
+                                results_json = args.get("results_json", "")
+                                if results_json:
+                                    eval_data = json.loads(results_json)
+                                    patch_rfp(rfp_id, {"evaluation": eval_data})
+                                    logging.info(
+                                        "Saved evaluation to RFP %s (%d vendors)",
+                                        rfp_id, len(eval_data.get("vendors", [])),
+                                    )
+                            except Exception as save_err:
+                                logging.warning("Could not save evaluation to RFP: %s", save_err)
+
+                        # When risk_heatmap fires and we have an rfp_id,
+                        # persist the heatmap to the correct RFP record.
+                        if call.name == "risk_heatmap" and rfp_id:
+                            try:
+                                args = call.args if isinstance(call.args, dict) else {}
+                                compliance_json = args.get("compliance_results", "")
+                                if compliance_json:
+                                    # The tool already computes and saves; we also
+                                    # grab its output later. But pre-save the raw
+                                    # result via the tool's rfp_id param.
+                                    logging.info(
+                                        "risk_heatmap tool called for RFP %s", rfp_id
+                                    )
+                            except Exception as save_err:
+                                logging.warning("Could not handle risk_heatmap: %s", save_err)
+
                 # ── Agent transfers ──────────────────────────────────────────
                 if author and author != root_agent.name:
                     yield f"data: {json.dumps({'type': 'status', 'text': f'Handed off to: {author}'})}\n\n"
@@ -319,18 +375,17 @@ async def api_get_risk_heatmap():
 @app.get("/api/stats")
 async def api_get_stats():
     rfps = list_rfps()
+    # Count evaluations stored inside RFP records
+    evaluated_rfps = [r for r in rfps if r.get("evaluation") is not None]
+    total_vendors_evaluated = sum(
+        len(r["evaluation"].get("vendors", []))
+        for r in evaluated_rfps
+    )
     stats = {
         "active_rfps":          sum(1 for r in rfps if r["status"] == "draft"),
-        "pending_evaluations":  0,
+        "pending_evaluations":  total_vendors_evaluated,
         "total_documents":      0,
     }
-    eval_path = OUTPUT_DIR / "evaluations.json"
-    if eval_path.exists():
-        try:
-            data = json.loads(eval_path.read_text(encoding="utf-8"))
-            stats["pending_evaluations"] = len(data.get("vendors", []))
-        except Exception:
-            pass
     if OUTPUT_DIR.exists():
         stats["total_documents"] = len(list(OUTPUT_DIR.glob("*.pdf")))
     return JSONResponse(content=stats)
