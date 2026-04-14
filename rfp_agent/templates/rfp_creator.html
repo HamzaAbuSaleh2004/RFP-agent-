@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html class="light" lang="en"><head>
+<html class="light" lang="{{ locale }}" {% if rtl %}dir="rtl"{% endif %}><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>RFP Director | AI Assistant</title>
@@ -81,10 +81,25 @@
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
-        body { font-family: 'Inter', sans-serif; }
-        h1, h2, h3 { font-family: 'Manrope', sans-serif; }
+        body { font-family: {% if rtl %}'Cairo', {% endif %}'Inter', sans-serif; }
+        h1, h2, h3 { font-family: {% if rtl %}'Cairo', {% endif %}'Manrope', sans-serif; }
+        {% if rtl %}
+        .ml-64 { margin-left: 0 !important; margin-right: 16rem; }
+        aside { left: auto !important; right: 0; }
+        /* RTL chat layout */
+        .chat-user-msg { direction: rtl; text-align: right; }
+        .chat-user-msg .msg-bubble { border-radius: 1rem 0 1rem 1rem; }
+        .chat-agent-msg { direction: rtl; text-align: right; }
+        .chat-agent-msg .msg-bubble { border-radius: 0 1.5rem 1.5rem 1.5rem; }
+        #chat-input { direction: rtl; text-align: right; }
+        #chat-messages { direction: rtl; }
+        .chat-agent-msg .markdown-body { direction: rtl; text-align: right; }
+        .chat-agent-msg .markdown-body table { direction: rtl; }
+        .chat-agent-msg .markdown-body th { text-align: right; }
+        {% endif %}
     </style>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+{% if rtl %}<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet"/>{% endif %}
 </head>
 <body class="bg-surface text-on-surface antialiased">
 <!-- Shared SideNavBar -->
@@ -101,24 +116,24 @@
 <nav class="flex-grow space-y-2">
 <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/">
 <span class="material-symbols-outlined">dashboard</span>
-<span class="font-medium">Dashboard</span>
+<span class="font-medium">{{ t('nav.dashboard', locale) }}</span>
 </a>
 <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/documents">
 <span class="material-symbols-outlined">description</span>
-<span class="font-medium">Documents</span>
+<span class="font-medium">{{ t('nav.documents', locale) }}</span>
 </a>
 <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/evaluations">
 <span class="material-symbols-outlined">analytics</span>
-<span class="font-medium">Evaluations</span>
+<span class="font-medium">{{ t('nav.evaluations', locale) }}</span>
 </a>
-<!-- Active Tab: Inferred as Dashboard/Home for the Agent UI -->
+<!-- Active Tab: AI Assistant -->
 <a class="flex items-center gap-3 px-4 py-3 text-blue-950 font-semibold bg-white rounded-lg shadow-sm" href="/chat">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
-<span class="font-medium">AI Assistant</span>
+<span class="font-medium">{{ t('page.chat', locale) }}</span>
 </a>
-<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="#">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/settings">
 <span class="material-symbols-outlined">settings</span>
-<span class="font-medium">Settings</span>
+<span class="font-medium">{{ t('nav.settings', locale) }}</span>
 </a>
 </nav>
 <button class="mt-auto bg-gradient-to-br from-primary-container to-primary text-white py-4 px-6 rounded-xl flex items-center justify-center gap-2 font-bold shadow-lg hover:scale-[0.98] transition-transform">
@@ -127,7 +142,7 @@
 </button>
 </aside>
 <!-- Shared TopNavBar -->
-<header class="flex justify-between items-center w-[calc(100%-16rem)] px-12 py-6 sticky top-0 z-40 ml-64 bg-white/70 backdrop-blur-xl">
+<header class="flex justify-between items-center w-[calc(100%-16rem)] px-12 py-6 sticky top-0 z-40 ml-64 bg-white/70 backdrop-blur-xl" {% if rtl %}dir="rtl"{% endif %}>
 <div class="flex items-center bg-surface-container-low px-4 py-2.5 rounded-full w-full max-w-md">
 <span class="material-symbols-outlined text-slate-400 mr-2">search</span>
 <input class="bg-transparent border-none focus:ring-0 text-sm w-full text-on-surface" placeholder="Search RFPs, vendors, or intel..." type="text"/>
@@ -136,6 +151,10 @@
 <div class="flex items-center gap-4 text-slate-400">
 <button class="hover:text-blue-900 transition-colors"><span class="material-symbols-outlined">notifications</span></button>
 <button class="hover:text-blue-900 transition-colors"><span class="material-symbols-outlined">help_outline</span></button>
+<div class="flex items-center rounded-lg overflow-hidden border border-slate-200 text-[11px] font-bold">
+  <a href="#" onclick="setLang('en');return false;" class="px-2.5 py-1.5 transition-colors {% if locale == 'en' %}bg-primary-container text-white{% else %}text-slate-500 hover:bg-surface-container-low{% endif %}">EN</a>
+  <a href="#" onclick="setLang('ar');return false;" class="px-2.5 py-1.5 transition-colors {% if locale == 'ar' %}bg-primary-container text-white{% else %}text-slate-500 hover:bg-surface-container-low{% endif %}">AR</a>
+</div>
 </div>
 <div class="h-10 w-10 rounded-full bg-slate-200 overflow-hidden">
 <img alt="Executive User Profile" class="w-full h-full object-cover" data-alt="Professional portrait of a senior procurement executive in a light-colored business suit against a clean studio background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCiKaw2mMA_X_2pHGq3lpDpIxJ4s_j63o2FjAE5b9ml195YcbZH2QVPoqFxQgUhHMi9Y8fDwIieJsu5yFrXmCUlBIrNOqgHhlmHY9phj8mwnIGHtNd7Fb6hkyQ8w8kotAA88bmEofM0xOtZXvHeCcVslbQU_Q8P412B7xS4X3erQT3dvlT4QMqKfR6exooEUAIT3vfOkal9-rpyupdlp0meTvNxvTZRHzZZli-pod6lTrW1_3uAVK6-5v7MlAsFVOMxs3vRTmbQ4Y"/>
@@ -143,7 +162,7 @@
 </div>
 </header>
 <!-- Main Content Canvas -->
-<main class="ml-64 px-12 pb-12 flex gap-8 overflow-hidden" style="height:calc(100vh - 88px); margin-top:88px;">
+<main class="ml-64 px-12 pb-12 flex gap-8 overflow-hidden" style="height:calc(100vh - 88px); margin-top:88px;" {% if rtl %}dir="rtl"{% endif %}>
 <!-- Central Chat Area -->
 <section class="flex-grow flex flex-col gap-6 max-w-4xl min-h-0 overflow-hidden">
 <header class="mb-4 shrink-0">
@@ -157,8 +176,8 @@
 <!-- Input Area -->
 <div class="mt-8 pt-6 border-t border-slate-100">
 <div class="relative">
-<input id="chat-input" class="w-full bg-surface-container-low border-none rounded-2xl py-5 px-6 pr-16 text-primary focus:ring-2 focus:ring-tertiary-fixed-dim transition-all" placeholder="Ask follow-up questions or refine requirements..." type="text"/>
-<button id="send-button" class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-primary text-white rounded-xl flex items-center justify-center shadow-lg hover:scale-95 transition-transform">
+<input id="chat-input" class="w-full bg-surface-container-low border-none rounded-2xl py-5 px-6 {% if rtl %}pl-16{% else %}pr-16{% endif %} text-primary focus:ring-2 focus:ring-tertiary-fixed-dim transition-all" placeholder="{{ t('chat.placeholder', locale) }}" type="text" {% if rtl %}dir="rtl"{% endif %}/>
+<button id="send-button" class="absolute {% if rtl %}left-3{% else %}right-3{% endif %} top-1/2 -translate-y-1/2 w-10 h-10 bg-primary text-white rounded-xl flex items-center justify-center shadow-lg hover:scale-95 transition-transform">
 <span class="material-symbols-outlined">send</span>
 </button>
 </div>
@@ -337,7 +356,9 @@
     // ── Welcome / context message ─────────────────────────────────────────────
     function showWelcome() {
         const container = document.createElement('div');
-        container.className = 'flex flex-col items-start gap-4 mr-12';
+        container.className = IS_RTL
+            ? 'chat-agent-msg flex flex-col items-end gap-4 ml-12'
+            : 'flex flex-col items-start gap-4 mr-12';
 
         if (RFP_DATA) {
             // Context-aware welcome when opened from /create
@@ -409,11 +430,15 @@
     }
 
     // ── Chat helpers ─────────────────────────────────────────────────────────
+    const IS_RTL = {{ rtl | tojson }};
+
     function appendUserMessage(text) {
         const div = document.createElement('div');
-        div.className = 'flex flex-col items-end gap-3 ml-12';
+        div.className = IS_RTL
+            ? 'chat-user-msg flex flex-col items-start gap-3 ml-12'
+            : 'flex flex-col items-end gap-3 ml-12';
         div.innerHTML = `
-            <div class="bg-primary text-white p-6 rounded-2xl rounded-tr-none shadow-md max-w-[85%]">
+            <div class="msg-bubble bg-primary text-white p-6 rounded-2xl ${IS_RTL ? 'rounded-tl-none' : 'rounded-tr-none'} shadow-md max-w-[85%]">
                 <p class="leading-relaxed">${text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p>
             </div>
             <span class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold px-2">You • Just now</span>
@@ -424,7 +449,11 @@
 
     function createAgentMessageContainer() {
         const container = document.createElement('div');
-        container.className = 'flex flex-col items-start gap-4 mr-12 mt-4';
+        container.className = IS_RTL
+            ? 'chat-agent-msg flex flex-col items-end gap-4 ml-12 mt-4'
+            : 'flex flex-col items-start gap-4 mr-12 mt-4';
+        const bubbleRadius = IS_RTL ? 'rounded-tr-none' : 'rounded-tl-none';
+        const borderSide   = IS_RTL ? 'border-r-4' : 'border-l-4';
         container.innerHTML = `
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 bg-tertiary-fixed-dim rounded-full flex items-center justify-center">
@@ -432,9 +461,9 @@
                 </div>
                 <span class="text-[10px] uppercase tracking-widest text-primary font-bold agent-status">RFP Agent • Thinking…</span>
             </div>
-            <div class="bg-surface-container-low p-8 rounded-3xl rounded-tl-none space-y-4 w-full">
+            <div class="msg-bubble bg-surface-container-low p-8 rounded-3xl ${bubbleRadius} space-y-4 w-full">
                 <div class="markdown-body text-primary leading-relaxed font-medium"></div>
-                <div class="agent-logs hidden bg-white/60 rounded-xl p-3 border-l-4 border-tertiary-fixed-dim flex-col gap-1.5"></div>
+                <div class="agent-logs hidden bg-white/60 rounded-xl p-3 ${borderSide} border-tertiary-fixed-dim flex-col gap-1.5"></div>
             </div>
         `;
         chatMessages.appendChild(container);
@@ -465,7 +494,7 @@
         let hasLogs = false;
 
         try {
-            const chatBody = { message: text, session_id: 'default' };
+            const chatBody = { message: text, session_id: RFP_ID ? `rfp_${RFP_ID}` : 'default' };
             if (RFP_ID) chatBody.rfp_id = RFP_ID;
             const response = await fetch('/api/chat', {
                 method: 'POST',
@@ -554,5 +583,11 @@
 
     sendButton.addEventListener('click', sendMessage);
     chatInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
+</script>
+<script>
+function setLang(locale) {
+  document.cookie = `ui_lang=${locale};path=/;max-age=31536000`;
+  location.reload();
+}
 </script>
 </body></html>

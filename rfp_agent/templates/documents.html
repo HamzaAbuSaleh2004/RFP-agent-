@@ -1,332 +1,386 @@
 <!DOCTYPE html>
-
-<html class="light" lang="en"><head>
+<html class="light" lang="{{ locale }}" {% if rtl %}dir="rtl"{% endif %}>
+<head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>RFP Director | Document Management</title>
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<title>RFP Director | {{ t('docs.title', locale) }}</title>
+{% if rtl %}<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet"/>{% endif %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script id="tailwind-config">
-    tailwind.config = {
-      darkMode: "class",
-      theme: {
-        extend: {
-          "colors": {
-                  "inverse-on-surface": "#f0f1f2",
-                  "inverse-surface": "#2e3132",
-                  "tertiary-fixed-dim": "#fbbc00",
-                  "on-surface": "#191c1d",
-                  "on-tertiary-fixed-variant": "#5c4300",
-                  "surface-container-lowest": "#ffffff",
-                  "on-primary": "#ffffff",
-                  "surface-container": "#edeeef",
-                  "on-tertiary": "#ffffff",
-                  "surface": "#f8f9fa",
-                  "tertiary-fixed": "#ffdfa0",
-                  "background": "#f8f9fa",
-                  "on-tertiary-container": "#ae8100",
-                  "tertiary-container": "#2d1f00",
-                  "surface-bright": "#f8f9fa",
-                  "surface-container-high": "#e7e8e9",
-                  "primary-fixed-dim": "#aec7f6",
-                  "secondary-fixed": "#d5e3ff",
-                  "on-surface-variant": "#44474e",
-                  "surface-tint": "#465f88",
-                  "secondary-fixed-dim": "#a7c8ff",
-                  "surface-container-highest": "#e1e3e4",
-                  "on-secondary-fixed-variant": "#1f477b",
-                  "outline": "#74777f",
-                  "error": "#ba1a1a",
-                  "outline-variant": "#c4c6cf",
-                  "on-background": "#191c1d",
-                  "surface-dim": "#d9dadb",
-                  "on-error": "#ffffff",
-                  "on-secondary-container": "#294f83",
-                  "error-container": "#ffdad6",
-                  "surface-variant": "#e1e3e4",
-                  "on-primary-container": "#708ab5",
-                  "on-error-container": "#93000a",
-                  "on-primary-fixed": "#001b3d",
-                  "on-secondary-fixed": "#001b3c",
-                  "on-tertiary-fixed": "#261a00",
-                  "primary": "#000a1e",
-                  "secondary": "#3a5f94",
-                  "surface-container-low": "#f3f4f5",
-                  "tertiary": "#100900",
-                  "inverse-primary": "#aec7f6",
-                  "primary-fixed": "#d6e3ff",
-                  "secondary-container": "#9fc2fe",
-                  "primary-container": "#002147",
-                  "on-primary-fixed-variant": "#2d476f",
-                  "on-secondary": "#ffffff"
-          },
-          "borderRadius": {
-                  "DEFAULT": "0.125rem",
-                  "lg": "0.25rem",
-                  "xl": "0.5rem",
-                  "full": "0.75rem"
-          },
-          "fontFamily": {
-                  "headline": ["Manrope"],
-                  "body": ["Inter"],
-                  "label": ["Inter"]
-          }
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "inverse-on-surface":"#f0f1f2","inverse-surface":"#2e3132",
+          "tertiary-fixed-dim":"#fbbc00","on-surface":"#191c1d",
+          "on-tertiary-fixed-variant":"#5c4300","surface-container-lowest":"#ffffff",
+          "on-primary":"#ffffff","surface-container":"#edeeef",
+          "on-tertiary":"#ffffff","surface":"#f8f9fa",
+          "tertiary-fixed":"#ffdfa0","background":"#f8f9fa",
+          "on-tertiary-container":"#ae8100","tertiary-container":"#2d1f00",
+          "surface-bright":"#f8f9fa","surface-container-high":"#e7e8e9",
+          "primary-fixed-dim":"#aec7f6","secondary-fixed":"#d5e3ff",
+          "on-surface-variant":"#44474e","surface-tint":"#465f88",
+          "secondary-fixed-dim":"#a7c8ff","surface-container-highest":"#e1e3e4",
+          "on-secondary-fixed-variant":"#1f477b","outline":"#74777f",
+          "error":"#ba1a1a","outline-variant":"#c4c6cf",
+          "on-background":"#191c1d","surface-dim":"#d9dadb",
+          "on-error":"#ffffff","on-secondary-container":"#294f83",
+          "error-container":"#ffdad6","surface-variant":"#e1e3e4",
+          "on-primary-container":"#708ab5","on-error-container":"#93000a",
+          "on-primary-fixed":"#001b3d","on-secondary-fixed":"#001b3c",
+          "on-tertiary-fixed":"#261a00","primary":"#000a1e",
+          "secondary":"#3a5f94","surface-container-low":"#f3f4f5",
+          "tertiary":"#100900","inverse-primary":"#aec7f6",
+          "primary-fixed":"#d6e3ff","secondary-container":"#9fc2fe",
+          "primary-container":"#002147","on-primary-fixed-variant":"#2d476f",
+          "on-secondary":"#ffffff"
         },
-      },
+        borderRadius: { DEFAULT:"0.125rem", lg:"0.25rem", xl:"0.5rem", full:"0.75rem" },
+        fontFamily: { headline:["Manrope"], body:["Inter"], label:["Inter"] }
+      }
     }
-  </script>
+  }
+</script>
 <style>
-    body { font-family: 'Inter', sans-serif; }
-    .headline-font { font-family: 'Manrope', sans-serif; }
-    .material-symbols-outlined {
-      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-      vertical-align: middle;
-    }
-    .ghost-border { border: 1px solid rgba(196, 198, 207, 0.15); }
-    .ambient-shadow { box-shadow: 0 12px 32px rgba(25, 28, 29, 0.04); }
-    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: #e1e3e4; border-radius: 10px; }
-  </style>
+  body { font-family: {% if rtl %}'Cairo', {% endif %}'Inter', sans-serif; }
+  h1,h2,h3 { font-family: {% if rtl %}'Cairo', {% endif %}'Manrope', sans-serif; }
+  {% if rtl %}
+  .ml-64 { margin-left: 0 !important; margin-right: 16rem; }
+  aside { left: auto !important; right: 0; }
+  {% endif %}
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+  .ambient-shadow { box-shadow: 0 12px 32px rgba(25,28,29,0.04); }
+  .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+  .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+  .custom-scrollbar::-webkit-scrollbar-thumb { background: #e1e3e4; border-radius: 10px; }
+  .status-badge-draft    { background:#dbeafe; color:#1e40af; }
+  .status-badge-approved { background:#d1fae5; color:#065f46; }
+  .status-badge-done     { background:#f1f5f9; color:#475569; }
+  .rfp-row.active { background:#fff; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-left: 3px solid #fbbc00; }
+  {% if rtl %}.rfp-row.active { border-left: none; border-right: 3px solid #fbbc00; }{% endif %}
+
+  /* Markdown preview styles */
+  .md-preview h1 { font-family:'Manrope',sans-serif; font-weight:800; font-size:1.4rem; margin:1rem 0 .5rem; color:#000a1e; }
+  .md-preview h2 { font-family:'Manrope',sans-serif; font-weight:700; font-size:1.1rem; margin:1rem 0 .4rem; color:#002147; border-bottom:1px solid #e2e8f0; padding-bottom:.3rem; }
+  .md-preview h3 { font-family:'Manrope',sans-serif; font-weight:600; font-size:.95rem; margin:.8rem 0 .3rem; }
+  .md-preview p  { margin-bottom:.6rem; line-height:1.7; font-size:.85rem; }
+  .md-preview ul,.md-preview ol { padding-left:1.4rem; margin-bottom:.6rem; font-size:.85rem; }
+  .md-preview li { margin-bottom:.2rem; }
+  .md-preview table { width:100%; border-collapse:collapse; margin:.8rem 0; font-size:.8rem; }
+  .md-preview th { background:#f0f4f8; text-align:left; padding:.35rem .5rem; border:1px solid #d1d5db; font-weight:600; }
+  .md-preview td { padding:.3rem .5rem; border:1px solid #e5e7eb; }
+  .md-preview strong { font-weight:600; }
+  .md-preview blockquote { border-left:3px solid #94a3b8; padding-left:1rem; color:#64748b; margin:.5rem 0; }
+  {% if rtl %}
+  .md-preview { direction: rtl; text-align: right; }
+  .md-preview th { text-align: right; }
+  .md-preview blockquote { border-left: none; border-right: 3px solid #94a3b8; padding-left: 0; padding-right: 1rem; }
+  {% endif %}
+</style>
 </head>
 <body class="bg-surface text-on-surface antialiased overflow-hidden">
+
 <!-- SideNavBar -->
-<aside class="fixed left-0 top-0 h-full flex flex-col p-6 bg-slate-50 dark:bg-slate-950 h-screen w-64 border-r-0 z-50 font-['Manrope'] antialiased">
-<div class="flex items-center gap-3 mb-10 px-2">
-<div class="w-10 h-10 bg-primary-container rounded-lg flex items-center justify-center text-white">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">description</span>
-</div>
-<div>
-<h1 class="text-xl font-bold tracking-tight text-blue-900 dark:text-blue-50">RFP Director</h1>
-<p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Enterprise Procurement</p>
-</div>
-</div>
-<nav class="flex-1 space-y-2">
-<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-blue-900 dark:hover:text-blue-200 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors rounded-lg group" href="/">
-<span class="material-symbols-outlined group-active:scale-95 transition-transform duration-150">dashboard</span>
-<span class="font-medium">Dashboard</span>
-</a>
-<!-- Active Tab: Documents -->
-<a class="flex items-center gap-3 px-4 py-3 text-blue-950 dark:text-white font-semibold bg-white dark:bg-blue-900/30 rounded-lg shadow-sm" href="/documents">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">description</span>
-<span class="font-semibold">Documents</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-blue-900 dark:hover:text-blue-200 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors rounded-lg group" href="/evaluations">
-<span class="material-symbols-outlined group-active:scale-95 transition-transform duration-150">analytics</span>
-<span class="font-medium">Evaluations</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-blue-900 dark:hover:text-blue-200 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors rounded-lg group" href="#">
-<span class="material-symbols-outlined group-active:scale-95 transition-transform duration-150">settings</span>
-<span class="font-medium">Settings</span>
-</a>
-</nav>
-<div class="mt-auto">
-<button class="w-full py-4 bg-gradient-to-br from-primary-container to-primary text-white rounded-xl font-semibold shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2">
-<span class="material-symbols-outlined">add</span>
-<span>Create RFP</span>
-</button>
-</div>
+<aside class="fixed left-0 top-0 h-full flex flex-col p-6 bg-slate-50 dark:bg-slate-950 w-64 border-r-0 z-50 font-['Manrope'] antialiased">
+  <div class="flex items-center gap-3 mb-10 px-2">
+    <div class="w-10 h-10 bg-primary-container rounded-lg flex items-center justify-center overflow-hidden">
+      <img alt="RFP Director Logo" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpZLLS4QJDdjky3Llue_mYCs_u0h6BRUK5E0MXQ_48_k1JNpyUZybTatEO5YAVHUVWDIMp1GuTNyUDIJIxXuFTuqx7JUvxyly2FnimyTGUS6jXcdlz8D-876iKfRKvFHjyU43H3AyrLDfaDhBASUPNaJ67WpR90rV3hJDjriLVmu975CmQLdlKgON6JZSZCxdDH2tEjYIEYmp9KTg6aBBkoF97ncEIb-Dc6bwW8RoCyE_8152uCGA1hVvEP14cIf05htQ5c_Hxcws"/>
+    </div>
+    <div>
+      <h1 class="text-xl font-bold tracking-tight text-blue-900">RFP Director</h1>
+      <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Enterprise Procurement</p>
+    </div>
+  </div>
+  <nav class="flex-1 space-y-2">
+    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/">
+      <span class="material-symbols-outlined">dashboard</span><span class="font-medium">{{ t('nav.dashboard', locale) }}</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 text-blue-950 font-semibold bg-white rounded-lg shadow-sm" href="/documents">
+      <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">description</span><span class="font-semibold">{{ t('nav.documents', locale) }}</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/evaluations">
+      <span class="material-symbols-outlined">analytics</span><span class="font-medium">{{ t('nav.evaluations', locale) }}</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/settings">
+      <span class="material-symbols-outlined">settings</span><span class="font-medium">{{ t('nav.settings', locale) }}</span>
+    </a>
+  </nav>
+  <div class="mt-auto">
+    <a href="/create" class="block w-full py-4 bg-primary-container text-white rounded-xl font-bold shadow-lg text-center text-sm hover:brightness-110 transition-all">
+      {{ t('nav.create_rfp', locale) }}
+    </a>
+  </div>
 </aside>
-<!-- Main Content Wrapper -->
+
+<!-- Main Content -->
 <main class="ml-64 flex flex-col h-screen">
-<!-- TopNavBar -->
-<header class="flex justify-between items-center w-full px-8 py-4 sticky top-0 z-40 bg-white/70 backdrop-blur-xl transition-all duration-300 ease-in-out font-['Inter'] text-sm tracking-wide">
-<div class="flex items-center flex-1 max-w-xl">
-<div class="relative w-full group">
-<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-<input class="w-full pl-12 pr-4 py-2.5 bg-surface-container-low border-none rounded-full focus:ring-2 focus:ring-tertiary-fixed-dim/40 transition-all text-on-surface" placeholder="Search Google Drive" type="text"/>
-</div>
-</div>
-<div class="flex items-center gap-6 ml-auto">
-<button class="text-slate-400 hover:text-blue-700 transition-colors relative">
-<span class="material-symbols-outlined">notifications</span>
-<span class="absolute top-0 right-0 w-2 h-2 bg-tertiary-fixed-dim rounded-full border-2 border-white"></span>
-</button>
-<button class="text-slate-400 hover:text-blue-700 transition-colors">
-<span class="material-symbols-outlined">help_outline</span>
-</button>
-<div class="h-8 w-[1px] bg-outline-variant/20 mx-2"></div>
-<div class="flex items-center gap-3">
-<div class="text-right">
-<p class="text-xs font-bold text-primary">Julianne Vane</p>
-<p class="text-[10px] text-slate-400 font-medium">Procurement Lead</p>
-</div>
-<img alt="Executive User Profile" class="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm" data-alt="professional headshot of an executive woman with a friendly expression in a brightly lit modern office setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDeG4ywfCNHqrUKtQyRHgihkk5Hh2yynupsnldCq9akDNBRZwzRbGkw_O20QHsZEAx5RdBimH8BVp9ioInTjVK8j9qYuCx4j8vHRFcpepgwayfA3ZzGUW6_aPM2B7DrS0A_Yrm-A7i622xvm01W6G8GoS5eP4ldh8GJKoE3ONCxX6Eq4Ekl22Qt4Nlijk_tiExlMISloMyfaI1I5kSzRU_1xa4jEei7ncmuuV1-6McKfvEfzyK3yCZT_hiASMDqh6RCb5fbevZieeE"/>
-</div>
-</div>
-</header>
-<!-- Document Workspace -->
-<div class="flex flex-1 overflow-hidden p-8 gap-8">
-<!-- Left Column: File Explorer -->
-<section class="flex-[1.5] flex flex-col space-y-8 overflow-hidden">
-<div>
-<h2 class="headline-font text-3xl font-extrabold text-primary tracking-tight mb-2">Documents</h2>
-<p class="text-sm text-on-surface-variant/70">Manage your RFP lifecycle assets and shared vendor files.</p>
-</div>
-<!-- Directory / Filter Taps -->
-<div class="flex gap-4">
-<button class="px-6 py-2 bg-surface-container-highest text-primary font-bold rounded-full text-xs transition-all">All Files</button>
-<button class="px-6 py-2 bg-transparent text-slate-400 hover:bg-surface-container-low font-semibold rounded-full text-xs transition-all">Drafts</button>
-<button class="px-6 py-2 bg-transparent text-slate-400 hover:bg-surface-container-low font-semibold rounded-full text-xs transition-all">Shared with me</button>
-<button class="px-6 py-2 bg-transparent text-slate-400 hover:bg-surface-container-low font-semibold rounded-full text-xs transition-all">Archived</button>
-</div>
-<!-- File List -->
-<div class="bg-surface-container-low rounded-3xl p-6 flex-1 overflow-hidden flex flex-col shadow-sm">
-<div class="flex items-center justify-between mb-6 px-2">
-<span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Name &amp; Last Modified</span>
-<span class="material-symbols-outlined text-slate-400 cursor-pointer">sort</span>
-</div>
-<div class="flex-1 overflow-y-auto custom-scrollbar space-y-1">
-<!-- Folder -->
-<div class="group flex items-center gap-4 p-4 rounded-2xl hover:bg-surface-container-lowest transition-all cursor-pointer">
-<div class="w-10 h-10 flex items-center justify-center text-tertiary-fixed-dim bg-tertiary-container/10 rounded-lg">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">folder</span>
-</div>
-<div class="flex-1">
-<h4 class="text-sm font-bold text-primary">Q3 Infrastructure Project</h4>
-<p class="text-xs text-slate-400">Folder • 12 items</p>
-</div>
-<div class="text-right">
-<p class="text-xs font-medium text-slate-500">2 hours ago</p>
-</div>
-</div>
-<!-- Active Selection: RFP File -->
-<div class="group flex items-center gap-4 p-4 rounded-2xl bg-surface-container-lowest shadow-sm border-l-4 border-tertiary-fixed-dim transition-all cursor-pointer">
-<div class="w-10 h-10 flex items-center justify-center text-blue-600 bg-blue-50 rounded-lg">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">description</span>
-</div>
-<div class="flex-1">
-<h4 class="text-sm font-bold text-primary">Main_RFP_Vendor_Framework_v4.pdf</h4>
-<p class="text-xs text-slate-400">PDF • 4.2 MB</p>
-</div>
-<div class="text-right">
-<p class="text-xs font-bold text-primary">Active Now</p>
-</div>
-</div>
-<!-- More Files -->
-<div class="group flex items-center gap-4 p-4 rounded-2xl hover:bg-surface-container-lowest transition-all cursor-pointer opacity-70">
-<div class="w-10 h-10 flex items-center justify-center text-emerald-600 bg-emerald-50 rounded-lg">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">table_chart</span>
-</div>
-<div class="flex-1">
-<h4 class="text-sm font-bold text-primary">Cost_Matrix_Consolidation.xlsx</h4>
-<p class="text-xs text-slate-400">Spreadsheet • 840 KB</p>
-</div>
-<div class="text-right">
-<p class="text-xs font-medium text-slate-500">Yesterday</p>
-</div>
-</div>
-<div class="group flex items-center gap-4 p-4 rounded-2xl hover:bg-surface-container-lowest transition-all cursor-pointer opacity-70">
-<div class="w-10 h-10 flex items-center justify-center text-red-600 bg-red-50 rounded-lg">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">picture_as_pdf</span>
-</div>
-<div class="flex-1">
-<h4 class="text-sm font-bold text-primary">Contract_Legal_Draft_July.pdf</h4>
-<p class="text-xs text-slate-400">PDF • 1.1 MB</p>
-</div>
-<div class="text-right">
-<p class="text-xs font-medium text-slate-500">Jul 12, 2023</p>
-</div>
-</div>
-<div class="group flex items-center gap-4 p-4 rounded-2xl hover:bg-surface-container-lowest transition-all cursor-pointer opacity-70">
-<div class="w-10 h-10 flex items-center justify-center text-blue-600 bg-blue-50 rounded-lg">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">description</span>
-</div>
-<div class="flex-1">
-<h4 class="text-sm font-bold text-primary">Compliance_Checklist.docx</h4>
-<p class="text-xs text-slate-400">Word • 244 KB</p>
-</div>
-<div class="text-right">
-<p class="text-xs font-medium text-slate-500">Jul 10, 2023</p>
-</div>
-</div>
-</div>
-</div>
-</section>
-<!-- Right Column: Preview Pane -->
-<aside class="flex-1 flex flex-col bg-surface-container-lowest rounded-3xl ambient-shadow overflow-hidden">
-<!-- Preview Header / Actions -->
-<div class="p-6 border-b border-outline-variant/10">
-<div class="flex justify-between items-start mb-6">
-<div>
-<span class="px-2 py-1 bg-tertiary-fixed-dim/20 text-on-tertiary-container text-[10px] font-bold rounded uppercase tracking-wider mb-2 inline-block">Draft Review</span>
-<h3 class="headline-font text-xl font-bold text-primary">Vendor Framework v4</h3>
-</div>
-<button class="p-2 hover:bg-surface-container-low rounded-full transition-colors">
-<span class="material-symbols-outlined text-slate-400">more_vert</span>
-</button>
-</div>
-<!-- Action Buttons -->
-<div class="grid grid-cols-2 gap-3">
-<button class="flex items-center justify-center gap-2 px-4 py-3 bg-surface-container-high text-primary font-bold rounded-xl text-xs hover:bg-surface-container-highest transition-all">
-<span class="material-symbols-outlined text-lg">open_in_new</span>
-              Open in Drive
-            </button>
-<button class="flex items-center justify-center gap-2 px-4 py-3 bg-surface-container-high text-primary font-bold rounded-xl text-xs hover:bg-surface-container-highest transition-all">
-<span class="material-symbols-outlined text-lg">download</span>
-              Download PDF
-            </button>
-<button class="col-span-2 flex items-center justify-center gap-2 px-4 py-3 bg-primary text-white font-bold rounded-xl text-xs hover:shadow-lg transition-all">
-<span class="material-symbols-outlined text-lg">send</span>
-              Share to Slack
-            </button>
-</div>
-</div>
-<!-- Document Preview Canvas -->
-<div class="flex-1 bg-surface-container p-6 overflow-y-auto custom-scrollbar">
-<div class="bg-white rounded shadow-sm min-h-[600px] w-full p-12 flex flex-col space-y-6">
-<!-- Skeleton Document Content -->
-<div class="flex items-center justify-between border-b pb-4">
-<div class="w-24 h-6 bg-slate-100"></div>
-<div class="w-16 h-3 bg-slate-50"></div>
-</div>
-<div class="space-y-4">
-<div class="h-8 bg-slate-100 w-3/4 rounded"></div>
-<div class="h-4 bg-slate-50 w-full rounded"></div>
-<div class="h-4 bg-slate-50 w-full rounded"></div>
-<div class="h-4 bg-slate-50 w-5/6 rounded"></div>
-</div>
-<div class="h-40 bg-slate-50/50 rounded-xl relative overflow-hidden">
-<img alt="Document Visualization" class="w-full h-full object-cover opacity-20 grayscale" data-alt="faded architectural floor plan or technical diagram with blue lines on a clean white paper background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPwND7k42gISl6TwfjMjULNMwuxYmrp-dQEQWaX8nqGRsB3PjYpI8I5TNrVlDn1zQWCZoZr8hd8ZpHRskwUUwPKla2DQcOawU_JW3oFlB5RcBJngR_lQP_TRV8DVwdJcarjU7yqrjVJuIy8IE_4OxzM0UXjdWjSaMnXOQbsedOvnOF0r8EAWup-o7XUuehTgBGBT8EgS_szOGtt_yltNejiaCRax0p0MLGE3nk7YAGxPM6aU7YR-VfWdk366lhw9vefDYIG6LQKPY"/>
-<div class="absolute inset-0 flex items-center justify-center">
-<p class="text-[10px] font-bold text-slate-300 uppercase tracking-widest">Asset Visualization Placeholder</p>
-</div>
-</div>
-<div class="space-y-4 pt-4">
-<div class="h-6 bg-slate-100 w-1/2 rounded"></div>
-<div class="grid grid-cols-2 gap-4">
-<div class="h-20 bg-slate-50 rounded"></div>
-<div class="h-20 bg-slate-50 rounded"></div>
-</div>
-<div class="h-4 bg-slate-50 w-full rounded"></div>
-<div class="h-4 bg-slate-50 w-full rounded"></div>
-</div>
-<div class="pt-10 mt-auto border-t">
-<div class="flex items-center gap-2">
-<div class="w-6 h-6 rounded-full bg-tertiary-fixed-dim"></div>
-<div class="h-3 bg-slate-100 w-24 rounded"></div>
-</div>
-</div>
-</div>
-</div>
-<!-- Meta Info -->
-<div class="p-4 bg-surface-container-low/50 flex justify-between items-center px-6">
-<div class="flex -space-x-2">
-<img alt="Collaborator" class="w-6 h-6 rounded-full border-2 border-white" data-alt="close-up portrait of a professional woman with glasses" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBlTe7kNJ6ZYbpV8gwJZBmH2DOZEcBiRfuRHTBuvbQ-u40BPmr71d4RVLEEr_YYtyCGBrjfBWp_xLVJGBJz9eXv4KloZTMGkvvso50VGRq-mSAaH2PUAIsWjhgoJno5eZ8hbS3OoqQOww0hZYtvvbbq7GKR1pPEySakMTYm-3vXwVqI0IKL6fQBzKZkjORQ3R2iaYRC3iU2PQedxF0pt3kq014fxkCUIoKDDTLJssJ70nK265CSKP_iF570f-fnh5dvoCaFnnaF1MQ"/>
-<img alt="Collaborator" class="w-6 h-6 rounded-full border-2 border-white" data-alt="headshot of a smiling businessman in a professional setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_LlpKddyczLv2v7LKGjjMcbmyHbSZwE2ZiUiLZsVpGIbuAtyuqIogpZmg4bjCLjWy4ZNRPrxPzXnyoFpQtBI9MlMtgMF0y-CL5FBu6Cr1SGgFLFHu-gcKlGIGfnaJuhHskVEVkG0U0SG-KZS3gwA7UyXKqgF6xO52c1BPG99h2jL9vmlU66Hq7sQjBFzp4-ALNQ72qBJ5RZMsAp17_GsK0LIJjnmmF7xJlNvy0SGZBV1if-rHcNpgXSd-dFX8nrv-pL_b_V_KQis"/>
-<div class="w-6 h-6 rounded-full border-2 border-white bg-slate-200 flex items-center justify-center text-[8px] font-bold">+4</div>
-</div>
-<p class="text-[10px] text-slate-400 font-medium">Auto-saved at 14:22 PM</p>
-</div>
-</aside>
-</div>
+  <!-- TopNavBar -->
+  <header class="flex justify-between items-center w-full px-8 py-4 sticky top-0 z-40 bg-white/70 backdrop-blur-xl">
+    <div class="flex items-center flex-1 max-w-xl">
+      <div class="relative w-full">
+        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+        <input id="search-input" oninput="filterRFPs()"
+               class="w-full pl-12 pr-4 py-2.5 bg-surface-container-low border-none rounded-full focus:ring-2 focus:ring-tertiary-fixed-dim/40 transition-all text-on-surface text-sm"
+               placeholder="{{ t('form.search', locale) }}" type="text"/>
+      </div>
+    </div>
+    <div class="flex items-center gap-6 {% if rtl %}mr-auto ml-0{% else %}ml-auto{% endif %}">
+      <div class="flex items-center rounded-lg overflow-hidden border border-slate-200 text-[11px] font-bold">
+        <a href="#" onclick="setLang('en');return false;"
+           class="px-2.5 py-1.5 transition-colors {% if locale == 'en' %}bg-primary-container text-white{% else %}text-slate-500 hover:bg-surface-container-low{% endif %}">EN</a>
+        <a href="#" onclick="setLang('ar');return false;"
+           class="px-2.5 py-1.5 transition-colors {% if locale == 'ar' %}bg-primary-container text-white{% else %}text-slate-500 hover:bg-surface-container-low{% endif %}">AR</a>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="{% if rtl %}text-left{% else %}text-right{% endif %}">
+          <p class="text-xs font-bold text-primary">Alex Sterling</p>
+          <p class="text-[10px] text-slate-400">Executive Director</p>
+        </div>
+        <img alt="Profile" class="w-9 h-9 rounded-full object-cover ring-2 ring-surface-container-high" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTcWdH7qA3eeGEQCR1saQUN_SAuXVa7cwjbM_FTISLKJQYrX2WaRmNJhpxvErwrgczJ4WjAvPhY-zUE1WIWL85H4wxB_PNVfMaSkNjLn_Coi7GhtUb0ExOfCimWCwdbBTI4bkbNZda80DOWx1P9KI4juMXoLbgAJT8BqRrQUGA8m1-J5kGFOtkqFEF2s2-i04Xk6XXkb0SGX6c3PPrDF4cyzee4Pl4C-NSHyPpZjwTwMMmZENOZvagk03QCcljIXmQbx-6lT9fbDA"/>
+      </div>
+    </div>
+  </header>
+
+  <!-- Document Workspace -->
+  <div class="flex flex-1 overflow-hidden p-8 gap-8">
+    <!-- Left Column: RFP List -->
+    <section class="flex-[1.5] flex flex-col space-y-6 overflow-hidden">
+      <div>
+        <h2 class="text-3xl font-extrabold text-primary tracking-tight mb-2">{{ t('docs.title', locale) }}</h2>
+        <p class="text-sm text-on-surface-variant/70">{{ t('docs.subtitle', locale) }}</p>
+      </div>
+
+      <!-- Filter tabs -->
+      <div class="flex gap-3" id="filter-tabs">
+        <button onclick="setDocFilter('all')" data-filter="all"
+          class="doc-filter active-filter px-5 py-2 rounded-full text-xs font-bold transition-all">{{ t('filter.all', locale) }}</button>
+        <button onclick="setDocFilter('draft')" data-filter="draft"
+          class="doc-filter px-5 py-2 bg-transparent text-slate-400 hover:bg-surface-container-low font-semibold rounded-full text-xs transition-all">{{ t('filter.draft', locale) }}</button>
+        <button onclick="setDocFilter('approved')" data-filter="approved"
+          class="doc-filter px-5 py-2 bg-transparent text-slate-400 hover:bg-surface-container-low font-semibold rounded-full text-xs transition-all">{{ t('filter.approved', locale) }}</button>
+        <button onclick="setDocFilter('done')" data-filter="done"
+          class="doc-filter px-5 py-2 bg-transparent text-slate-400 hover:bg-surface-container-low font-semibold rounded-full text-xs transition-all">{{ t('filter.done', locale) }}</button>
+      </div>
+
+      <!-- RFP File List -->
+      <div class="bg-surface-container-low rounded-3xl p-6 flex-1 overflow-hidden flex flex-col shadow-sm">
+        <div class="flex items-center justify-between mb-4 px-2">
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest" id="rfp-count-label">—</span>
+        </div>
+        <div id="rfp-list" class="flex-1 overflow-y-auto custom-scrollbar space-y-1">
+          <!-- Populated by JS -->
+        </div>
+        <!-- Empty state -->
+        <div id="rfp-list-empty" class="hidden flex flex-col items-center justify-center py-16 text-center">
+          <span class="material-symbols-outlined text-4xl text-slate-300 mb-3">folder_open</span>
+          <p class="font-bold text-primary mb-1">{{ t('empty.no_rfps', locale) }}</p>
+          <p class="text-sm text-on-surface-variant mb-4">{{ t('empty.create_first', locale) }}</p>
+          <a href="/create" class="bg-primary-container text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:brightness-110">{{ t('nav.create_rfp', locale) }}</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Column: Preview Pane -->
+    <aside id="preview-pane" class="flex-1 flex flex-col bg-surface-container-lowest rounded-3xl ambient-shadow overflow-hidden">
+      <!-- Empty preview state -->
+      <div id="preview-empty" class="flex-1 flex flex-col items-center justify-center text-center p-8">
+        <span class="material-symbols-outlined text-5xl text-slate-200 mb-4">article</span>
+        <p class="font-bold text-primary mb-1">{{ t('docs.select_rfp', locale) }}</p>
+      </div>
+      <!-- Loaded preview -->
+      <div id="preview-loaded" class="hidden flex flex-col h-full">
+        <!-- Preview Header -->
+        <div class="p-6 border-b border-outline-variant/10 shrink-0">
+          <div class="flex justify-between items-start mb-4">
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2 mb-2">
+                <span id="preview-status" class="status-badge-draft text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full"></span>
+                <span id="preview-lang" class="text-[11px] font-bold text-slate-400"></span>
+              </div>
+              <h3 id="preview-title" class="text-xl font-bold text-primary truncate"></h3>
+              <p id="preview-desc" class="text-xs text-on-surface-variant mt-1 line-clamp-2"></p>
+            </div>
+          </div>
+          <!-- Action Buttons -->
+          <div class="grid grid-cols-2 gap-3" id="preview-actions">
+            <a id="action-editor" href="#"
+               class="flex items-center justify-center gap-2 px-4 py-3 bg-surface-container-high text-primary font-bold rounded-xl text-xs hover:bg-surface-container-highest transition-all">
+              <span class="material-symbols-outlined text-lg">edit_document</span>
+              {{ t('docs.open_editor', locale) }}
+            </a>
+            <a id="action-chat" href="#"
+               class="flex items-center justify-center gap-2 px-4 py-3 bg-primary-container text-white font-bold rounded-xl text-xs hover:brightness-110 transition-all">
+              <span class="material-symbols-outlined text-lg">chat</span>
+              {{ t('docs.open_chat', locale) }}
+            </a>
+          </div>
+        </div>
+        <!-- Document Preview Canvas -->
+        <div class="flex-1 bg-surface-container p-6 overflow-y-auto custom-scrollbar">
+          <div id="preview-content" class="bg-white rounded shadow-sm w-full p-10 md-preview text-sm text-on-surface min-h-[400px]">
+          </div>
+          <!-- No content state -->
+          <div id="preview-no-content" class="hidden flex flex-col items-center justify-center py-16 text-center">
+            <span class="material-symbols-outlined text-4xl text-slate-200 mb-3">edit_note</span>
+            <p class="text-sm text-on-surface-variant">{{ t('docs.no_content', locale) }}</p>
+          </div>
+        </div>
+        <!-- Meta -->
+        <div class="p-4 bg-surface-container-low/50 flex justify-between items-center px-6 shrink-0">
+          <div class="flex items-center gap-2 text-[10px] text-slate-400 font-medium">
+            <span class="material-symbols-outlined text-sm">calendar_today</span>
+            <span id="preview-date"></span>
+          </div>
+          <div class="flex items-center gap-2 text-[10px] text-slate-400 font-medium">
+            <span class="material-symbols-outlined text-sm">group</span>
+            <span id="preview-collabs"></span>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
 </main>
-<!-- FAB for Quick Upload (Optional visual flair) -->
-<button class="fixed bottom-10 right-10 w-14 h-14 bg-tertiary-fixed-dim text-on-tertiary-fixed rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50">
-<span class="material-symbols-outlined" style="font-variation-settings: 'wght' 600;">upload_file</span>
-</button>
-</body></html>
+
+<script>
+const ALL_RFPS = {{ rfps | tojson }};
+let currentFilter = 'all';
+let selectedId = null;
+
+const STATUS_LABELS = {
+  draft:    '{{ t("status.draft", locale) }}',
+  approved: '{{ t("status.approved", locale) }}',
+  done:     '{{ t("status.done", locale) }}',
+};
+
+function fmtDate(iso) {
+  if (!iso) return '—';
+  try { return new Date(iso).toLocaleDateString(undefined, { month:'short', day:'numeric', year:'numeric' }); }
+  catch(e) { return iso; }
+}
+
+function getFiltered() {
+  let list = currentFilter === 'all' ? ALL_RFPS : ALL_RFPS.filter(r => r.status === currentFilter);
+  const q = (document.getElementById('search-input')?.value || '').toLowerCase();
+  if (q) list = list.filter(r => r.title.toLowerCase().includes(q) || (r.description||'').toLowerCase().includes(q));
+  return list;
+}
+
+function renderRFPList() {
+  const filtered = getFiltered();
+  const listEl = document.getElementById('rfp-list');
+  const emptyEl = document.getElementById('rfp-list-empty');
+  const countEl = document.getElementById('rfp-count-label');
+
+  countEl.textContent = `${filtered.length} document${filtered.length !== 1 ? 's' : ''}`;
+
+  if (filtered.length === 0) {
+    listEl.innerHTML = '';
+    emptyEl.classList.remove('hidden');
+    return;
+  }
+  emptyEl.classList.add('hidden');
+
+  listEl.innerHTML = filtered.map(rfp => {
+    const isActive = rfp.id === selectedId;
+    const hasContent = !!rfp.rfp_content;
+    const langFlag = rfp.language === 'ar' ? '\u{1F1F8}\u{1F1E6} AR' : '\u{1F1EC}\u{1F1E7} EN';
+    const icon = hasContent ? 'description' : 'draft';
+    const iconColor = hasContent ? 'text-blue-600 bg-blue-50' : 'text-slate-400 bg-slate-100';
+
+    return `
+      <div class="rfp-row group flex items-center gap-4 p-4 rounded-2xl hover:bg-surface-container-lowest transition-all cursor-pointer ${isActive ? 'active' : ''}"
+           onclick="selectRFP('${rfp.id}')">
+        <div class="w-10 h-10 flex items-center justify-center ${iconColor} rounded-lg shrink-0">
+          <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">${icon}</span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <h4 class="text-sm font-bold text-primary truncate">${rfp.title.replace(/</g,'&lt;')}</h4>
+          <p class="text-xs text-slate-400 truncate">${langFlag} &middot; ${fmtDate(rfp.updated_at)}</p>
+        </div>
+        <div class="shrink-0">
+          <span class="status-badge-${rfp.status} text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full">
+            ${STATUS_LABELS[rfp.status] || rfp.status}
+          </span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function selectRFP(id) {
+  selectedId = id;
+  renderRFPList();
+
+  const rfp = ALL_RFPS.find(r => r.id === id);
+  if (!rfp) return;
+
+  document.getElementById('preview-empty').classList.add('hidden');
+  document.getElementById('preview-loaded').classList.remove('hidden');
+
+  // Header
+  document.getElementById('preview-title').textContent = rfp.title;
+  document.getElementById('preview-desc').textContent = rfp.description || '';
+  const statusEl = document.getElementById('preview-status');
+  statusEl.textContent = STATUS_LABELS[rfp.status] || rfp.status;
+  statusEl.className = `status-badge-${rfp.status} text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full`;
+  document.getElementById('preview-lang').textContent = rfp.language === 'ar' ? '\u{1F1F8}\u{1F1E6} Arabic' : '\u{1F1EC}\u{1F1E7} English';
+
+  // Actions
+  document.getElementById('action-editor').href = `/editor/${rfp.id}`;
+  document.getElementById('action-chat').href = `/chat?rfp_id=${rfp.id}`;
+
+  // Content
+  const contentEl = document.getElementById('preview-content');
+  const noContentEl = document.getElementById('preview-no-content');
+  if (rfp.rfp_content) {
+    contentEl.innerHTML = marked.parse(rfp.rfp_content);
+    contentEl.classList.remove('hidden');
+    noContentEl.classList.add('hidden');
+  } else {
+    contentEl.classList.add('hidden');
+    noContentEl.classList.remove('hidden');
+  }
+
+  // Meta
+  document.getElementById('preview-date').textContent = fmtDate(rfp.updated_at);
+  const collabs = (rfp.invited_users || []).length;
+  document.getElementById('preview-collabs').textContent = `${collabs} {{ t('card.collaborators', locale) }}${collabs !== 1 ? 's' : ''}`;
+}
+
+window.setDocFilter = function(filter) {
+  currentFilter = filter;
+  document.querySelectorAll('.doc-filter').forEach(btn => {
+    if (btn.dataset.filter === filter) {
+      btn.classList.add('active-filter');
+      btn.classList.remove('text-slate-400', 'bg-transparent', 'hover:bg-surface-container-low');
+    } else {
+      btn.classList.remove('active-filter');
+      btn.classList.add('text-slate-400', 'bg-transparent', 'hover:bg-surface-container-low');
+    }
+  });
+  renderRFPList();
+};
+
+window.filterRFPs = function() { renderRFPList(); };
+
+// Auto-select first RFP if available
+renderRFPList();
+if (ALL_RFPS.length > 0) selectRFP(ALL_RFPS[0].id);
+</script>
+
+<style>
+  .doc-filter.active-filter { background: #002147; color: #fff; }
+</style>
+
+<script>
+function setLang(locale) {
+  document.cookie = `ui_lang=${locale};path=/;max-age=31536000`;
+  location.reload();
+}
+</script>
+</body>
+</html>

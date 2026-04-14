@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html class="light" lang="{{ locale }}" {% if rtl %}dir="rtl"{% endif %}>
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RFP Director | Editor</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+{% if rtl %}<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet"/>{% endif %}
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "inverse-on-surface": "#f0f1f2", "inverse-surface": "#2e3132",
+          "tertiary-fixed-dim": "#fbbc00", "on-surface": "#191c1d",
+          "on-tertiary-fixed-variant": "#5c4300", "surface-container-lowest": "#ffffff",
+          "on-primary": "#ffffff", "surface-container": "#edeeef",
+          "on-tertiary": "#ffffff", "surface": "#f8f9fa",
+          "tertiary-fixed": "#ffdfa0", "background": "#f8f9fa",
+          "on-tertiary-container": "#ae8100", "tertiary-container": "#2d1f00",
+          "surface-bright": "#f8f9fa", "surface-container-high": "#e7e8e9",
+          "primary-fixed-dim": "#aec7f6", "secondary-fixed": "#d5e3ff",
+          "on-surface-variant": "#44474e", "surface-tint": "#465f88",
+          "secondary-fixed-dim": "#a7c8ff", "surface-container-highest": "#e1e3e4",
+          "on-secondary-fixed-variant": "#1f477b", "outline": "#74777f",
+          "error": "#ba1a1a", "outline-variant": "#c4c6cf",
+          "on-background": "#191c1d", "surface-dim": "#d9dadb",
+          "on-error": "#ffffff", "on-secondary-container": "#294f83",
+          "error-container": "#ffdad6", "surface-variant": "#e1e3e4",
+          "on-primary-container": "#708ab5", "on-error-container": "#93000a",
+          "on-primary-fixed": "#001b3d", "on-secondary-fixed": "#001b3c",
+          "on-tertiary-fixed": "#261a00", "primary": "#000a1e",
+          "secondary": "#3a5f94", "surface-container-low": "#f3f4f5",
+          "tertiary": "#100900", "inverse-primary": "#aec7f6",
+          "primary-fixed": "#d6e3ff", "secondary-container": "#9fc2fe",
+          "primary-container": "#002147", "on-primary-fixed-variant": "#2d476f",
+          "on-secondary": "#ffffff"
+        },
+        borderRadius: { DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem" },
+        fontFamily: { headline: ["Manrope"], body: ["Inter"], label: ["Inter"] }
+      }
+    }
+  }
+</script>
+<style>
+  body { font-family: {% if rtl %}'Cairo', {% endif %}'Inter', sans-serif; }
+  h1, h2, h3 { font-family: {% if rtl %}'Cairo', {% endif %}'Manrope', sans-serif; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+
+  /* Split pane */
+  .editor-layout { height: calc(100vh - 120px); display: flex; gap: 1px; background: #e2e8f0; }
+  .pane          { overflow-y: auto; background: #fff; }
+  .pane-editor   { width: 50%; padding: 1.25rem; }
+  .pane-preview  { width: 50%; padding: 1.5rem 2rem; }
+
+  /* Read-only: single full-width preview */
+  .editor-layout.readonly .pane-editor  { display: none; }
+  .editor-layout.readonly .pane-preview { width: 100%; padding: 2rem 4rem; }
+
+  /* RTL mode */
+  .editor-layout.rtl-mode .pane-editor  textarea { direction: rtl; text-align: right; }
+  .editor-layout.rtl-mode .pane-preview            { direction: rtl; text-align: right; }
+
+  #md-editor {
+    width: 100%; height: 100%; resize: none; outline: none; border: none;
+    font-family: 'Courier New', Courier, monospace; font-size: 0.82rem;
+    line-height: 1.7; color: #1e293b; background: transparent;
+  }
+
+  /* Markdown preview styles */
+  .md-preview h1 { font-family:'Manrope',sans-serif; font-weight:800; font-size:1.5rem; margin:1rem 0 .5rem; color:#000a1e; }
+  .md-preview h2 { font-family:'Manrope',sans-serif; font-weight:700; font-size:1.15rem; margin:1rem 0 .4rem; color:#002147; border-bottom:1px solid #e2e8f0; padding-bottom:.3rem; }
+  .md-preview h3 { font-family:'Manrope',sans-serif; font-weight:600; font-size:1rem; margin:.8rem 0 .3rem; }
+  .md-preview p  { margin-bottom:.65rem; line-height:1.7; }
+  .md-preview ul,.md-preview ol { padding-left:1.4rem; margin-bottom:.6rem; }
+  .md-preview li { margin-bottom:.25rem; }
+  .md-preview table { width:100%; border-collapse:collapse; margin:1rem 0; font-size:.83rem; }
+  .md-preview th { background:#f0f4f8; text-align:left; padding:.4rem .65rem; border:1px solid #d1d5db; font-weight:600; }
+  .md-preview td { padding:.35rem .65rem; border:1px solid #e5e7eb; }
+  .md-preview code { background:#f1f5f9; padding:.1rem .3rem; border-radius:.2rem; font-size:.82em; font-family:'Courier New',monospace; }
+  .md-preview pre  { background:#f8fafc; border:1px solid #e2e8f0; border-radius:.4rem; padding:1rem; overflow-x:auto; margin:.6rem 0; }
+  .md-preview pre code { background:none; padding:0; }
+  .md-preview blockquote { border-left:3px solid #94a3b8; padding-left:1rem; color:#64748b; margin:.6rem 0; }
+  .md-preview hr { border:none; border-top:1px solid #e2e8f0; margin:1rem 0; }
+  .md-preview strong { font-weight:600; }
+
+  /* Status badges */
+  .badge-draft    { background:#dbeafe; color:#1e40af; }
+  .badge-approved { background:#d1fae5; color:#065f46; }
+  .badge-done     { background:#f1f5f9; color:#475569; }
+
+  /* Toast */
+  #toast { transition: opacity .3s, transform .3s; }
+</style>
+</head>
+<body class="bg-surface text-on-surface antialiased overflow-hidden">
+
+<!-- ── Top bar ──────────────────────────────────────────────────────────────── -->
+<header class="flex items-center justify-between px-6 py-3 bg-white border-b border-slate-100 z-10 h-[60px]">
+  <!-- Left: back + title + badges -->
+  <div class="flex items-center gap-4 min-w-0">
+    <a href="/" class="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-primary transition-colors shrink-0">
+      <span class="material-symbols-outlined text-base">arrow_back</span>{{ t('editor.back_dashboard', locale) }}
+    </a>
+    <div class="h-4 w-px bg-slate-200"></div>
+    <p id="rfp-title" class="font-bold text-sm text-primary truncate max-w-[340px] font-['Manrope']">
+      {{ rfp.title | e }}
+    </p>
+    <span id="status-badge"
+          class="badge-{{ rfp.status }} text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full shrink-0">
+      {{ rfp.status }}
+    </span>
+    {% if rfp.language == 'ar' %}
+    <span class="text-[10px] font-bold text-slate-400 shrink-0">🇸🇦 AR</span>
+    {% endif %}
+  </div>
+
+  <!-- Right: action buttons -->
+  <div class="flex items-center gap-3 shrink-0">
+    <a href="/chat?rfp_id={{ rfp.id }}"
+       class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold text-secondary bg-surface-container-low hover:bg-surface-container-high transition-all">
+      <span class="material-symbols-outlined text-sm">chat</span>{{ t('editor.back_chat', locale) }}
+    </a>
+
+    {% if rfp.status == 'draft' %}
+    <button onclick="saveDraft()" id="save-btn"
+            class="flex items-center gap-1.5 px-5 py-2 rounded-lg text-xs font-bold text-white bg-secondary hover:brightness-110 transition-all">
+      <span class="material-symbols-outlined text-sm">save</span>{{ t('btn.save_draft', locale) }}
+    </button>
+    <button onclick="approveRfp()" id="approve-btn"
+            class="flex items-center gap-1.5 px-5 py-2 rounded-lg text-xs font-bold text-white bg-emerald-600 hover:brightness-110 transition-all">
+      <span class="material-symbols-outlined text-sm">check_circle</span>{{ t('btn.approve', locale) }}
+    </button>
+    <button onclick="regeneratePdf()" id="regen-btn"
+            class="flex items-center gap-1.5 px-5 py-2 rounded-lg text-xs font-bold text-white bg-primary-container hover:brightness-110 transition-all">
+      <span class="material-symbols-outlined text-sm" id="regen-icon">picture_as_pdf</span>
+      <span id="regen-label">{{ t('btn.regen_pdf', locale) }}</span>
+    </button>
+    {% else %}
+    <div class="flex items-center gap-2 px-4 py-2 rounded-lg bg-surface-container-low text-xs font-bold text-slate-400">
+      <span class="material-symbols-outlined text-sm">lock</span>
+      {{ t('editor.locked', locale) }} {{ rfp.status | capitalize }}
+    </div>
+    {% endif %}
+  </div>
+</header>
+
+<!-- ── Locked banner (approved/done) ────────────────────────────────────────── -->
+{% if rfp.status != 'draft' %}
+<div class="flex items-center gap-2 px-6 py-2 bg-amber-50 border-b border-amber-200 text-xs font-bold text-amber-700">
+  <span class="material-symbols-outlined text-sm">info</span>
+  {{ t('editor.read_only_info', locale) }}
+</div>
+{% endif %}
+
+<!-- ── Split-pane editor ─────────────────────────────────────────────────────── -->
+<div class="editor-layout {% if rfp.status != 'draft' %}readonly{% endif %} {% if rfp.language == 'ar' %}rtl-mode{% endif %}"
+     id="editor-layout">
+
+  <!-- Left: raw markdown -->
+  {% if rfp.status == 'draft' %}
+  <div class="pane pane-editor">
+    <textarea id="md-editor" spellcheck="false"
+              placeholder="Start writing your RFP in Markdown…">{{ rfp.rfp_content or '' }}</textarea>
+  </div>
+  {% endif %}
+
+  <!-- Right: live preview -->
+  <div class="pane pane-preview">
+    <div id="md-preview" class="md-preview text-sm text-on-surface"></div>
+  </div>
+</div>
+
+<!-- ── Toast ────────────────────────────────────────────────────────────────── -->
+<div id="toast" class="fixed bottom-6 right-6 z-50 opacity-0 translate-y-2 pointer-events-none
+     flex items-center gap-3 px-5 py-3.5 rounded-xl shadow-xl text-sm font-bold text-white max-w-sm">
+  <span class="material-symbols-outlined text-base" id="toast-icon">check_circle</span>
+  <span id="toast-msg"></span>
+</div>
+
+<!-- ── PDF result modal ──────────────────────────────────────────────────────── -->
+<div id="pdf-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+  <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4">
+    <div class="flex items-center gap-3 mb-4">
+      <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+        <span class="material-symbols-outlined text-emerald-600">picture_as_pdf</span>
+      </div>
+      <div>
+        <p class="font-bold text-primary font-['Manrope']">PDF Generated</p>
+        <p class="text-xs text-on-surface-variant">Your document has been regenerated.</p>
+      </div>
+    </div>
+    <p id="pdf-result-text" class="text-xs text-on-surface-variant bg-surface-container-low rounded-lg p-4 font-mono whitespace-pre-wrap break-all mb-6"></p>
+    <button onclick="document.getElementById('pdf-modal').classList.add('hidden')"
+            class="w-full py-2.5 rounded-lg text-sm font-bold text-white bg-primary-container hover:brightness-110 transition-all">
+      Close
+    </button>
+  </div>
+</div>
+
+<script>
+// ── Data from server ─────────────────────────────────────────────────────────
+const RFP_ID     = {{ rfp.id | tojson }};
+const IS_DRAFT   = {{ (rfp.status == 'draft') | tojson }};
+const IS_RTL     = {{ (rfp.language == 'ar') | tojson }};
+
+// ── Preview renderer ─────────────────────────────────────────────────────────
+const preview = document.getElementById('md-preview');
+
+function renderPreview(md) {
+  preview.innerHTML = marked.parse(md || '');
+}
+
+// Initial render from server-supplied content
+renderPreview({{ (rfp.rfp_content or '') | tojson }});
+
+// Live preview on keystroke (debounced 300 ms)
+if (IS_DRAFT) {
+  const ta = document.getElementById('md-editor');
+  let debounce;
+  ta.addEventListener('input', () => {
+    clearTimeout(debounce);
+    debounce = setTimeout(() => renderPreview(ta.value), 300);
+  });
+}
+
+// ── Save draft ───────────────────────────────────────────────────────────────
+async function saveDraft() {
+  const btn  = document.getElementById('save-btn');
+  const content = document.getElementById('md-editor').value;
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="material-symbols-outlined text-sm animate-spin">progress_activity</span>Saving…';
+
+  try {
+    const res = await fetch(`/api/rfps/${RFP_ID}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rfp_content: content }),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    showToast('Draft saved successfully', 'success');
+  } catch (e) {
+    showToast('Save failed: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span class="material-symbols-outlined text-sm">save</span>Save Draft';
+  }
+}
+
+// ── Approve RFP ─────────────────────────────────────────────────────────────
+async function approveRfp() {
+  const btn = document.getElementById('approve-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="material-symbols-outlined text-sm animate-spin">progress_activity</span>Approving…';
+
+  // Save content first
+  try {
+    const content = document.getElementById('md-editor').value;
+    await fetch(`/api/rfps/${RFP_ID}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rfp_content: content }),
+    });
+  } catch (_) { /* non-fatal */ }
+
+  // Transition to approved
+  try {
+    const res = await fetch(`/api/rfps/${RFP_ID}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'approved' }),
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.detail || 'Failed to approve');
+    }
+    showToast('RFP approved successfully!', 'success');
+    setTimeout(() => window.location.reload(), 1200);
+  } catch (e) {
+    showToast('Approve failed: ' + e.message, 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<span class="material-symbols-outlined text-sm">check_circle</span>{{ t("btn.approve", locale) }}';
+  }
+}
+
+// ── Regenerate PDF ───────────────────────────────────────────────────────────
+async function regeneratePdf() {
+  // Auto-save first
+  try {
+    const content = document.getElementById('md-editor').value;
+    await fetch(`/api/rfps/${RFP_ID}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rfp_content: content }),
+    });
+  } catch (_) { /* non-fatal */ }
+
+  const btn   = document.getElementById('regen-btn');
+  const icon  = document.getElementById('regen-icon');
+  const label = document.getElementById('regen-label');
+
+  btn.disabled  = true;
+  icon.textContent  = 'hourglass_top';
+  label.textContent = 'Generating…';
+  btn.classList.add('opacity-75');
+
+  try {
+    const res = await fetch(`/api/rfps/${RFP_ID}/regenerate-pdf`, { method: 'POST' });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || JSON.stringify(data));
+
+    document.getElementById('pdf-result-text').textContent = data.result || 'Done.';
+    document.getElementById('pdf-modal').classList.remove('hidden');
+    showToast('PDF regenerated', 'success');
+  } catch (e) {
+    showToast('PDF generation failed: ' + e.message, 'error');
+  } finally {
+    btn.disabled  = false;
+    icon.textContent  = 'picture_as_pdf';
+    label.textContent = 'Regenerate PDF';
+    btn.classList.remove('opacity-75');
+  }
+}
+
+// ── Toast helper ─────────────────────────────────────────────────────────────
+function showToast(msg, type = 'success') {
+  const t  = document.getElementById('toast');
+  const ic = document.getElementById('toast-icon');
+  t.className = t.className.replace(/bg-\S+/g, '');
+  if (type === 'success') { t.classList.add('bg-emerald-600'); ic.textContent = 'check_circle'; }
+  else                    { t.classList.add('bg-red-600');     ic.textContent = 'error'; }
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.remove('opacity-0', 'translate-y-2', 'pointer-events-none');
+  t.classList.add('opacity-100', 'translate-y-0');
+  setTimeout(() => {
+    t.classList.add('opacity-0', 'translate-y-2', 'pointer-events-none');
+    t.classList.remove('opacity-100', 'translate-y-0');
+  }, 3500);
+}
+</script>
+<script>
+function setLang(locale) {
+  document.cookie = `ui_lang=${locale};path=/;max-age=31536000`;
+  location.reload();
+}
+</script>
+</body>
+</html>

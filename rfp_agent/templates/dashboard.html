@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 
-<html class="light" lang="en"><head>
+<html class="light" lang="{{ locale }}" {% if rtl %}dir="rtl"{% endif %}><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>RFP Director | Enterprise Procurement Dashboard</title>
+<title>RFP Director | {{ t('page.dashboard', locale) }}</title>
+{% if rtl %}<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet"/>{% endif %}
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Manrope:wght@500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
@@ -78,8 +79,12 @@
       }
     </script>
 <style>
-        body { font-family: 'Inter', sans-serif; }
-        h1, h2, h3 { font-family: 'Manrope', sans-serif; }
+        body { font-family: {% if rtl %}'Cairo', {% endif %}'Inter', sans-serif; }
+        h1, h2, h3 { font-family: {% if rtl %}'Cairo', {% endif %}'Manrope', sans-serif; }
+        {% if rtl %}
+        .ml-64 { margin-left: 0 !important; margin-right: 16rem; }
+        aside { left: auto !important; right: 0; }
+        {% endif %}
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
@@ -111,24 +116,24 @@
 <!-- Active Tab: Dashboard -->
 <a class="flex items-center gap-3 px-4 py-3 text-blue-950 dark:text-white font-semibold bg-white dark:bg-blue-900/30 rounded-lg shadow-sm transition-transform duration-150 active:scale-95" href="/">
 <span class="material-symbols-outlined text-blue-900" data-icon="dashboard">dashboard</span>
-<span class="text-sm">Dashboard</span>
+<span class="text-sm">{{ t('nav.dashboard', locale) }}</span>
 </a>
 <a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-blue-900 dark:hover:text-blue-200 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors" href="/documents">
 <span class="material-symbols-outlined" data-icon="description">description</span>
-<span class="text-sm">Documents</span>
+<span class="text-sm">{{ t('nav.documents', locale) }}</span>
 </a>
 <a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-blue-900 dark:hover:text-blue-200 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors" href="/evaluations">
 <span class="material-symbols-outlined" data-icon="analytics">analytics</span>
-<span class="text-sm">Evaluations</span>
+<span class="text-sm">{{ t('nav.evaluations', locale) }}</span>
 </a>
-<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-blue-900 dark:hover:text-blue-200 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors" href="#">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-blue-900 dark:hover:text-blue-200 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors" href="/settings">
 <span class="material-symbols-outlined" data-icon="settings">settings</span>
-<span class="text-sm">Settings</span>
+<span class="text-sm">{{ t('nav.settings', locale) }}</span>
 </a>
 </nav>
 <div class="mt-auto">
 <a href="/create" class="block w-full bg-primary-container text-white py-3 rounded-lg font-bold text-sm shadow-lg hover:brightness-110 transition-all text-center">
-                Create RFP
+                {{ t('nav.create_rfp', locale) }}
             </a>
 </div>
 </aside>
@@ -137,17 +142,24 @@
 <div class="flex items-center w-1/3">
 <div class="relative w-full max-w-sm">
 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg" data-icon="search">search</span>
-<input class="w-full bg-surface-container-low border-none rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-tertiary-fixed-dim transition-all" placeholder="Search RFPs, vendors, or docs..." type="text"/>
+<input class="w-full bg-surface-container-low border-none rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-tertiary-fixed-dim transition-all" placeholder="{{ t('form.search', locale) }}" type="text"/>
 </div>
 </div>
 <div class="flex items-center gap-6">
-<div class="flex gap-4">
+<div class="flex gap-4 items-center">
 <button class="text-slate-400 hover:text-blue-700 transition-all duration-300">
 <span class="material-symbols-outlined" data-icon="notifications">notifications</span>
 </button>
 <button class="text-slate-400 hover:text-blue-700 transition-all duration-300">
 <span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
 </button>
+<!-- Language toggle -->
+<div class="flex items-center rounded-lg overflow-hidden border border-slate-200 text-[11px] font-bold">
+  <a href="?lang=en" onclick="setLang('en');return false;"
+     class="px-2.5 py-1.5 transition-colors {% if locale == 'en' %}bg-primary-container text-white{% else %}text-slate-500 hover:bg-surface-container-low{% endif %}">EN</a>
+  <a href="?lang=ar" onclick="setLang('ar');return false;"
+     class="px-2.5 py-1.5 transition-colors {% if locale == 'ar' %}bg-primary-container text-white{% else %}text-slate-500 hover:bg-surface-container-low{% endif %}">AR</a>
+</div>
 </div>
 <div class="h-8 w-[1px] bg-outline-variant/20"></div>
 <div class="flex items-center gap-3">
@@ -165,28 +177,25 @@
 <section class="mb-12 flex flex-col md:flex-row justify-between items-end gap-8">
 <div class="max-w-2xl">
 <h2 class="text-4xl font-extrabold tracking-tight text-primary mb-4 leading-tight">
-                    Welcome back, Director. <br/>
-<span class="text-primary-container/60">Your procurement pipeline is at 84% efficiency.</span>
+                    {{ t('dashboard.welcome', locale) }} <br/>
+<span class="text-primary-container/60">{{ t('dashboard.efficiency', locale) }}</span>
 </h2>
-<p class="text-on-surface-variant font-medium max-w-lg">
-                    Three evaluations require your signature today. The Laptop Fleet RFP has received 12 new competitive bids.
-                </p>
 </div>
 <div class="flex gap-4">
 <a href="/create" class="bg-gradient-to-br from-primary-container to-primary text-white px-8 py-4 rounded-xl font-bold flex items-center gap-3 ambient-shadow hover:scale-[1.02] transition-transform">
 <span class="material-symbols-outlined" data-icon="add_circle" style="font-variation-settings: 'FILL' 1;">add_circle</span>
-                    Create New RFP
+                    {{ t('btn.create_rfp', locale) }}
                 </a>
 <a href="/chat" class="bg-surface-container-high text-primary px-8 py-4 rounded-xl font-bold flex items-center gap-3 hover:bg-surface-container-highest transition-colors">
 <span class="material-symbols-outlined" data-icon="analytics">analytics</span>
-                    Evaluate Bids
+                    {{ t('btn.evaluate_bids', locale) }}
                 </a>
 </div>
 </section>
 <!-- Stats Bento Grid -->
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
 <div class="bg-surface-container-lowest p-8 rounded-2xl ambient-shadow">
-<p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Active RFPs</p>
+<p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">{{ t('stats.active_rfps', locale) }}</p>
 <div class="flex items-baseline gap-3">
 <span id="stat-rfps" class="text-5xl font-black text-primary leading-none">—</span>
 <span class="text-sm font-bold text-emerald-600 flex items-center">
@@ -198,7 +207,7 @@
 </div>
 </div>
 <div class="bg-surface-container-lowest p-8 rounded-2xl ambient-shadow">
-<p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Pending Evaluations</p>
+<p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">{{ t('stats.pending_evaluations', locale) }}</p>
 <div class="flex items-baseline gap-3">
 <span id="stat-evals" class="text-5xl font-black text-primary leading-none">—</span>
 <span id="stat-evals-badge" class="hidden px-2 py-0.5 bg-tertiary-fixed-dim/20 text-on-tertiary-container text-[10px] font-black rounded uppercase">Pending</span>
@@ -210,11 +219,11 @@
 </div>
 </div>
 <div class="bg-gradient-to-br from-tertiary-fixed-dim to-[#e5ac00] p-8 rounded-2xl ambient-shadow text-on-tertiary-fixed">
-<p class="text-xs font-bold text-on-tertiary-fixed/60 uppercase tracking-widest mb-2">Generated Documents</p>
+<p class="text-xs font-bold text-on-tertiary-fixed/60 uppercase tracking-widest mb-2">{{ t('stats.generated_docs', locale) }}</p>
 <div class="flex items-baseline gap-3">
 <span id="stat-docs" class="text-5xl font-black leading-none">—</span>
 </div>
-<p class="mt-6 text-sm font-medium opacity-80">PDFs created and uploaded to Drive</p>
+<p class="mt-6 text-sm font-medium opacity-80">{{ t('stats.pdfs_drive', locale) }}</p>
 </div>
 </div>
 <script>
@@ -238,17 +247,17 @@
 
   <!-- Section header + filter tabs -->
   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-1">
-    <h3 class="text-xl font-bold text-primary">RFP Pipeline</h3>
+    <h3 class="text-xl font-bold text-primary">{{ t('dashboard.pipeline', locale) }}</h3>
     <div id="filter-tabs" class="flex gap-2">
-      <button onclick="setFilter('all')"      data-filter="all"      class="filter-tab active-tab px-4 py-1.5 rounded-full text-xs font-bold transition-all">All</button>
-      <button onclick="setFilter('draft')"    data-filter="draft"    class="filter-tab px-4 py-1.5 rounded-full text-xs font-bold transition-all text-slate-500 bg-surface-container-low hover:bg-surface-container-high">Draft</button>
-      <button onclick="setFilter('approved')" data-filter="approved" class="filter-tab px-4 py-1.5 rounded-full text-xs font-bold transition-all text-slate-500 bg-surface-container-low hover:bg-surface-container-high">Approved</button>
-      <button onclick="setFilter('done')"     data-filter="done"     class="filter-tab px-4 py-1.5 rounded-full text-xs font-bold transition-all text-slate-500 bg-surface-container-low hover:bg-surface-container-high">Done</button>
+      <button onclick="setFilter('all')"      data-filter="all"      class="filter-tab active-tab px-4 py-1.5 rounded-full text-xs font-bold transition-all">{{ t('filter.all', locale) }}</button>
+      <button onclick="setFilter('draft')"    data-filter="draft"    class="filter-tab px-4 py-1.5 rounded-full text-xs font-bold transition-all text-slate-500 bg-surface-container-low hover:bg-surface-container-high">{{ t('filter.draft', locale) }}</button>
+      <button onclick="setFilter('approved')" data-filter="approved" class="filter-tab px-4 py-1.5 rounded-full text-xs font-bold transition-all text-slate-500 bg-surface-container-low hover:bg-surface-container-high">{{ t('filter.approved', locale) }}</button>
+      <button onclick="setFilter('done')"     data-filter="done"     class="filter-tab px-4 py-1.5 rounded-full text-xs font-bold transition-all text-slate-500 bg-surface-container-low hover:bg-surface-container-high">{{ t('filter.done', locale) }}</button>
     </div>
   </div>
 
   <!-- RFP cards grid — populated by JS from server data -->
-  <div id="rfp-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+  <div id="rfp-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
     <!-- cards injected by renderRFPs() -->
   </div>
 
@@ -257,10 +266,10 @@
     <div class="w-16 h-16 rounded-2xl bg-surface-container-low flex items-center justify-center mb-4">
       <span class="material-symbols-outlined text-slate-300 text-3xl">folder_open</span>
     </div>
-    <p class="font-bold text-primary mb-1">No RFPs yet</p>
-    <p class="text-sm text-on-surface-variant mb-6">Create your first RFP to get started.</p>
+    <p class="font-bold text-primary mb-1">{{ t('empty.no_rfps', locale) }}</p>
+    <p class="text-sm text-on-surface-variant mb-6">{{ t('empty.create_first', locale) }}</p>
     <a href="/create" class="bg-primary-container text-white px-6 py-3 rounded-xl font-bold text-sm hover:brightness-110 transition-all">
-      Create RFP
+      {{ t('nav.create_rfp', locale) }}
     </a>
   </div>
 
@@ -289,10 +298,14 @@
     } catch(e) { return isoStr; }
   }
 
+  const STATUS_LABELS = {
+    draft:    '{{ t("status.draft", locale) }}',
+    approved: '{{ t("status.approved", locale) }}',
+    done:     '{{ t("status.done", locale) }}',
+  };
   function statusBadge(status) {
-    const labels = { draft:'Draft', approved:'Approved', done:'Done' };
     return `<span class="status-badge-${status} text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full">
-              ${labels[status] || status}
+              ${STATUS_LABELS[status] || status}
             </span>`;
   }
 
@@ -302,7 +315,17 @@
 
   function cardLink(rfp) {
     if (rfp.status === 'draft') return `/chat?rfp_id=${rfp.id}`;
-    return '/documents';
+    return `/editor/${rfp.id}`;
+  }
+
+  function editButton(rfp) {
+    const label = rfp.status === 'draft' ? '{{ t("card.edit", locale) }}' : '{{ t("card.view", locale) }}';
+    const icon  = rfp.status === 'draft' ? 'edit_document' : 'visibility';
+    return `<a href="/editor/${rfp.id}"
+               onclick="event.stopPropagation()"
+               class="flex items-center gap-1 text-[11px] font-bold text-slate-400 hover:text-secondary transition-colors px-2 py-1 rounded-lg hover:bg-surface-container-low">
+              <span class="material-symbols-outlined text-sm">${icon}</span>${label}
+            </a>`;
   }
 
   function renderRFPs() {
@@ -326,33 +349,42 @@
       const isDraft = rfp.status === 'draft';
       return `
         <a href="${link}"
-           class="group block bg-surface-container-lowest rounded-2xl p-6 ambient-shadow hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer">
-          <!-- Top row: lang + status -->
-          <div class="flex items-center justify-between mb-4">
-            <span class="text-[11px] font-bold text-slate-400">${langFlag(rfp.language)}</span>
-            ${statusBadge(rfp.status)}
-          </div>
-
-          <!-- Title -->
-          <p class="font-bold text-primary text-sm leading-snug mb-1 group-hover:text-secondary transition-colors line-clamp-2">${rfp.title.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p>
-
-          <!-- Description preview -->
-          <p class="text-xs text-on-surface-variant leading-relaxed line-clamp-2 mb-5">${(rfp.description || '').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p>
-
-          <!-- Footer -->
-          <div class="flex items-center justify-between border-t border-slate-100 pt-4">
-            <div class="flex items-center gap-1.5 text-[11px] text-slate-400 font-medium">
-              <span class="material-symbols-outlined text-sm">calendar_today</span>
-              ${fmtDate(rfp.created_at)}
+           class="group block bg-surface-container-lowest rounded-2xl ambient-shadow hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer overflow-hidden">
+          <!-- Color accent bar -->
+          <div class="h-1 ${isDraft ? 'bg-blue-400' : rfp.status === 'approved' ? 'bg-emerald-400' : 'bg-slate-300'}"></div>
+          <div class="p-5">
+            <!-- Top row: status + lang -->
+            <div class="flex items-center justify-between mb-3">
+              ${statusBadge(rfp.status)}
+              <span class="text-[10px] font-bold text-slate-400">${langFlag(rfp.language)}</span>
             </div>
-            <div class="flex items-center gap-1.5 text-[11px] text-slate-400 font-medium">
-              <span class="material-symbols-outlined text-sm">group</span>
-              ${inviteCount} collaborator${inviteCount !== 1 ? 's' : ''}
+
+            <!-- Title -->
+            <p class="font-bold text-primary text-sm leading-snug mb-1.5 group-hover:text-secondary transition-colors line-clamp-2">${rfp.title.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p>
+
+            <!-- Description -->
+            <p class="text-xs text-on-surface-variant leading-relaxed line-clamp-2 mb-4">${(rfp.description || '').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p>
+
+            <!-- Meta row -->
+            <div class="flex items-center gap-3 text-[10px] text-slate-400 font-medium mb-3">
+              <span class="flex items-center gap-1">
+                <span class="material-symbols-outlined" style="font-size:13px">calendar_today</span>
+                ${fmtDate(rfp.created_at)}
+              </span>
+              <span class="flex items-center gap-1">
+                <span class="material-symbols-outlined" style="font-size:13px">group</span>
+                ${inviteCount}
+              </span>
             </div>
-            <div class="flex items-center gap-1 text-[11px] font-bold ${isDraft ? 'text-secondary' : 'text-slate-400'}">
-              ${isDraft
-                ? '<span class="material-symbols-outlined text-sm">edit_note</span> Continue'
-                : '<span class="material-symbols-outlined text-sm">description</span> View'}
+
+            <!-- Action row -->
+            <div class="flex items-center justify-between border-t border-slate-100 pt-3">
+              ${editButton(rfp)}
+              <div class="flex items-center gap-1 text-[11px] font-bold ${isDraft ? 'text-secondary' : 'text-slate-400'}">
+                ${isDraft
+                  ? '<span class="material-symbols-outlined text-sm">edit_note</span> {{ t("card.continue", locale) }}'
+                  : '<span class="material-symbols-outlined text-sm">visibility</span> {{ t("card.view", locale) }}'}
+              </div>
             </div>
           </div>
         </a>
@@ -393,4 +425,11 @@
 </div>
 </footer>
 </main>
+<script>
+// Language toggle — persists choice in cookie and reloads the page
+function setLang(locale) {
+  document.cookie = `ui_lang=${locale};path=/;max-age=31536000`;
+  location.reload();
+}
+</script>
 </body></html>

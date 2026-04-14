@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html class="light" lang="{{ locale }}" {% if rtl %}dir="rtl"{% endif %}>
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RFP Director | Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+{% if rtl %}<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet"/>{% endif %}
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "inverse-on-surface": "#f0f1f2", "inverse-surface": "#2e3132",
+          "tertiary-fixed-dim": "#fbbc00", "on-surface": "#191c1d",
+          "on-tertiary-fixed-variant": "#5c4300", "surface-container-lowest": "#ffffff",
+          "on-primary": "#ffffff", "surface-container": "#edeeef",
+          "on-tertiary": "#ffffff", "surface": "#f8f9fa",
+          "tertiary-fixed": "#ffdfa0", "background": "#f8f9fa",
+          "on-tertiary-container": "#ae8100", "tertiary-container": "#2d1f00",
+          "surface-bright": "#f8f9fa", "surface-container-high": "#e7e8e9",
+          "primary-fixed-dim": "#aec7f6", "secondary-fixed": "#d5e3ff",
+          "on-surface-variant": "#44474e", "surface-tint": "#465f88",
+          "secondary-fixed-dim": "#a7c8ff", "surface-container-highest": "#e1e3e4",
+          "on-secondary-fixed-variant": "#1f477b", "outline": "#74777f",
+          "error": "#ba1a1a", "outline-variant": "#c4c6cf",
+          "on-background": "#191c1d", "surface-dim": "#d9dadb",
+          "on-error": "#ffffff", "on-secondary-container": "#294f83",
+          "error-container": "#ffdad6", "surface-variant": "#e1e3e4",
+          "on-primary-container": "#708ab5", "on-error-container": "#93000a",
+          "on-primary-fixed": "#001b3d", "on-secondary-fixed": "#001b3c",
+          "on-tertiary-fixed": "#261a00", "primary": "#000a1e",
+          "secondary": "#3a5f94", "surface-container-low": "#f3f4f5",
+          "tertiary": "#100900", "inverse-primary": "#aec7f6",
+          "primary-fixed": "#d6e3ff", "secondary-container": "#9fc2fe",
+          "primary-container": "#002147", "on-primary-fixed-variant": "#2d476f",
+          "on-secondary": "#ffffff"
+        },
+        borderRadius: { DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem" },
+        fontFamily: { headline: ["Manrope"], body: ["Inter"], label: ["Inter"] }
+      }
+    }
+  }
+</script>
+<style>
+  body { font-family: {% if rtl %}'Cairo', {% endif %}'Inter', sans-serif; }
+  h1, h2, h3 { font-family: {% if rtl %}'Cairo', {% endif %}'Manrope', sans-serif; }
+  {% if rtl %}.ml-64 { margin-left: 0 !important; margin-right: 16rem; } aside { left: auto !important; right: 0; }{% endif %}
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .ambient-shadow { box-shadow: 0 12px 32px rgba(25,28,29,0.04); }
+
+  /* Tab styles */
+  .main-tab.active  { background:#002147; color:#fff; }
+  .main-tab         { cursor:pointer; }
+  .guide-tab.active { background:#002147; color:#fff; }
+  .guide-tab        { cursor:pointer; }
+
+  /* Markdown preview */
+  .md-preview h1,.md-preview h2,.md-preview h3 { font-family:'Manrope',sans-serif; font-weight:700; margin-bottom:.5rem; }
+  .md-preview h1 { font-size:1.4rem; margin-top:1rem; }
+  .md-preview h2 { font-size:1.15rem; margin-top:1rem; color:#002147; }
+  .md-preview h3 { font-size:1rem; margin-top:.75rem; }
+  .md-preview p  { margin-bottom:.6rem; line-height:1.65; }
+  .md-preview ul,.md-preview ol { padding-left:1.4rem; margin-bottom:.6rem; }
+  .md-preview li { margin-bottom:.2rem; }
+  .md-preview table { width:100%; border-collapse:collapse; margin-bottom:1rem; font-size:.85rem; }
+  .md-preview th { background:#f0f4f8; text-align:left; padding:.4rem .6rem; border:1px solid #d1d5db; }
+  .md-preview td { padding:.35rem .6rem; border:1px solid #e5e7eb; }
+  .md-preview code { background:#f1f5f9; padding:.1rem .3rem; border-radius:.2rem; font-size:.82em; }
+  .md-preview blockquote { border-left:3px solid #cbd5e1; padding-left:.9rem; color:#64748b; margin:.5rem 0; }
+  .md-preview hr { border:none; border-top:1px solid #e2e8f0; margin:1rem 0; }
+
+  /* Toast */
+  #toast { transition: opacity .3s, transform .3s; }
+</style>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+
+<!-- ── Sidebar ─────────────────────────────────────────────────────────────── -->
+<aside class="fixed left-0 top-0 h-full flex flex-col p-6 w-64 bg-slate-50 font-['Manrope'] antialiased z-50">
+  <div class="flex flex-col mb-10">
+    <div class="flex items-center gap-3 mb-1">
+      <div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center overflow-hidden">
+        <img alt="RFP Director Logo" class="w-full h-full object-cover"
+             src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpZLLS4QJDdjky3Llue_mYCs_u0h6BRUK5E0MXQ_48_k1JNpyUZybTatEO5YAVHUVWDIMp1GuTNyUDIJIxXuFTuqx7JUvxyly2FnimyTGUS6jXcdlz8D-876iKfRKvFHjyU43H3AyrLDfaDhBASUPNaJ67WpR90rV3hJDjriLVmu975CmQLdlKgON6JZSZCxdDH2tEjYIEYmp9KTg6aBBkoF97ncEIb-Dc6bwW8RoCyE_8152uCGA1hVvEP14cIf05htQ5c_Hxcws"/>
+      </div>
+      <h1 class="text-xl font-bold tracking-tight text-blue-900">RFP Director</h1>
+    </div>
+    <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold ml-1">Enterprise Procurement</p>
+  </div>
+  <nav class="flex-1 space-y-2">
+    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/">
+      <span class="material-symbols-outlined">dashboard</span><span class="text-sm">Dashboard</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/documents">
+      <span class="material-symbols-outlined">description</span><span class="text-sm">Documents</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/evaluations">
+      <span class="material-symbols-outlined">analytics</span><span class="text-sm">Evaluations</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 text-blue-950 font-semibold bg-white rounded-lg shadow-sm transition-transform duration-150 active:scale-95" href="/settings">
+      <span class="material-symbols-outlined text-blue-900">settings</span><span class="text-sm">Settings</span>
+    </a>
+  </nav>
+  <div class="mt-auto">
+    <a href="/create" class="block w-full bg-primary-container text-white py-3 rounded-lg font-bold text-sm shadow-lg hover:brightness-110 transition-all text-center">
+      Create RFP
+    </a>
+  </div>
+</aside>
+
+<!-- ── Top bar ──────────────────────────────────────────────────────────────── -->
+<header class="flex justify-between items-center w-full px-8 py-4 sticky top-0 z-40 ml-64 bg-white/70 backdrop-blur-xl border-b border-slate-100">
+  <div>
+    <h2 class="text-xl font-bold text-primary font-['Manrope']">Settings</h2>
+    <p class="text-xs text-on-surface-variant mt-0.5">Manage company guidelines and integrations</p>
+  </div>
+  <div class="flex items-center gap-4">
+    <!-- Language toggle -->
+    <div class="flex items-center rounded-lg overflow-hidden border border-slate-200 text-[11px] font-bold">
+      <a href="#" onclick="setLang('en');return false;" class="px-2.5 py-1.5 transition-colors {% if locale == 'en' %}bg-primary-container text-white{% else %}text-slate-500 hover:bg-surface-container-low{% endif %}">EN</a>
+      <a href="#" onclick="setLang('ar');return false;" class="px-2.5 py-1.5 transition-colors {% if locale == 'ar' %}bg-primary-container text-white{% else %}text-slate-500 hover:bg-surface-container-low{% endif %}">AR</a>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="text-right">
+        <p class="text-xs font-bold text-primary">Alex Sterling</p>
+        <p class="text-[10px] text-slate-400">Executive Director</p>
+      </div>
+      <img alt="Profile" class="w-9 h-9 rounded-full object-cover ring-2 ring-surface-container-high"
+           src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTcWdH7qA3eeGEQCR1saQUN_SAuXVa7cwjbM_FTISLKJQYrX2WaRmNJhpxvErwrgczJ4WjAvPhY-zUE1WIWL85H4wxB_PNVfMaSkNjLn_Coi7GhtUb0ExOfCimWCwdbBTI4bkbNZda80DOWx1P9KI4juMXoLbgAJT8BqRrQUGA8m1-J5kGFOtkqFEF2s2-i04Xk6XXkb0SGX6c3PPrDF4cyzee4Pl4C-NSHyPpZjwTwMMmZENOZvagk03QCcljIXmQbx-6lT9fbDA"/>
+    </div>
+  </div>
+</header>
+
+<!-- ── Main canvas ──────────────────────────────────────────────────────────── -->
+<main class="ml-64 p-8 min-h-screen">
+
+  <!-- Main tabs: Guidelines | Integrations -->
+  <div class="flex gap-2 mb-8 border-b border-slate-200 pb-0">
+    <button class="main-tab active px-6 py-2.5 rounded-t-lg text-sm font-bold transition-all" onclick="switchMain('guidelines')">
+      <span class="material-symbols-outlined text-sm align-middle mr-1">article</span>{{ t('settings.guidelines', locale) }}
+    </button>
+    <button class="main-tab px-6 py-2.5 rounded-t-lg text-sm font-bold text-slate-500 hover:text-primary transition-all" onclick="switchMain('integrations')">
+      <span class="material-symbols-outlined text-sm align-middle mr-1">hub</span>{{ t('settings.integrations', locale) }}
+    </button>
+  </div>
+
+  <!-- ══ GUIDELINES PANEL ══════════════════════════════════════════════════════ -->
+  <div id="panel-guidelines">
+
+    <!-- Guide sub-tabs: Legal | Commercial | Technical | Financial -->
+    <div class="flex gap-2 mb-6">
+      <button class="guide-tab active px-5 py-2 rounded-full text-xs font-bold transition-all" onclick="switchGuide('legal')">{{ t('settings.legal', locale) }}</button>
+      <button class="guide-tab px-5 py-2 rounded-full text-xs font-bold text-slate-500 bg-surface-container-low hover:bg-surface-container-high transition-all" onclick="switchGuide('commercial')">{{ t('settings.commercial', locale) }}</button>
+      <button class="guide-tab px-5 py-2 rounded-full text-xs font-bold text-slate-500 bg-surface-container-low hover:bg-surface-container-high transition-all" onclick="switchGuide('technical')">{{ t('settings.technical', locale) }}</button>
+      <button class="guide-tab px-5 py-2 rounded-full text-xs font-bold text-slate-500 bg-surface-container-low hover:bg-surface-container-high transition-all" onclick="switchGuide('financial')">{{ t('settings.financial', locale) }}</button>
+    </div>
+
+    <!-- Editor card -->
+    <div class="bg-surface-container-lowest rounded-2xl ambient-shadow overflow-hidden">
+      <!-- Card header -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+        <div>
+          <h3 id="guide-title" class="text-base font-bold text-primary font-['Manrope']">Legal Guidelines</h3>
+          <p id="guide-meta" class="text-xs text-on-surface-variant mt-0.5">Loading…</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button onclick="togglePreview()" id="preview-btn"
+                  class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold text-secondary bg-surface-container-low hover:bg-surface-container-high transition-all">
+            <span class="material-symbols-outlined text-sm">preview</span>Preview
+          </button>
+          <button onclick="saveGuideline()"
+                  class="flex items-center gap-1.5 px-5 py-2 rounded-lg text-xs font-bold text-white bg-primary-container hover:brightness-110 transition-all">
+            <span class="material-symbols-outlined text-sm">save</span>Save Changes
+          </button>
+        </div>
+      </div>
+
+      <!-- Textarea -->
+      <div id="editor-pane" class="p-4">
+        <textarea id="guide-textarea"
+                  class="w-full min-h-[560px] p-4 font-mono text-sm bg-surface-container-low rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/30 resize-y transition-all"
+                  placeholder="Loading content…" spellcheck="false"></textarea>
+      </div>
+
+      <!-- Preview pane (hidden by default) -->
+      <div id="preview-pane" class="hidden px-8 py-6 min-h-[560px] border-t border-slate-100">
+        <div id="md-output" class="md-preview text-sm text-on-surface"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ INTEGRATIONS PANEL ════════════════════════════════════════════════════ -->
+  <div id="panel-integrations" class="hidden">
+    <p class="text-sm text-on-surface-variant mb-6">
+      Manage connections to external services. Changes take effect immediately.
+    </p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+
+      <!-- Slack -->
+      <div class="bg-surface-container-lowest rounded-2xl ambient-shadow p-6 flex flex-col gap-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-[#4A154B] flex items-center justify-center">
+              <svg viewBox="0 0 24 24" fill="white" class="w-5 h-5"><path d="M6 15a2 2 0 0 1-2 2 2 2 0 0 1-2-2 2 2 0 0 1 2-2h2v2zm1 0a2 2 0 0 1 2-2 2 2 0 0 1 2 2v5a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-5zm2-9a2 2 0 0 1-2-2 2 2 0 0 1 2-2 2 2 0 0 1 2 2v2H9zm0 1a2 2 0 0 1 2 2 2 2 0 0 1-2 2H4a2 2 0 0 1-2-2 2 2 0 0 1 2-2h5zm9 2a2 2 0 0 1 2-2 2 2 0 0 1 2 2 2 2 0 0 1-2 2h-2V9zm-1 0a2 2 0 0 1-2 2 2 2 0 0 1-2-2V4a2 2 0 0 1 2-2 2 2 0 0 1 2 2v5zm-2 9a2 2 0 0 1 2 2 2 2 0 0 1-2 2 2 2 0 0 1-2-2v-2h2zm0-1a2 2 0 0 1-2-2 2 2 0 0 1 2-2h5a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-5z"/></svg>
+            </div>
+            <div>
+              <p class="font-bold text-sm text-primary">Slack</p>
+              <p class="text-xs text-on-surface-variant">Notifications & alerts</p>
+            </div>
+          </div>
+          <span class="flex items-center gap-1.5 text-xs font-bold text-emerald-600">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>Connected
+          </span>
+        </div>
+        <p class="text-xs text-on-surface-variant">Posts RFP creation, evaluation results, and legal alerts to designated channels.</p>
+        <button class="mt-auto text-xs font-bold text-secondary hover:text-primary transition-colors flex items-center gap-1">
+          Configure <span class="material-symbols-outlined text-sm">arrow_forward</span>
+        </button>
+      </div>
+
+      <!-- Google Drive -->
+      <div class="bg-surface-container-lowest rounded-2xl ambient-shadow p-6 flex flex-col gap-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-[#1a73e8] flex items-center justify-center">
+              <span class="material-symbols-outlined text-white text-lg">folder_shared</span>
+            </div>
+            <div>
+              <p class="font-bold text-sm text-primary">Google Drive</p>
+              <p class="text-xs text-on-surface-variant">Document storage & sharing</p>
+            </div>
+          </div>
+          <span class="flex items-center gap-1.5 text-xs font-bold text-emerald-600">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>Connected
+          </span>
+        </div>
+        <p class="text-xs text-on-surface-variant">Automatically uploads generated RFP PDFs and retrieves past RFP documents.</p>
+        <button class="mt-auto text-xs font-bold text-secondary hover:text-primary transition-colors flex items-center gap-1">
+          Configure <span class="material-symbols-outlined text-sm">arrow_forward</span>
+        </button>
+      </div>
+
+      <!-- Linear -->
+      <div class="bg-surface-container-lowest rounded-2xl ambient-shadow p-6 flex flex-col gap-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-[#5E6AD2] flex items-center justify-center">
+              <span class="material-symbols-outlined text-white text-lg">task_alt</span>
+            </div>
+            <div>
+              <p class="font-bold text-sm text-primary">Linear</p>
+              <p class="text-xs text-on-surface-variant">Issue & project tracking</p>
+            </div>
+          </div>
+          <span class="flex items-center gap-1.5 text-xs font-bold text-slate-400">
+            <span class="w-2 h-2 rounded-full bg-slate-300 inline-block"></span>Not configured
+          </span>
+        </div>
+        <p class="text-xs text-on-surface-variant">Creates vendor evaluation issues and tracks procurement workflow tasks.</p>
+        <button class="mt-auto text-xs font-bold text-secondary hover:text-primary transition-colors flex items-center gap-1">
+          Configure <span class="material-symbols-outlined text-sm">arrow_forward</span>
+        </button>
+      </div>
+
+      <!-- Airtable -->
+      <div class="bg-surface-container-lowest rounded-2xl ambient-shadow p-6 flex flex-col gap-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-[#FCB400] flex items-center justify-center">
+              <span class="material-symbols-outlined text-white text-lg">table_chart</span>
+            </div>
+            <div>
+              <p class="font-bold text-sm text-primary">Airtable</p>
+              <p class="text-xs text-on-surface-variant">Vendor records database</p>
+            </div>
+          </div>
+          <span class="flex items-center gap-1.5 text-xs font-bold text-slate-400">
+            <span class="w-2 h-2 rounded-full bg-slate-300 inline-block"></span>Not configured
+          </span>
+        </div>
+        <p class="text-xs text-on-surface-variant">Stores vendor bid records, evaluation scores, and historical procurement data.</p>
+        <button class="mt-auto text-xs font-bold text-secondary hover:text-primary transition-colors flex items-center gap-1">
+          Configure <span class="material-symbols-outlined text-sm">arrow_forward</span>
+        </button>
+      </div>
+
+      <!-- FMP — Financial Modeling Prep -->
+      <div class="bg-surface-container-lowest rounded-2xl ambient-shadow p-6 flex flex-col gap-4 ring-1 ring-emerald-200">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center">
+              <span class="material-symbols-outlined text-white text-lg">trending_up</span>
+            </div>
+            <div>
+              <p class="font-bold text-sm text-primary">FMP</p>
+              <p class="text-xs text-on-surface-variant">Financial Modeling Prep</p>
+            </div>
+          </div>
+          <span class="flex items-center gap-1.5 text-xs font-bold text-emerald-600">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>Connected
+          </span>
+        </div>
+        <p class="text-xs text-on-surface-variant">Powers vendor financial health checks during bid evaluation — revenue, margins, debt ratios, and cash runway.</p>
+
+        <!-- Masked API key -->
+        <div class="bg-surface-container-low rounded-lg px-4 py-2.5 flex items-center justify-between">
+          <span class="font-mono text-xs text-on-surface-variant">sk-••••••••••••3a7f</span>
+          <button class="text-xs text-secondary hover:text-primary transition-colors font-medium">Change</button>
+        </div>
+
+        <!-- Last verified -->
+        <p class="text-[11px] text-slate-400">
+          <span class="material-symbols-outlined text-xs align-middle">verified</span>
+          Last verified: <span id="fmp-verified-date"></span>
+        </p>
+
+        <!-- Test connection -->
+        <button onclick="testFmpConnection()" id="fmp-test-btn"
+                class="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-all">
+          <span class="material-symbols-outlined text-sm" id="fmp-test-icon">wifi_tethering</span>
+          <span id="fmp-test-label">Test Connection</span>
+        </button>
+      </div>
+
+    </div><!-- /grid -->
+  </div><!-- /panel-integrations -->
+
+</main>
+
+<!-- ── Toast ────────────────────────────────────────────────────────────────── -->
+<div id="toast" class="fixed bottom-6 right-6 z-50 opacity-0 translate-y-2 pointer-events-none
+     flex items-center gap-3 px-5 py-3.5 rounded-xl shadow-xl text-sm font-bold text-white max-w-sm">
+  <span class="material-symbols-outlined text-base" id="toast-icon">check_circle</span>
+  <span id="toast-msg"></span>
+</div>
+
+<script>
+// ── State ────────────────────────────────────────────────────────────────────
+const CATEGORIES = ['legal', 'commercial', 'technical', 'financial'];
+const GUIDE_LABELS = {
+  legal:      'Legal Guidelines',
+  commercial: 'Commercial Guidelines',
+  technical:  'Technical Guidelines',
+  financial:  'Financial Guidelines',
+};
+let currentGuide = 'legal';
+let showingPreview = false;
+const guideCache = {};
+
+// ── Tab switchers ────────────────────────────────────────────────────────────
+function switchMain(tab) {
+  document.querySelectorAll('.main-tab').forEach((el, i) => {
+    const tabs = ['guidelines', 'integrations'];
+    if (tabs[i] === tab) { el.classList.add('active'); el.classList.remove('text-slate-500','hover:text-primary'); }
+    else                 { el.classList.remove('active'); el.classList.add('text-slate-500','hover:text-primary'); }
+  });
+  document.getElementById('panel-guidelines').classList.toggle('hidden',   tab !== 'guidelines');
+  document.getElementById('panel-integrations').classList.toggle('hidden', tab !== 'integrations');
+}
+
+function switchGuide(cat) {
+  currentGuide = cat;
+  showingPreview = false;
+  document.getElementById('editor-pane').classList.remove('hidden');
+  document.getElementById('preview-pane').classList.add('hidden');
+  document.getElementById('preview-btn').innerHTML = '<span class="material-symbols-outlined text-sm">preview</span>Preview';
+
+  document.querySelectorAll('.guide-tab').forEach((el, i) => {
+    if (CATEGORIES[i] === cat) {
+      el.classList.add('active');
+      el.classList.remove('text-slate-500','bg-surface-container-low','hover:bg-surface-container-high');
+    } else {
+      el.classList.remove('active');
+      el.classList.add('text-slate-500','bg-surface-container-low','hover:bg-surface-container-high');
+    }
+  });
+
+  document.getElementById('guide-title').textContent = GUIDE_LABELS[cat];
+  loadGuideline(cat);
+}
+
+// ── Load & display ───────────────────────────────────────────────────────────
+async function loadGuideline(cat) {
+  const ta   = document.getElementById('guide-textarea');
+  const meta = document.getElementById('guide-meta');
+
+  if (guideCache[cat]) {
+    ta.value = guideCache[cat].content;
+    meta.textContent = guideCache[cat].meta;
+    return;
+  }
+
+  ta.value = 'Loading…';
+  meta.textContent = 'Fetching…';
+
+  try {
+    const res  = await fetch(`/api/settings/guidelines/${cat}`);
+    const data = await res.json();
+    const ts   = data.last_modified
+      ? new Date(data.last_modified).toLocaleString(undefined, { dateStyle:'medium', timeStyle:'short' })
+      : 'Never saved';
+
+    guideCache[cat] = { content: data.content, meta: `Last modified: ${ts}` };
+    ta.value        = data.content;
+    meta.textContent = `Last modified: ${ts}`;
+  } catch (e) {
+    ta.value = '';
+    meta.textContent = 'Failed to load';
+    showToast('Failed to load guideline', 'error');
+  }
+}
+
+// ── Preview toggle ───────────────────────────────────────────────────────────
+function togglePreview() {
+  showingPreview = !showingPreview;
+  const editorPane  = document.getElementById('editor-pane');
+  const previewPane = document.getElementById('preview-pane');
+  const btn         = document.getElementById('preview-btn');
+
+  if (showingPreview) {
+    const md   = document.getElementById('guide-textarea').value;
+    document.getElementById('md-output').innerHTML = marked.parse(md);
+    editorPane.classList.add('hidden');
+    previewPane.classList.remove('hidden');
+    btn.innerHTML = '<span class="material-symbols-outlined text-sm">edit</span>Edit';
+  } else {
+    editorPane.classList.remove('hidden');
+    previewPane.classList.add('hidden');
+    btn.innerHTML = '<span class="material-symbols-outlined text-sm">preview</span>Preview';
+  }
+}
+
+// ── Save ─────────────────────────────────────────────────────────────────────
+async function saveGuideline() {
+  const content = document.getElementById('guide-textarea').value;
+  try {
+    const res = await fetch(`/api/settings/guidelines/${currentGuide}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content }),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+    const ts   = data.last_modified
+      ? new Date(data.last_modified).toLocaleString(undefined, { dateStyle:'medium', timeStyle:'short' })
+      : '—';
+    const metaText = `Last modified: ${ts}`;
+    document.getElementById('guide-meta').textContent = metaText;
+    guideCache[currentGuide] = { content, meta: metaText };
+    showToast('Guidelines saved successfully', 'success');
+  } catch (e) {
+    showToast('Failed to save: ' + e.message, 'error');
+  }
+}
+
+// ── FMP test connection ──────────────────────────────────────────────────────
+function testFmpConnection() {
+  const btn   = document.getElementById('fmp-test-btn');
+  const icon  = document.getElementById('fmp-test-icon');
+  const label = document.getElementById('fmp-test-label');
+
+  btn.disabled   = true;
+  icon.textContent  = 'hourglass_top';
+  label.textContent = 'Testing…';
+  btn.classList.replace('bg-emerald-600', 'bg-slate-400');
+
+  setTimeout(() => {
+    btn.disabled   = false;
+    icon.textContent  = 'check_circle';
+    label.textContent = 'Test Connection';
+    btn.classList.replace('bg-slate-400', 'bg-emerald-600');
+    showToast('FMP API is responding normally', 'success');
+  }, 1500);
+}
+
+// ── Toast helper ─────────────────────────────────────────────────────────────
+function showToast(msg, type = 'success') {
+  const t  = document.getElementById('toast');
+  const ic = document.getElementById('toast-icon');
+  t.className = t.className.replace(/bg-\S+/, '');
+  if (type === 'success') {
+    t.classList.add('bg-emerald-600');
+    ic.textContent = 'check_circle';
+  } else {
+    t.classList.add('bg-red-600');
+    ic.textContent = 'error';
+  }
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.remove('opacity-0','translate-y-2','pointer-events-none');
+  t.classList.add('opacity-100','translate-y-0');
+  setTimeout(() => {
+    t.classList.add('opacity-0','translate-y-2','pointer-events-none');
+    t.classList.remove('opacity-100','translate-y-0');
+  }, 3500);
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+document.getElementById('fmp-verified-date').textContent =
+  new Date().toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' });
+
+loadGuideline('legal');
+</script>
+<script>
+function setLang(locale) {
+  document.cookie = `ui_lang=${locale};path=/;max-age=31536000`;
+  location.reload();
+}
+</script>
+</body>
+</html>

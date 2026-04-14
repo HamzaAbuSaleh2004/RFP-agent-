@@ -1,5 +1,6 @@
 import json
 import logging
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Optional
 from dotenv import load_dotenv
@@ -12,10 +13,20 @@ from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 
-OUTPUT_DIR = Path(__file__).parent.parent / "output"
+OUTPUT_DIR      = Path(__file__).parent.parent / "output"
+TEMPLATES_DIR   = Path(__file__).parent.parent / "company_templates"
+
+# Map URL category slug → filename stem in company_templates/
+GUIDELINE_FILES = {
+    "legal":      "legal_guidelines.md",
+    "commercial": "commercial_guidelines.md",
+    "technical":  "technical_guidelines.md",
+    "financial":  "financial_guidelines.md",
+}
 
 from rfp_agent.agent import root_agent
 from rfp_agent.rfp_store import create_rfp, list_rfps, get_rfp, patch_rfp
+from rfp_agent.i18n import t, is_rtl, get_locale_from_cookie, all_translations, SUPPORTED_LOCALES
 from google.adk import Runner
 from google.adk.sessions.in_memory_session_service import InMemorySessionService
 from google.genai.types import Content, Part
@@ -23,7 +34,18 @@ from google.genai.types import Content, Part
 app = FastAPI()
 templates = Jinja2Templates(directory="rfp_agent/templates")
 
+# Expose the translation helper directly inside every Jinja2 template
+templates.env.globals["t"]      = t
+templates.env.globals["is_rtl"] = is_rtl
+
 logging.basicConfig(level=logging.DEBUG)
+
+
+# ── i18n helper ───────────────────────────────────────────────────────────────
+
+def _locale(request: Request) -> str:
+    """Read the ui_lang cookie; fall back to 'en'."""
+    return get_locale_from_cookie(request.headers.get("cookie"))
 
 # Initialize once so session memory persists across requests
 session_service = InMemorySessionService()
@@ -47,6 +69,10 @@ class PatchRFPRequest(BaseModel):
     invited_users: Optional[List[str]] = None
 
 
+class GuidelineUpdateRequest(BaseModel):
+    content: str
+
+
 class ChatRequest(BaseModel):
     message: str
     session_id: str = "default_session"
@@ -57,37 +83,56 @@ class ChatRequest(BaseModel):
 
 @app.get("/", response_class=HTMLResponse)
 async def get_dashboard(request: Request):
-    rfps = list_rfps()
-    return templates.TemplateResponse("dashboard.html", {"request": request, "rfps": rfps})
+    locale = _locale(request)
+    rfps   = list_rfps()
+    return templates.TemplateResponse("dashboard.html", {
+        "request": request, "rfps": rfps,
+        "locale": locale, "rtl": is_rtl(locale),
+    })
 
 
 @app.get("/create", response_class=HTMLResponse)
 async def get_create(request: Request):
-    return templates.TemplateResponse("create.html", {"request": request})
+    locale = _locale(request)
+    return templates.TemplateResponse("create.html", {
+        "request": request, "locale": locale, "rtl": is_rtl(locale),
+    })
 
 
 @app.get("/chat", response_class=HTMLResponse)
 async def get_chat(request: Request, rfp_id: Optional[str] = None):
-    rfp = get_rfp(rfp_id) if rfp_id else None
-    return templates.TemplateResponse(
-        "rfp_creator.html",
-        {"request": request, "rfp": rfp, "rfp_id": rfp_id},
-    )
+    locale = _locale(request)
+    rfp    = get_rfp(rfp_id) if rfp_id else None
+    return templates.TemplateResponse("rfp_creator.html", {
+        "request": request, "rfp": rfp, "rfp_id": rfp_id,
+        "locale": locale, "rtl": is_rtl(locale),
+    })
 
 
 @app.get("/documents", response_class=HTMLResponse)
 async def get_documents(request: Request):
-    return templates.TemplateResponse("documents.html", {"request": request})
+    locale = _locale(request)
+    rfps   = list_rfps()
+    return templates.TemplateResponse("documents.html", {
+        "request": request, "locale": locale, "rtl": is_rtl(locale), "rfps": rfps,
+    })
 
 
 @app.get("/evaluations", response_class=HTMLResponse)
 async def get_evaluations(request: Request):
-    return templates.TemplateResponse("evaluations.html", {"request": request})
+    locale = _locale(request)
+    rfps   = list_rfps()
+    return templates.TemplateResponse("evaluations.html", {
+        "request": request, "locale": locale, "rtl": is_rtl(locale), "rfps": rfps,
+    })
 
 
 @app.get("/flowchart", response_class=HTMLResponse)
 async def get_flowchart(request: Request):
-    return templates.TemplateResponse("flowchart.html", {"request": request})
+    locale = _locale(request)
+    return templates.TemplateResponse("flowchart.html", {
+        "request": request, "locale": locale, "rtl": is_rtl(locale),
+    })
 
 
 # ── RFP CRUD endpoints ────────────────────────────────────────────────────────
@@ -147,8 +192,28 @@ async def api_chat(body: ChatRequest):
                 app_name="rfp_agent", user_id="user1", session_id=session_id
             )
 
+        # When the RFP is in Arabic, prepend a language directive on the very
+        # first message of each session so every sub-agent inherits the context.
+        effective_input = user_input
+        if rfp_id:
+            rfp_record = get_rfp(rfp_id)
+            if rfp_record and rfp_record.get("language") == "ar" and existing is None:
+                effective_input = (
+                    "[LANGUAGE DIRECTIVE — MANDATORY]\n"
+                    "You MUST conduct this entire conversation in Arabic "
+                    "(Modern Standard Arabic / اللغة العربية الفصحى). "
+                    "Draft all RFP content, section headings, clauses, and responses in formal Arabic. "
+                    "Use proper right-to-left formatting conventions. "
+                    "Every TEXT response you write must be in Arabic.\n"
+                    "CRITICAL EXCEPTION: Function/tool calls (transfer_to_agent, read_local_templates, "
+                    "create_rfp_pdf, fmp_get_financials, etc.) are technical JSON operations — they are "
+                    "ALWAYS called using their English names. This does NOT violate the Arabic rule. "
+                    "You MUST still call functions normally whenever the routing rules require it.\n\n"
+                    + user_input
+                )
+
         # Wrap the plain string into the ADK Content schema
-        message = Content(role="user", parts=[Part(text=user_input)])
+        message = Content(role="user", parts=[Part(text=effective_input)])
         try:
             async for event in runner.run_async(
                 user_id="user1",
@@ -269,6 +334,102 @@ async def api_get_stats():
     if OUTPUT_DIR.exists():
         stats["total_documents"] = len(list(OUTPUT_DIR.glob("*.pdf")))
     return JSONResponse(content=stats)
+
+
+# ── Settings page ─────────────────────────────────────────────────────────────
+
+@app.get("/settings", response_class=HTMLResponse)
+async def get_settings(request: Request):
+    locale = _locale(request)
+    return templates.TemplateResponse("settings.html", {
+        "request": request, "locale": locale, "rtl": is_rtl(locale),
+    })
+
+
+# ── Editor page ───────────────────────────────────────────────────────────────
+
+@app.get("/editor/{rfp_id}", response_class=HTMLResponse)
+async def get_editor(request: Request, rfp_id: str):
+    rfp = get_rfp(rfp_id)
+    if rfp is None:
+        raise HTTPException(status_code=404, detail="RFP not found")
+    locale = _locale(request)
+    return templates.TemplateResponse("editor.html", {
+        "request": request, "rfp": rfp,
+        "locale": locale, "rtl": is_rtl(locale),
+    })
+
+
+# ── i18n API ─────────────────────────────────────────────────────────────────
+
+@app.get("/api/i18n/{locale}")
+async def api_i18n(locale: str):
+    if locale not in SUPPORTED_LOCALES:
+        raise HTTPException(status_code=400, detail=f"Unsupported locale '{locale}'. Use: {SUPPORTED_LOCALES}")
+    return JSONResponse(content=all_translations(locale))
+
+
+# ── Guidelines API ────────────────────────────────────────────────────────────
+
+def _guideline_record(category: str) -> dict:
+    """Read one guideline file and return a serialisable record."""
+    filename = GUIDELINE_FILES[category]
+    path     = TEMPLATES_DIR / filename
+    if not path.exists():
+        content = ""
+        last_modified = None
+    else:
+        content = path.read_text(encoding="utf-8")
+        mtime   = path.stat().st_mtime
+        last_modified = datetime.fromtimestamp(mtime, tz=timezone.utc).isoformat()
+    return {
+        "category":      category,
+        "filename":      filename,
+        "content":       content,
+        "last_modified": last_modified,
+    }
+
+
+@app.get("/api/settings/guidelines")
+async def api_get_all_guidelines():
+    return JSONResponse(content=[_guideline_record(c) for c in GUIDELINE_FILES])
+
+
+@app.get("/api/settings/guidelines/{category}")
+async def api_get_guideline(category: str):
+    if category not in GUIDELINE_FILES:
+        raise HTTPException(status_code=404, detail=f"Unknown category '{category}'")
+    return JSONResponse(content=_guideline_record(category))
+
+
+@app.put("/api/settings/guidelines/{category}")
+async def api_put_guideline(category: str, body: GuidelineUpdateRequest):
+    if category not in GUIDELINE_FILES:
+        raise HTTPException(status_code=404, detail=f"Unknown category '{category}'")
+    path = TEMPLATES_DIR / GUIDELINE_FILES[category]
+    TEMPLATES_DIR.mkdir(parents=True, exist_ok=True)
+    path.write_text(body.content, encoding="utf-8")
+    logging.info("Guideline '%s' updated (%d chars)", category, len(body.content))
+    return JSONResponse(content=_guideline_record(category))
+
+
+# ── Regenerate PDF endpoint ───────────────────────────────────────────────────
+
+@app.post("/api/rfps/{rfp_id}/regenerate-pdf")
+async def api_regenerate_pdf(rfp_id: str):
+    rfp = get_rfp(rfp_id)
+    if rfp is None:
+        raise HTTPException(status_code=404, detail="RFP not found")
+    content = rfp.get("rfp_content")
+    if not content:
+        raise HTTPException(status_code=422, detail="No rfp_content to render")
+
+    from rfp_agent.custom_tools import create_rfp_pdf as _create_pdf
+    safe_title = "".join(c if c.isalnum() or c in " _-" else "_" for c in rfp["title"])[:60]
+    filename   = f"{safe_title.replace(' ', '_')}_regenerated.pdf"
+
+    result = _create_pdf(rfp_content=content, output_filename=filename)
+    return JSONResponse(content={"result": result, "filename": filename})
 
 
 if __name__ == "__main__":

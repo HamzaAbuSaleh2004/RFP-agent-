@@ -9,7 +9,8 @@
       "Read(//c/c/Users/hamza/Desktop/LiverX/RFP/**)",
       "Bash(start \"\" \"c:\\\\Users\\\\hamza\\\\Desktop\\\\LiverX\\\\RFP\\\\output\\\\test_overlay.pdf\")",
       "Read(//c/Users/hamza/Desktop/LiverX/RFP/rfp_agent/**)",
-      "Read(//c/Users/hamza/Desktop/LiverX/RFP/**)"
+      "Read(//c/Users/hamza/Desktop/LiverX/RFP/**)",
+      "Bash(python -c \"from rfp_agent.i18n import t; print\\(t\\('eval.award_rfp', 'en'\\)\\)\")"
     ]
   }
 }
