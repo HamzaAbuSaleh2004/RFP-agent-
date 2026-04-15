@@ -239,6 +239,12 @@ async def api_chat(body: ChatRequest):
 
         # Wrap the plain string into the ADK Content schema
         message = Content(role="user", parts=[Part(text=effective_input)])
+
+        # Accumulators for fallback persistence (BUG-1 / BUG-2)
+        accumulated_text: list[str] = []
+        rfp_content_saved = False
+        eval_saved = False
+
         try:
             async for event in runner.run_async(
                 user_id="user1",
@@ -277,6 +283,7 @@ async def api_chat(body: ChatRequest):
                                 content_md = args.get("rfp_content")
                                 if content_md:
                                     patch_rfp(rfp_id, {"rfp_content": content_md})
+                                    rfp_content_saved = True
                                     logging.info(
                                         "Saved rfp_content to RFP %s (%d chars)",
                                         rfp_id, len(content_md),
@@ -293,6 +300,7 @@ async def api_chat(body: ChatRequest):
                                 if results_json:
                                     eval_data = json.loads(results_json)
                                     patch_rfp(rfp_id, {"evaluation": eval_data})
+                                    eval_saved = True
                                     logging.info(
                                         "Saved evaluation to RFP %s (%d vendors)",
                                         rfp_id, len(eval_data.get("vendors", [])),
@@ -325,6 +333,7 @@ async def api_chat(body: ChatRequest):
                     for part in event.content.parts:
                         text = getattr(part, "text", None)
                         if text:
+                            accumulated_text.append(text)
                             yield f"data: {json.dumps({'type': 'chunk', 'text': text})}\n\n"
 
                 # ── Final response fallback ──────────────────────────────────
@@ -336,7 +345,52 @@ async def api_chat(body: ChatRequest):
                     for part in (event.content.parts or []):
                         text = getattr(part, "text", None)
                         if text:
+                            accumulated_text.append(text)
                             yield f"data: {json.dumps({'type': 'chunk', 'text': text})}\n\n"
+
+            # ── Fallback: persist rfp_content from streamed text (BUG-1) ────
+            if rfp_id and not rfp_content_saved and accumulated_text:
+                full_text = "".join(accumulated_text)
+                # Only save if the text looks like a full RFP draft
+                # (at least 3 markdown section headings and substantial length)
+                if full_text.count("## ") >= 3 and len(full_text) > 500:
+                    try:
+                        existing = get_rfp(rfp_id)
+                        if existing and not existing.get("rfp_content"):
+                            patch_rfp(rfp_id, {"rfp_content": full_text})
+                            logging.info(
+                                "Fallback: saved rfp_content from streamed text for RFP %s (%d chars)",
+                                rfp_id, len(full_text),
+                            )
+                    except Exception as fb_err:
+                        logging.warning("Fallback rfp_content save failed: %s", fb_err)
+
+            # ── Fallback: persist evaluation from streamed text (BUG-2) ─────
+            if rfp_id and not eval_saved and accumulated_text:
+                full_text = "".join(accumulated_text)
+                # Look for a JSON block that contains a "vendors" key
+                try:
+                    import re as _re
+                    json_blocks = _re.findall(r'\{[^{}]*"vendors"[^{}]*\[.*?\]\s*\}', full_text, _re.DOTALL)
+                    if not json_blocks:
+                        # Try wider search for any JSON object with vendors array
+                        json_blocks = _re.findall(r'\{.*?"vendors"\s*:\s*\[.*?\]\s*\}', full_text, _re.DOTALL)
+                    for block in json_blocks:
+                        try:
+                            eval_data = json.loads(block)
+                            if eval_data.get("vendors"):
+                                existing = get_rfp(rfp_id)
+                                if existing and not existing.get("evaluation"):
+                                    patch_rfp(rfp_id, {"evaluation": eval_data})
+                                    logging.info(
+                                        "Fallback: saved evaluation from streamed text for RFP %s",
+                                        rfp_id,
+                                    )
+                                break
+                        except json.JSONDecodeError:
+                            continue
+                except Exception as fb_err:
+                    logging.warning("Fallback evaluation save failed: %s", fb_err)
 
             yield f"data: {json.dumps({'type': 'done'})}\n\n"
 

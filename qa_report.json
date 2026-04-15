@@ -1,0 +1,358 @@
+{
+  "run_at": "2026-04-15T10:48:26.728963",
+  "summary": {
+    "pass": 37,
+    "bug": 3,
+    "fail": 18
+  },
+  "results": [
+    {
+      "num": 1,
+      "feature": "Dashboard loads",
+      "status": "PASS",
+      "notes": "No console errors"
+    },
+    {
+      "num": 2,
+      "feature": "Nav: documents",
+      "status": "PASS",
+      "notes": ""
+    },
+    {
+      "num": 2,
+      "feature": "Nav: evaluations",
+      "status": "PASS",
+      "notes": ""
+    },
+    {
+      "num": 2,
+      "feature": "Nav: flowchart",
+      "status": "PASS",
+      "notes": ""
+    },
+    {
+      "num": 2,
+      "feature": "Nav: settings",
+      "status": "PASS",
+      "notes": ""
+    },
+    {
+      "num": 2,
+      "feature": "Nav: dashboard",
+      "status": "PASS",
+      "notes": ""
+    },
+    {
+      "num": 3,
+      "feature": "Title check: /",
+      "status": "PASS",
+      "notes": "\"RFP Director | Enterprise Procurement Dashboard\""
+    },
+    {
+      "num": 3,
+      "feature": "Title check: /documents",
+      "status": "PASS",
+      "notes": "\"RFP Director | RFP Documents\""
+    },
+    {
+      "num": 3,
+      "feature": "Title check: /evaluations",
+      "status": "PASS",
+      "notes": "\"RFP Director | Evaluations\""
+    },
+    {
+      "num": 3,
+      "feature": "Title check: /settings",
+      "status": "PASS",
+      "notes": "\"RFP Director | Settings\""
+    },
+    {
+      "num": 4,
+      "feature": "No HTTP errors on nav",
+      "status": "PASS",
+      "notes": ""
+    },
+    {
+      "num": 5,
+      "feature": "Dashboard stat cards",
+      "status": "PASS",
+      "notes": "stats={'active_rfps': 0, 'pending_evaluations': 0, 'total_documents': 0}"
+    },
+    {
+      "num": 6,
+      "feature": "Create RFP button on dashboard",
+      "status": "PASS",
+      "notes": ""
+    },
+    {
+      "num": 7,
+      "feature": "Create form fields present",
+      "status": "PASS",
+      "notes": "title fields=1, desc fields=1"
+    },
+    {
+      "num": 8,
+      "feature": "Empty form validation",
+      "status": "BUG",
+      "notes": "No submit button found"
+    },
+    {
+      "num": 9,
+      "feature": "Valid EN RFP creation",
+      "status": "FAIL",
+      "notes": "Locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator(\"button[type='submit'], button:has-text('Create'), button:has-text('Submit')\").first\n"
+    },
+    {
+      "num": 10,
+      "feature": "Arabic RFP creation",
+      "status": "FAIL",
+      "notes": "Locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator(\"button[type='submit'], button:has-text('Create'), button:has-text('Submit')\").first\n"
+    },
+    {
+      "num": 11,
+      "feature": "Chat tests",
+      "status": "FAIL",
+      "notes": "Skipped — RFP_ID not set"
+    },
+    {
+      "num": 12,
+      "feature": "Chat tests",
+      "status": "FAIL",
+      "notes": "Skipped — RFP_ID not set"
+    },
+    {
+      "num": 13,
+      "feature": "Chat tests",
+      "status": "FAIL",
+      "notes": "Skipped — RFP_ID not set"
+    },
+    {
+      "num": 14,
+      "feature": "Chat tests",
+      "status": "FAIL",
+      "notes": "Skipped — RFP_ID not set"
+    },
+    {
+      "num": 15,
+      "feature": "Chat tests",
+      "status": "FAIL",
+      "notes": "Skipped — RFP_ID not set"
+    },
+    {
+      "num": 16,
+      "feature": "Chat page without rfp_id",
+      "status": "BUG",
+      "notes": "Page crashed without rfp_id param"
+    },
+    {
+      "num": 17,
+      "feature": "Editor tests",
+      "status": "FAIL",
+      "notes": "Skipped — RFP_ID not set"
+    },
+    {
+      "num": 18,
+      "feature": "Editor tests",
+      "status": "FAIL",
+      "notes": "Skipped — RFP_ID not set"
+    },
+    {
+      "num": 19,
+      "feature": "Editor tests",
+      "status": "FAIL",
+      "notes": "Skipped — RFP_ID not set"
+    },
+    {
+      "num": 20,
+      "feature": "Editor tests",
+      "status": "FAIL",
+      "notes": "Skipped — RFP_ID not set"
+    },
+    {
+      "num": 21,
+      "feature": "Editor tests",
+      "status": "FAIL",
+      "notes": "Skipped — RFP_ID not set"
+    },
+    {
+      "num": 22,
+      "feature": "Editor tests",
+      "status": "FAIL",
+      "notes": "Skipped — RFP_ID not set"
+    },
+    {
+      "num": 23,
+      "feature": "Evaluations page loads",
+      "status": "PASS",
+      "notes": ""
+    },
+    {
+      "num": 24,
+      "feature": "Evaluation tests",
+      "status": "FAIL",
+      "notes": "Skipped — RFP_ID not set"
+    },
+    {
+      "num": 25,
+      "feature": "Evaluation tests",
+      "status": "FAIL",
+      "notes": "Skipped — RFP_ID not set"
+    },
+    {
+      "num": 26,
+      "feature": "Evaluation tests",
+      "status": "FAIL",
+      "notes": "Skipped — RFP_ID not set"
+    },
+    {
+      "num": 27,
+      "feature": "Documents page lists RFPs",
+      "status": "PASS",
+      "notes": ""
+    },
+    {
+      "num": 28,
+      "feature": "Status badges on documents",
+      "status": "PASS",
+      "notes": ""
+    },
+    {
+      "num": 30,
+      "feature": "All 4 guideline tabs visible",
+      "status": "PASS",
+      "notes": ""
+    },
+    {
+      "num": 31,
+      "feature": "Guidelines API: legal",
+      "status": "PASS",
+      "notes": "4920 chars"
+    },
+    {
+      "num": 31,
+      "feature": "Guidelines API: commercial",
+      "status": "PASS",
+      "notes": "5594 chars"
+    },
+    {
+      "num": 31,
+      "feature": "Guidelines API: technical",
+      "status": "PASS",
+      "notes": "5955 chars"
+    },
+    {
+      "num": 31,
+      "feature": "Guidelines API: financial",
+      "status": "PASS",
+      "notes": "5325 chars"
+    },
+    {
+      "num": 32,
+      "feature": "Save guideline via API (PUT)",
+      "status": "PASS",
+      "notes": ""
+    },
+    {
+      "num": 33,
+      "feature": "Unknown guideline category → 404",
+      "status": "PASS",
+      "notes": ""
+    },
+    {
+      "num": 34,
+      "feature": "Settings UI save button",
+      "status": "FAIL",
+      "notes": "Locator.fill: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator(\"textarea\").first\n    - locator resolved to <textarea spellcheck=\"false\" id=\"guide-textarea\" placeholder=\"Loading content…\" class=\"w-full min-h-[560px] p-4 font-mono text-sm bg-surface-container-low rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/30 resize-y transition-all\"></textarea>\n    - fill(\"# Legal Guidelines — Vendor & Procurement Requirements \n\n> These guidelines define the minimum legal standards every vendor must meet.\n> Procurement and Legal teams should update this document annually or after any\n> regulatory change. Guidelines here are read by the RFP Agent at draft time.\n\n---\n\n## 1. Conflict of Interest\n\n1.1 Every vendor must submit a signed **Conflict of Interest Declaration** as part\n    of their bid package. No bid will be evaluated without this document.\n\n1.2 Vendors must disclose any current, pending, or historical business relationship\n    with LiverX employees, board members, or their immediate family members.\n\n1.3 Declarations must be signed by an authorised officer of the vendor (VP level or\n    above) and notarised for contracts exceeding USD 500,000.\n\n---\n\n## 2. Minimum Insurance Requirements\n\nVendors must maintain the following insurance policies throughout the engagement and\nprovide current certificates of insurance before contract execution:\n\n| Coverage Type | Minimum Limit |\n|---|---|\n| General Liability (Commercial) | USD 2,000,000 per occurrence / USD 4,000,000 aggregate |\n| Professional Indemnity (E&O) | USD 5,000,000 per claim |\n| Cyber Liability | USD 1,000,000 per occurrence |\n| Workers' Compensation | As required by applicable law (minimum statutory) |\n\n2.1 LiverX must be named as an **Additional Insured** on all General Liability and\n    Cyber Liability policies.\n\n2.2 Vendor must provide **30 days written notice** of cancellation or material change\n    to any required policy.\n\n2.3 Insurance must be placed with carriers rated **A- or better** by AM Best.\n\n---\n\n## 3. Governing Law & Jurisdiction\n\n3.1 All contracts arising from LiverX RFPs shall be governed by and construed in\n    accordance with the **laws of the Hashemite Kingdom of Jordan**.\n\n3.2 Any disputes shall be subject to the exclusive jurisdiction of the competent\n    courts of **Amman, Jordan**, unless resolved through arbitration per Section 4.\n\n---\n\n## 4. Dispute Resolution\n\n4.1 **Step 1 — Negotiation:** Parties must attempt in good faith to resolve disputes\n    within **30 calendar days** of written notice.\n\n4.2 **Step 2 — Mediation:** If unresolved, disputes proceed to formal mediation\n    administered by the **Amman Chamber of Commerce Mediation Centre**.\n\n4.3 **Step 3 — Arbitration:** If mediation fails within 60 days, disputes are\n    referred to binding arbitration under the **Amman Arbitration Centre (AAC) Rules**.\n    The arbitration shall be conducted in Arabic and English, with a panel of\n    three arbitrators. The seat of arbitration is Amman, Jordan.\n\n---\n\n## 5. NDA & Confidentiality\n\n5.1 Vendors must sign LiverX's standard **Non-Disclosure Agreement (NDA)** before\n    receiving any technical specifications, budget information, or evaluation criteria.\n\n5.2 The NDA period is **5 years** from the date of signing.\n\n5.3 Vendors may not disclose their participation in any LiverX procurement process\n    without prior written consent from the LiverX Chief Procurement Officer.\n\n5.4 All work product, deliverables, and data accessed during the engagement are\n    **work-for-hire** and become the sole property of LiverX upon creation.\n\n---\n\n## 6. Data Protection & Privacy\n\n6.1 Vendors handling personal data on behalf of LiverX must comply with the\n    **Jordan Personal Data Protection Law (PDPL)** and its implementing regulations.\n\n6.2 A **Data Processing Agreement (DPA)** must be executed before any personal data\n    is transferred to the vendor or its sub-processors.\n\n6.3 In the event of a data breach, the vendor must notify LiverX within **72 hours**\n    of becoming aware of the incident, with a full incident report within 5 business days.\n\n6.4 Vendor must maintain data residency within the **Middle East & Africa (MEA) region**\n    unless explicitly approved in writing by LiverX's Data Protection Officer.\n\n---\n\n## 7. Subcontractor Disclosure\n\n7.1 Vendors must disclose **all subcontractors** who will perform any portion of the\n    contracted work at the time of bid submission.\n\n7.2 No new subcontractors may be engaged after contract award without written approval\n    from LiverX Procurement.\n\n7.3 The prime vendor remains fully liable for the acts and omissions of all\n    subcontractors as if performed by the prime vendor directly.\n\n7.4 Subcontractors must meet the same insurance and compliance standards as the prime\n    vendor.\n\n---\n\n## 8. Anti-Bribery & Anti-Corruption\n\n8.1 Vendors must comply with the **Jordanian Anti-Corruption Commission Law** (Law No. 62\n    of 2006 as amended) and, where applicable, the **U.S. Foreign Corrupt Practices Act\n    (FCPA)** and the **UK Bribery Act 2010**.\n\n8.2 Any vendor found to have offered, paid, or facilitated any bribe or improper\n    inducement will be immediately disqualified and reported to relevant authorities.\n\n---\n\n*Last updated: 2026-04-14 | Owner: LiverX Legal & Compliance*\n \")\n  - attempting fill action\n    2 × waiting for element to be visible, enabled and editable\n      - element is not visible\n    - retrying fill action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and editable\n      - element is not visible\n    - retrying fill action\n      - waiting 100ms\n    59 × waiting for element to be visible, enabled and editable\n       - element is not visible\n     - retrying fill action\n       - waiting 500ms\n"
+    },
+    {
+      "num": 35,
+      "feature": "Arabic RTL mode via cookie",
+      "status": "PASS",
+      "notes": "dir=rtl, lang=ar"
+    },
+    {
+      "num": 36,
+      "feature": "Cairo font present in AR mode",
+      "status": "PASS",
+      "notes": ""
+    },
+    {
+      "num": 37,
+      "feature": "All pages render in RTL mode",
+      "status": "PASS",
+      "notes": ""
+    },
+    {
+      "num": 38,
+      "feature": "Switch back to English (LTR)",
+      "status": "PASS",
+      "notes": "dir=None"
+    },
+    {
+      "num": 39,
+      "feature": "i18n API /en returns translations",
+      "status": "PASS",
+      "notes": "90 keys"
+    },
+    {
+      "num": 40,
+      "feature": "i18n API rejects unsupported locale",
+      "status": "PASS",
+      "notes": ""
+    },
+    {
+      "num": 41,
+      "feature": "GET /api/rfps",
+      "status": "PASS",
+      "notes": "HTTP 200"
+    },
+    {
+      "num": 42,
+      "feature": "GET /api/stats",
+      "status": "PASS",
+      "notes": "HTTP 200"
+    },
+    {
+      "num": 43,
+      "feature": "GET /api/evaluations",
+      "status": "PASS",
+      "notes": "HTTP 204"
+    },
+    {
+      "num": 44,
+      "feature": "GET /api/risk-heatmap",
+      "status": "PASS",
+      "notes": "HTTP 204"
+    },
+    {
+      "num": 45,
+      "feature": "GET /flowchart",
+      "status": "PASS",
+      "notes": "HTTP 200"
+    },
+    {
+      "num": 46,
+      "feature": "GET /api/rfps/bad-uuid → 404",
+      "status": "PASS",
+      "notes": ""
+    },
+    {
+      "num": 47,
+      "feature": "POST /api/rfps missing title → 422",
+      "status": "PASS",
+      "notes": ""
+    },
+    {
+      "num": 48,
+      "feature": "PATCH draft→done blocked",
+      "status": "FAIL",
+      "notes": "Skipped — AR_RFP_ID not set"
+    },
+    {
+      "num": 50,
+      "feature": "Mobile viewport (375px) — no horizontal scroll",
+      "status": "BUG",
+      "notes": "Horizontal overflow detected on dashboard"
+    }
+  ]
+}

@@ -97,49 +97,53 @@
         .chat-agent-msg .markdown-body table { direction: rtl; }
         .chat-agent-msg .markdown-body th { text-align: right; }
         {% endif %}
-    </style>
+      /* BUG-5: responsive sidebar -- hide on mobile */
+  @media (max-width: 767px) {
+    aside { display: none !important; }
+    header { margin-left: 0 !important; left: 0 !important; right: 0 !important; width: 100% !important; }
+    main, .ml-64 { margin-left: 0 !important; }
+    body { overflow-x: hidden; }
+  }
+</style>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 {% if rtl %}<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet"/>{% endif %}
 </head>
 <body class="bg-surface text-on-surface antialiased">
 <!-- Shared SideNavBar -->
-<aside class="fixed left-0 top-0 h-full flex flex-col p-6 h-screen w-64 bg-slate-50 border-r-0 z-50">
-<div class="mb-10 flex flex-col gap-1">
-<div class="flex items-center gap-3">
-<div class="w-8 h-8 bg-primary-container rounded flex items-center justify-center">
-<span class="material-symbols-outlined text-white text-sm" data-weight="fill">description</span>
+<aside class="fixed left-0 top-0 h-full flex flex-col p-6 w-64 bg-slate-50 font-['Manrope'] antialiased z-50">
+<div class="flex flex-col mb-10">
+<div class="flex items-center gap-3 mb-1">
+<div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center overflow-hidden">
+<img alt="RFP Director Logo" class="w-full h-full object-cover"
+     src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpZLLS4QJDdjky3Llue_mYCs_u0h6BRUK5E0MXQ_48_k1JNpyUZybTatEO5YAVHUVWDIMp1GuTNyUDIJIxXuFTuqx7JUvxyly2FnimyTGUS6jXcdlz8D-876iKfRKvFHjyU43H3AyrLDfaDhBASUPNaJ67WpR90rV3hJDjriLVmu975CmQLdlKgON6JZSZCxdDH2tEjYIEYmp9KTg6aBBkoF97ncEIb-Dc6bwW8RoCyE_8152uCGA1hVvEP14cIf05htQ5c_Hxcws"/>
 </div>
-<span class="text-xl font-bold tracking-tight text-blue-900">RFP Director</span>
+<h1 class="text-xl font-bold tracking-tight text-blue-900">RFP Director</h1>
 </div>
-<span class="text-xs font-medium text-slate-400 tracking-wider ml-11 uppercase">Enterprise Procurement</span>
+<p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold ml-1">Enterprise Procurement</p>
 </div>
-<nav class="flex-grow space-y-2">
+<nav class="flex-1 space-y-2">
 <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/">
 <span class="material-symbols-outlined">dashboard</span>
-<span class="font-medium">{{ t('nav.dashboard', locale) }}</span>
+<span class="text-sm">{{ t('nav.dashboard', locale) }}</span>
 </a>
 <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/documents">
 <span class="material-symbols-outlined">description</span>
-<span class="font-medium">{{ t('nav.documents', locale) }}</span>
+<span class="text-sm">{{ t('nav.documents', locale) }}</span>
 </a>
 <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/evaluations">
 <span class="material-symbols-outlined">analytics</span>
-<span class="font-medium">{{ t('nav.evaluations', locale) }}</span>
-</a>
-<!-- Active Tab: AI Assistant -->
-<a class="flex items-center gap-3 px-4 py-3 text-blue-950 font-semibold bg-white rounded-lg shadow-sm" href="/chat">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
-<span class="font-medium">{{ t('page.chat', locale) }}</span>
+<span class="text-sm">{{ t('nav.evaluations', locale) }}</span>
 </a>
 <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/settings">
 <span class="material-symbols-outlined">settings</span>
-<span class="font-medium">{{ t('nav.settings', locale) }}</span>
+<span class="text-sm">{{ t('nav.settings', locale) }}</span>
 </a>
 </nav>
-<button class="mt-auto bg-gradient-to-br from-primary-container to-primary text-white py-4 px-6 rounded-xl flex items-center justify-center gap-2 font-bold shadow-lg hover:scale-[0.98] transition-transform">
-<span class="material-symbols-outlined">add</span>
-<span>Create RFP</span>
-</button>
+<div class="mt-auto">
+<a href="/create" class="block w-full bg-primary-container text-white py-3 rounded-lg font-bold text-sm shadow-lg hover:brightness-110 transition-all text-center">
+{{ t('nav.create_rfp', locale) }}
+</a>
+</div>
 </aside>
 <!-- Shared TopNavBar -->
 <header class="flex justify-between items-center w-[calc(100%-16rem)] px-12 py-6 sticky top-0 z-40 ml-64 bg-white/70 backdrop-blur-xl" {% if rtl %}dir="rtl"{% endif %}>
@@ -169,6 +173,20 @@
 <h1 class="text-4xl font-extrabold tracking-tight text-primary mb-2">RFP Intelligence Agent</h1>
 <p class="text-on-surface-variant max-w-xl">Accelerate your procurement workflow with context-aware AI drafting and compliance verification.</p>
 </header>
+{% if not rfp_id %}
+<!-- BUG-8: no-RFP-context banner -->
+<div class="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-2xl px-5 py-4 shrink-0">
+  <span class="material-symbols-outlined text-amber-500 text-xl mt-0.5" style="font-variation-settings:'FILL' 1">info</span>
+  <div>
+    <p class="text-sm font-bold text-amber-800">No RFP selected</p>
+    <p class="text-xs text-amber-700 mt-0.5">
+      You are in general assistant mode. To draft or evaluate a specific RFP,
+      <a href="/create" class="font-bold underline hover:text-amber-900">create a new RFP</a>
+      or select one from <a href="/documents" class="font-bold underline hover:text-amber-900">Documents</a>.
+    </p>
+  </div>
+</div>
+{% endif %}
 <!-- Chat Interface -->
 <div class="flex-1 bg-surface-container-lowest rounded-3xl p-8 flex flex-col shadow-sm min-h-0 overflow-hidden">
 <div id="chat-messages" class="flex-1 overflow-y-auto space-y-8 pr-4 min-h-0">
@@ -351,6 +369,7 @@
     const RFP_ID   = {{ rfp_id | tojson }};
     const RFP_DATA = {{ rfp | tojson }};
     const CHAT_MODE = {{ mode | tojson }};  // "create" or "evaluate"
+    const IS_RTL = {{ rtl | tojson }};
 
     chatInput.focus();
 
@@ -437,8 +456,8 @@
             `- **Title**: ${RFP_DATA.title}\n` +
             `- **Description**: ${RFP_DATA.description}\n` +
             `- **Language**: ${langName} — please conduct this entire conversation and draft the RFP in ${langName}.\n\n` +
-            `Please proceed with collecting the remaining details needed to draft the RFP ` +
-            `(scope, vendor requirements, evaluation criteria, budget, and submission details). ` +
+            `Please proceed with collecting the remaining details needed to draft the RFP. ` +
+            `Ask me questions ONE AT A TIME to make it easier. ` +
             `Do not ask about the title or description again.`;
 
         setTimeout(() => {
@@ -457,7 +476,6 @@
     }
 
     // ── Chat helpers ─────────────────────────────────────────────────────────
-    const IS_RTL = {{ rtl | tojson }};
 
     function appendUserMessage(text) {
         const div = document.createElement('div');

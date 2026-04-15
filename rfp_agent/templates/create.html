@@ -96,6 +96,13 @@
     color: #fff;
     box-shadow: 0 2px 8px rgba(0,33,71,0.25);
   }
+  /* BUG-5: responsive sidebar -- hide on mobile */
+  @media (max-width: 767px) {
+    aside { display: none !important; }
+    header { margin-left: 0 !important; left: 0 !important; right: 0 !important; width: 100% !important; }
+    main, .ml-64 { margin-left: 0 !important; }
+    body { overflow-x: hidden; }
+  }
 </style>
 </head>
 <body class="bg-surface text-on-surface antialiased">
@@ -251,8 +258,8 @@
           onclick="handleSubmit()"
           class="flex items-center gap-2 bg-gradient-to-br from-primary-container to-primary text-white px-8 py-3 rounded-xl font-bold text-sm shadow-lg hover:scale-[1.02] transition-transform"
         >
-          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">smart_toy</span>
-          Start AI Session
+          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">add_circle</span>
+          Create RFP
         </button>
       </div>
 
@@ -346,8 +353,8 @@
     } catch (err) {
       btn.disabled = false;
       btn.innerHTML = `
-        <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">smart_toy</span>
-        Start AI Session
+        <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">add_circle</span>
+        Create RFP
       `;
       alert('Error: ' + err.message);
     }

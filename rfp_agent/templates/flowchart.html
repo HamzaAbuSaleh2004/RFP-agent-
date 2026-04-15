@@ -99,7 +99,14 @@
       border-radius: 3px;
       flex-shrink: 0;
     }
-  </style>
+    /* BUG-5: responsive sidebar -- hide on mobile */
+  @media (max-width: 767px) {
+    aside { display: none !important; }
+    header { margin-left: 0 !important; left: 0 !important; right: 0 !important; width: 100% !important; }
+    main, .ml-64 { margin-left: 0 !important; }
+    body { overflow-x: hidden; }
+  }
+</style>
 </head>
 <body>
 

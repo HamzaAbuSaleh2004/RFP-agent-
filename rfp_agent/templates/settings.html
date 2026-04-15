@@ -76,6 +76,13 @@
 
   /* Toast */
   #toast { transition: opacity .3s, transform .3s; }
+  /* BUG-5: responsive sidebar -- hide on mobile */
+  @media (max-width: 767px) {
+    aside { display: none !important; }
+    header { margin-left: 0 !important; left: 0 !important; right: 0 !important; width: 100% !important; }
+    main, .ml-64 { margin-left: 0 !important; }
+    body { overflow-x: hidden; }
+  }
 </style>
 </head>
 <body class="bg-surface text-on-surface antialiased">
@@ -180,7 +187,7 @@
         </div>
       </div>
 
-      <!-- Textarea (hidden by default — opens in view mode) -->
+      <!-- Textarea (hidden by default — preview mode on load) -->
       <div id="editor-pane" class="hidden p-4">
         <textarea id="guide-textarea"
                   class="w-full min-h-[560px] p-4 font-mono text-sm bg-surface-container-low rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/30 resize-y transition-all"
@@ -350,7 +357,7 @@ const GUIDE_LABELS = {
   financial:  'Financial Guidelines',
 };
 let currentGuide = 'legal';
-let showingPreview = true;
+let showingPreview = true;    // start in preview mode
 const guideCache = {};
 
 // ── Tab switchers ────────────────────────────────────────────────────────────
@@ -366,7 +373,7 @@ function switchMain(tab) {
 
 function switchGuide(cat) {
   currentGuide = cat;
-  showingPreview = true;
+  showingPreview = true;    // always return to preview mode when switching tabs
   document.getElementById('editor-pane').classList.add('hidden');
   document.getElementById('preview-pane').classList.remove('hidden');
   document.getElementById('preview-btn').innerHTML = '<span class="material-symbols-outlined text-sm">edit</span>Edit';

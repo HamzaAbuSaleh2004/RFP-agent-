@@ -81,6 +81,13 @@
   .md-preview th { text-align: right; }
   .md-preview blockquote { border-left: none; border-right: 3px solid #94a3b8; padding-left: 0; padding-right: 1rem; }
   {% endif %}
+  /* BUG-5: responsive sidebar -- hide on mobile */
+  @media (max-width: 767px) {
+    aside { display: none !important; }
+    header { margin-left: 0 !important; left: 0 !important; right: 0 !important; width: 100% !important; }
+    main, .ml-64 { margin-left: 0 !important; }
+    body { overflow-x: hidden; }
+  }
 </style>
 </head>
 <body class="bg-surface text-on-surface antialiased overflow-hidden">
@@ -218,6 +225,11 @@
               <span class="material-symbols-outlined text-lg">chat</span>
               {{ t('docs.open_chat', locale) }}
             </a>
+            <button id="action-regen" onclick="regenPDF()"
+               class="col-span-2 flex items-center justify-center gap-2 px-4 py-2.5 bg-surface-container text-on-surface-variant font-bold rounded-xl text-xs hover:bg-surface-container-high transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+              <span class="material-symbols-outlined text-base" id="regen-icon">picture_as_pdf</span>
+              <span id="regen-label">Regenerate PDF</span>
+            </button>
           </div>
         </div>
         <!-- Document Preview Canvas -->
@@ -333,6 +345,11 @@ function selectRFP(id) {
   document.getElementById('action-editor').href = `/editor/${rfp.id}`;
   document.getElementById('action-chat').href = `/chat?rfp_id=${rfp.id}`;
 
+  // Regenerate PDF button — disable when there is no content to render
+  const regenBtn = document.getElementById('action-regen');
+  regenBtn.disabled = !rfp.rfp_content;
+  regenBtn.dataset.rfpId = rfp.id;
+
   // Content
   const contentEl = document.getElementById('preview-content');
   const noContentEl = document.getElementById('preview-no-content');
@@ -370,6 +387,42 @@ window.filterRFPs = function() { renderRFPList(); };
 // Auto-select first RFP if available
 renderRFPList();
 if (ALL_RFPS.length > 0) selectRFP(ALL_RFPS[0].id);
+
+async function regenPDF() {
+  const btn   = document.getElementById('action-regen');
+  const icon  = document.getElementById('regen-icon');
+  const label = document.getElementById('regen-label');
+  const rfpId = btn.dataset.rfpId;
+  if (!rfpId) return;
+
+  btn.disabled = true;
+  icon.textContent = 'hourglass_top';
+  label.textContent = 'Generating…';
+
+  try {
+    const res = await fetch(`/api/rfps/${rfpId}/regenerate-pdf`, { method: 'POST' });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || 'Failed');
+    }
+    const data = await res.json();
+    icon.textContent = 'check_circle';
+    label.textContent = 'PDF Ready';
+    setTimeout(() => {
+      icon.textContent = 'picture_as_pdf';
+      label.textContent = 'Regenerate PDF';
+      btn.disabled = false;
+    }, 3000);
+  } catch (e) {
+    icon.textContent = 'error';
+    label.textContent = 'Failed: ' + e.message;
+    setTimeout(() => {
+      icon.textContent = 'picture_as_pdf';
+      label.textContent = 'Regenerate PDF';
+      btn.disabled = false;
+    }, 4000);
+  }
+}
 </script>
 
 <style>
