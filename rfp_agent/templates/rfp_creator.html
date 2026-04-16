@@ -111,17 +111,16 @@
 <body class="bg-surface text-on-surface antialiased">
 <!-- Shared SideNavBar -->
 <aside class="fixed left-0 top-0 h-full flex flex-col p-6 w-64 bg-slate-50 font-['Manrope'] antialiased z-50">
-<div class="flex flex-col mb-10">
-<div class="flex items-center gap-3 mb-1">
-<div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center overflow-hidden">
-<img alt="RFP Director Logo" class="w-full h-full object-cover"
-     src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpZLLS4QJDdjky3Llue_mYCs_u0h6BRUK5E0MXQ_48_k1JNpyUZybTatEO5YAVHUVWDIMp1GuTNyUDIJIxXuFTuqx7JUvxyly2FnimyTGUS6jXcdlz8D-876iKfRKvFHjyU43H3AyrLDfaDhBASUPNaJ67WpR90rV3hJDjriLVmu975CmQLdlKgON6JZSZCxdDH2tEjYIEYmp9KTg6aBBkoF97ncEIb-Dc6bwW8RoCyE_8152uCGA1hVvEP14cIf05htQ5c_Hxcws"/>
-</div>
-<h1 class="text-xl font-bold tracking-tight text-blue-900">RFP Director</h1>
-</div>
-<p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold ml-1">Enterprise Procurement</p>
-</div>
-<nav class="flex-1 space-y-2">
+  <div class="flex items-center gap-3 mb-10">
+    <div class="w-10 h-10 rounded-lg bg-white shadow-sm flex items-center justify-center overflow-hidden shrink-0 border border-slate-100">
+      <img alt="Network Safety Logo" class="w-full h-full object-contain p-1" src="/static/logo.png"/>
+    </div>
+    <div class="flex flex-col overflow-hidden">
+      <h1 class="text-xl font-bold tracking-tight text-blue-900">Network Safety</h1>
+      <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Enterprise Procurement</p>
+    </div>
+  </div>
+  <nav class="flex-1 space-y-2">
 <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/">
 <span class="material-symbols-outlined">dashboard</span>
 <span class="text-sm">{{ t('nav.dashboard', locale) }}</span>
@@ -452,13 +451,14 @@
     if (RFP_DATA && CHAT_MODE === 'create') {
         // Create mode: auto-send RFP creation context
         const langName = RFP_DATA.language === 'ar' ? 'Arabic' : 'English';
-        const contextMsg = `I want to draft a new RFP. Here is the project context:\n\n` +
+        const contextMsg = `I want to draft a new RFP. Here is ALL the project context I have:\n\n` +
             `- **Title**: ${RFP_DATA.title}\n` +
             `- **Description**: ${RFP_DATA.description}\n` +
             `- **Language**: ${langName} — please conduct this entire conversation and draft the RFP in ${langName}.\n\n` +
-            `Please proceed with collecting the remaining details needed to draft the RFP. ` +
-            `Ask me questions ONE AT A TIME to make it easier. ` +
-            `Do not ask about the title or description again.`;
+            `Carefully read the title and description above — they may already contain scope, budget, vendor requirements, evaluation criteria, or other details. ` +
+            `Do NOT re-ask about anything I already provided. ` +
+            `Only ask about information that is genuinely missing. ` +
+            `If the description is detailed enough, proceed directly to drafting.`;
 
         setTimeout(() => {
             chatInput.value = contextMsg;
@@ -507,13 +507,14 @@
                 <span class="text-[10px] uppercase tracking-widest text-primary font-bold agent-status">RFP Agent • Thinking…</span>
             </div>
             <div class="msg-bubble bg-surface-container-low p-8 rounded-3xl ${bubbleRadius} space-y-4 w-full">
+                <div class="agent-logs hidden bg-white/60 rounded-xl p-3 ${borderSide} border-tertiary-fixed-dim flex-col gap-1.5 mb-4"></div>
                 <div class="markdown-body text-primary leading-relaxed font-medium"></div>
-                <div class="agent-logs hidden bg-white/60 rounded-xl p-3 ${borderSide} border-tertiary-fixed-dim flex-col gap-1.5"></div>
             </div>
         `;
         chatMessages.appendChild(container);
         chatMessages.scrollTop = chatMessages.scrollHeight;
         return {
+            container,
             contentDiv: container.querySelector('.markdown-body'),
             statusSpan: container.querySelector('.agent-status'),
             logsDiv:    container.querySelector('.agent-logs')
@@ -521,11 +522,19 @@
     }
 
     // ── Send message ──────────────────────────────────────────────────────────
-    async function sendMessage() {
-        const text = chatInput.value.trim();
+
+    /**
+     * Core function that sends a message to the backend and processes the SSE stream.
+     * @param {string} text - Message to send
+     * @param {boolean} silent - If true, don't show the message as a user bubble (used for auto-triggers)
+     * @param {boolean} isKickstart - If true, this is already a kick-start attempt (don't retry)
+     */
+    async function _doSend(text, silent = false, isKickstart = false) {
         if (!text) return;
 
-        appendUserMessage(text);
+        if (!silent) {
+            appendUserMessage(text);
+        }
         chatInput.value = '';
         chatInput.style.height = '58px';
         chatInput.disabled = true;
@@ -538,6 +547,9 @@
         const agentUI = createAgentMessageContainer();
         let markdownBuffer = '';
         let hasLogs = false;
+        let handedOffTo = null;            // track sub-agent handoff
+        let sawTransferTool = false;       // track transfer_to_agent call
+        let postTransferChunks = 0;        // chunks received AFTER the handoff
 
         try {
             const chatBody = { message: text, session_id: RFP_ID ? `rfp_${RFP_ID}` : 'default' };
@@ -560,6 +572,7 @@
 
                     if (data.type === 'chunk') {
                         markdownBuffer += data.text;
+                        if (handedOffTo) postTransferChunks++;
                         agentUI.contentDiv.innerHTML = marked.parse(markdownBuffer);
                         chatMessages.scrollTop = chatMessages.scrollHeight;
 
@@ -579,8 +592,12 @@
 
                         if (data.text.startsWith('Running tool:')) {
                             addToolFeedEntry(data.text);
+                            if (data.text.includes('transfer_to_agent')) {
+                                sawTransferTool = true;
+                            }
                         } else if (data.text.startsWith('Handed off to:')) {
                             const agentKey = data.text.replace('Handed off to:', '').trim();
+                            handedOffTo = agentKey;
                             setAgentActive(agentKey);
                         }
 
@@ -600,21 +617,37 @@
                 const { value, done } = await reader.read();
                 if (done) break;
 
-                // Accumulate raw bytes decoded as UTF-8 stream
                 sseBuffer += decoder.decode(value, { stream: true });
 
-                // SSE events are delimited by double newlines (\n\n).
-                // Split so each entry is one complete event block.
-                // The last element may be an incomplete event — keep it in the buffer.
                 const events = sseBuffer.split('\n\n');
-                sseBuffer = events.pop(); // hold the trailing incomplete fragment
+                sseBuffer = events.pop();
 
                 for (const eventBlock of events) {
                     if (eventBlock.trim()) processSSEEvent(eventBlock);
                 }
             }
-            // Flush any final buffered fragment (stream closed without trailing \n\n)
             if (sseBuffer.trim()) processSSEEvent(sseBuffer);
+
+            // ── Auto-trigger sub-agent after handoff with no output ──────────
+            // When the root agent transfers to a sub-agent, ADK may require a
+            // new user message before the sub-agent executes.  If the stream
+            // ended with a transfer but the sub-agent produced no text chunks,
+            // silently send a kick-start message.  Guard: only retry once.
+            if ((sawTransferTool || handedOffTo) && postTransferChunks === 0 && !isKickstart) {
+                // Remove the bubble that only has the root agent's brief ack
+                agentUI.container.remove();
+
+                chatInput.disabled = false;
+                sendButton.disabled = false;
+
+                const triggerMsg = CHAT_MODE === 'create'
+                    ? 'All the information has been provided above in the conversation history. Please proceed with drafting the RFP now — start by calling read_local_templates and date_time, then draft the full document.'
+                    : 'Please proceed with the evaluation using all the information provided above in the conversation history.';
+
+                await _doSend(triggerMsg, true, true);
+                return;  // skip the finally block re-enable (already handled by recursive call)
+            }
+
         } catch (error) {
             console.error(error);
             agentUI.statusSpan.innerText = 'RFP Agent • Error';
@@ -625,6 +658,12 @@
             sendButton.disabled = false;
             chatInput.focus();
         }
+    }
+
+    async function sendMessage() {
+        const text = chatInput.value.trim();
+        if (!text) return;
+        await _doSend(text, false);
     }
 
     sendButton.addEventListener('click', sendMessage);

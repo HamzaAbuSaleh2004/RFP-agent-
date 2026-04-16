@@ -1,0 +1,260 @@
+[
+  {
+    "num": 1,
+    "feature": "GET /api/stats",
+    "status": "PASS",
+    "notes": "active=15"
+  },
+  {
+    "num": 2,
+    "feature": "POST /api/rfps (create)",
+    "status": "PASS",
+    "notes": "id=dd8009d0-d27..."
+  },
+  {
+    "num": 3,
+    "feature": "GET /api/rfps (list)",
+    "status": "PASS",
+    "notes": "24 RFPs total"
+  },
+  {
+    "num": 4,
+    "feature": "GET /api/rfps/:id (fetch)",
+    "status": "PASS",
+    "notes": ""
+  },
+  {
+    "num": 5,
+    "feature": "PATCH /api/rfps/:id (content)",
+    "status": "PASS",
+    "notes": ""
+  },
+  {
+    "num": 6,
+    "feature": "PATCH status draft→approved",
+    "status": "PASS",
+    "notes": ""
+  },
+  {
+    "num": 7,
+    "feature": "PATCH invalid transition",
+    "status": "PASS",
+    "notes": "Correctly rejected"
+  },
+  {
+    "num": 8,
+    "feature": "PATCH evaluation data",
+    "status": "PASS",
+    "notes": ""
+  },
+  {
+    "num": 9,
+    "feature": "PATCH risk_heatmap data",
+    "status": "PASS",
+    "notes": ""
+  },
+  {
+    "num": 10,
+    "feature": "GET /api/rfps/:id/evaluation",
+    "status": "PASS",
+    "notes": ""
+  },
+  {
+    "num": 11,
+    "feature": "GET /api/rfps/:id/risk-heatmap",
+    "status": "PASS",
+    "notes": ""
+  },
+  {
+    "num": 12,
+    "feature": "GET /api/rfps/404",
+    "status": "PASS",
+    "notes": "Correctly returns 404"
+  },
+  {
+    "num": 13,
+    "feature": "GET /api/i18n/en",
+    "status": "PASS",
+    "notes": ""
+  },
+  {
+    "num": 14,
+    "feature": "GET /api/i18n/ar",
+    "status": "PASS",
+    "notes": ""
+  },
+  {
+    "num": 15,
+    "feature": "GET /api/settings/guidelines",
+    "status": "PASS",
+    "notes": "4 categories"
+  },
+  {
+    "num": 16,
+    "feature": "SSE: stream completes",
+    "status": "PASS",
+    "notes": "chunks=1, statuses=4"
+  },
+  {
+    "num": 17,
+    "feature": "SSE: agent produces text",
+    "status": "PASS",
+    "notes": "18222 chars"
+  },
+  {
+    "num": 18,
+    "feature": "SSE: tool calls detected",
+    "status": "PASS",
+    "notes": "tools: ['Running tool: transfer_to_agent', 'Running tool: read_local_templates', 'Running tool: date_time']"
+  },
+  {
+    "num": 19,
+    "feature": "SSE: agent skips redundant questions",
+    "status": "PASS",
+    "notes": "Agent did not re-ask already-provided info"
+  },
+  {
+    "num": 20,
+    "feature": "SSE: RFP drafting initiated",
+    "status": "PASS",
+    "notes": "Transfer/drafting detected"
+  },
+  {
+    "num": 21,
+    "feature": "SSE: backend kick-start mechanism",
+    "status": "PASS",
+    "notes": "Sub-agent produced output directly"
+  },
+  {
+    "num": 22,
+    "feature": "UI: Dashboard loads",
+    "status": "PASS",
+    "notes": ""
+  },
+  {
+    "num": 23,
+    "feature": "UI: Navigate to Documents",
+    "status": "PASS",
+    "notes": ""
+  },
+  {
+    "num": 24,
+    "feature": "UI: Navigate to Evaluations",
+    "status": "PASS",
+    "notes": ""
+  },
+  {
+    "num": 25,
+    "feature": "UI: Navigate to Create",
+    "status": "PASS",
+    "notes": ""
+  },
+  {
+    "num": 26,
+    "feature": "UI: Navigate to Settings",
+    "status": "PASS",
+    "notes": ""
+  },
+  {
+    "num": 27,
+    "feature": "UI: Create form — fill fields",
+    "status": "PASS",
+    "notes": ""
+  },
+  {
+    "num": 28,
+    "feature": "UI: Create form — submit & redirect",
+    "status": "PASS",
+    "notes": "rfp_id=504e0540-7b8..."
+  },
+  {
+    "num": 29,
+    "feature": "UI: Chat page loads with context",
+    "status": "PASS",
+    "notes": ""
+  },
+  {
+    "num": 30,
+    "feature": "UI: Agent responds to auto-context",
+    "status": "PASS",
+    "notes": ""
+  },
+  {
+    "num": 31,
+    "feature": "UI: Tool activity sidebar",
+    "status": "PASS",
+    "notes": "0 calls, feed visible=True"
+  },
+  {
+    "num": 32,
+    "feature": "UI: Pre-populate test RFP",
+    "status": "PASS",
+    "notes": "id=3dbf0dca-9ee..."
+  },
+  {
+    "num": 33,
+    "feature": "UI: Document preview",
+    "status": "PASS",
+    "notes": "958 chars rendered"
+  },
+  {
+    "num": 34,
+    "feature": "UI: Editor loads with content",
+    "status": "PASS",
+    "notes": "1109 chars"
+  },
+  {
+    "num": 35,
+    "feature": "UI: Evaluation results display",
+    "status": "PASS",
+    "notes": "recommendation=yes, vendors=yes, heatmap=yes"
+  },
+  {
+    "num": 36,
+    "feature": "UI: Settings page loads",
+    "status": "PASS",
+    "notes": "Guidelines sections visible"
+  },
+  {
+    "num": 37,
+    "feature": "UI: Tool logs above content (DOM order)",
+    "status": "SKIP",
+    "notes": "No bubble found to check"
+  },
+  {
+    "num": 38,
+    "feature": "Eval SSE: stream completes",
+    "status": "PASS",
+    "notes": "chunks=2, statuses=12"
+  },
+  {
+    "num": 39,
+    "feature": "Eval SSE: evaluation text output",
+    "status": "PASS",
+    "notes": "5802 chars"
+  },
+  {
+    "num": 40,
+    "feature": "Eval SSE: vendor names in response",
+    "status": "PASS",
+    "notes": "Vendors mentioned in output"
+  },
+  {
+    "num": 41,
+    "feature": "Eval SSE: evaluation dimensions",
+    "status": "PASS",
+    "notes": "4/4 dimensions mentioned"
+  },
+  {
+    "num": 42,
+    "feature": "Eval SSE: store_evaluation_results tool",
+    "status": "PASS",
+    "notes": "Tool called"
+  },
+  {
+    "num": 43,
+    "feature": "Eval SSE: risk_heatmap tool",
+    "status": "PASS",
+    "notes": "Tool called"
+  }
+]

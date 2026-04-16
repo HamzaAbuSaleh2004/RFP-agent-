@@ -8,9 +8,10 @@ from dotenv import load_dotenv
 # Load .env from the rfp_agent/ directory regardless of where uvicorn is launched from
 load_dotenv(dotenv_path=Path(__file__).parent / ".env", override=True)
 
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, UploadFile, File
 from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 OUTPUT_DIR      = Path(__file__).parent.parent / "output"
@@ -32,6 +33,7 @@ from google.adk.sessions.in_memory_session_service import InMemorySessionService
 from google.genai.types import Content, Part
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory=str(Path(__file__).parent / "static")), name="static")
 templates = Jinja2Templates(directory="rfp_agent/templates")
 
 # Expose the translation helper directly inside every Jinja2 template
@@ -67,6 +69,8 @@ class PatchRFPRequest(BaseModel):
     rfp_content: Optional[str] = None
     assigned_vendor: Optional[str] = None
     invited_users: Optional[List[str]] = None
+    evaluation: Optional[dict] = None
+    risk_heatmap: Optional[dict] = None
 
 
 class GuidelineUpdateRequest(BaseModel):
@@ -240,18 +244,29 @@ async def api_chat(body: ChatRequest):
         # Wrap the plain string into the ADK Content schema
         message = Content(role="user", parts=[Part(text=effective_input)])
 
-        # Accumulators for fallback persistence (BUG-1 / BUG-2)
+        # ── Shared state across run(s) ───────────────────────────────────
         accumulated_text: list[str] = []
         rfp_content_saved = False
         eval_saved = False
+        last_announced_author: str | None = None
+        transfer_detected = False
+        sub_agent_text_chunks = 0
 
-        try:
+        # ── Inner helper: process one run_async call ─────────────────────
+        async def _stream_run(run_message):
+            """Process a single runner.run_async call, yielding SSE lines.
+
+            Mutates the outer-scope accumulators so state carries across
+            multiple runs (main run + optional kick-start).
+            """
+            nonlocal rfp_content_saved, eval_saved, last_announced_author
+            nonlocal transfer_detected, sub_agent_text_chunks
+
             async for event in runner.run_async(
                 user_id="user1",
                 session_id=session_id,
-                new_message=message,
+                new_message=run_message,
             ):
-                # ── Debug: log event structure ───────────────────────────────
                 author = getattr(event, "author", None)
                 logging.debug(
                     "ADK event | author=%s | has_content=%s | "
@@ -266,7 +281,7 @@ async def api_chat(body: ChatRequest):
                     event.is_final_response() if hasattr(event, "is_final_response") else "n/a",
                 )
 
-                # ── Tool calls ───────────────────────────────────────────────
+                # ── Tool calls ───────────────────────────────────────────
                 try:
                     fn_calls = event.get_function_calls()
                 except Exception:
@@ -275,8 +290,11 @@ async def api_chat(body: ChatRequest):
                     for call in fn_calls:
                         yield f"data: {json.dumps({'type': 'status', 'text': f'Running tool: {call.name}'})}\n\n"
 
-                        # When create_rfp_pdf fires and we have an rfp_id,
-                        # capture the markdown and persist it to the store.
+                        # Detect agent transfers
+                        if call.name == "transfer_to_agent":
+                            transfer_detected = True
+
+                        # Persist rfp_content when create_rfp_pdf fires
                         if call.name == "create_rfp_pdf" and rfp_id:
                             try:
                                 args = call.args if isinstance(call.args, dict) else {}
@@ -291,8 +309,7 @@ async def api_chat(body: ChatRequest):
                             except Exception as save_err:
                                 logging.warning("Could not save rfp_content: %s", save_err)
 
-                        # When store_evaluation_results fires and we have an rfp_id,
-                        # persist the evaluation to the correct RFP record.
+                        # Persist evaluation when store_evaluation_results fires
                         if call.name == "store_evaluation_results" and rfp_id:
                             try:
                                 args = call.args if isinstance(call.args, dict) else {}
@@ -308,35 +325,28 @@ async def api_chat(body: ChatRequest):
                             except Exception as save_err:
                                 logging.warning("Could not save evaluation to RFP: %s", save_err)
 
-                        # When risk_heatmap fires and we have an rfp_id,
-                        # persist the heatmap to the correct RFP record.
+                        # Log risk_heatmap calls
                         if call.name == "risk_heatmap" and rfp_id:
-                            try:
-                                args = call.args if isinstance(call.args, dict) else {}
-                                compliance_json = args.get("compliance_results", "")
-                                if compliance_json:
-                                    # The tool already computes and saves; we also
-                                    # grab its output later. But pre-save the raw
-                                    # result via the tool's rfp_id param.
-                                    logging.info(
-                                        "risk_heatmap tool called for RFP %s", rfp_id
-                                    )
-                            except Exception as save_err:
-                                logging.warning("Could not handle risk_heatmap: %s", save_err)
+                            logging.info("risk_heatmap tool called for RFP %s", rfp_id)
 
-                # ── Agent transfers ──────────────────────────────────────────
+                # ── Agent transfers (deduplicated) ───────────────────────
                 if author and author != root_agent.name:
-                    yield f"data: {json.dumps({'type': 'status', 'text': f'Handed off to: {author}'})}\n\n"
+                    transfer_detected = True
+                    if author != last_announced_author:
+                        last_announced_author = author
+                        yield f"data: {json.dumps({'type': 'status', 'text': f'Handed off to: {author}'})}\n\n"
 
-                # ── Text chunks (streaming partial tokens) ───────────────────
+                # ── Text chunks (streaming partial tokens) ───────────────
                 if event.content and event.content.parts:
                     for part in event.content.parts:
                         text = getattr(part, "text", None)
                         if text:
+                            if transfer_detected:
+                                sub_agent_text_chunks += 1
                             accumulated_text.append(text)
                             yield f"data: {json.dumps({'type': 'chunk', 'text': text})}\n\n"
 
-                # ── Final response fallback ──────────────────────────────────
+                # ── Final response fallback ──────────────────────────────
                 elif (
                     hasattr(event, "is_final_response")
                     and event.is_final_response()
@@ -345,18 +355,50 @@ async def api_chat(body: ChatRequest):
                     for part in (event.content.parts or []):
                         text = getattr(part, "text", None)
                         if text:
+                            if transfer_detected:
+                                sub_agent_text_chunks += 1
                             accumulated_text.append(text)
                             yield f"data: {json.dumps({'type': 'chunk', 'text': text})}\n\n"
 
-            # ── Fallback: persist rfp_content from streamed text (BUG-1) ────
+        # ── Main execution ───────────────────────────────────────────────
+        try:
+            # Run 1: process the user's message
+            async for sse in _stream_run(message):
+                yield sse
+
+            # ── Backend kick-start ───────────────────────────────────────
+            # If a transfer happened but the sub-agent produced no text,
+            # ADK needs a new user message to activate the sub-agent.
+            # Send it automatically in the same SSE stream — no frontend
+            # round-trip required.
+            if transfer_detected and sub_agent_text_chunks == 0:
+                logging.info(
+                    "Transfer detected with no sub-agent output — "
+                    "sending automatic kick-start (session=%s)", session_id,
+                )
+                yield f"data: {json.dumps({'type': 'status', 'text': 'Activating sub-agent...'})}\n\n"
+
+                kick_text = (
+                    "All project details have been provided in the conversation above. "
+                    "Please proceed immediately:\n"
+                    "- If you are the RFP Creator: call read_local_templates and date_time, "
+                    "then draft the full RFP document based on everything discussed.\n"
+                    "- If you are the Bid Evaluator: begin the 4-dimension evaluation "
+                    "using the bids provided above."
+                )
+                kick = Content(role="user", parts=[Part(text=kick_text)])
+
+                # Run 2: kick-start the sub-agent
+                async for sse in _stream_run(kick):
+                    yield sse
+
+            # ── Fallback: persist rfp_content from streamed text ─────────
             if rfp_id and not rfp_content_saved and accumulated_text:
                 full_text = "".join(accumulated_text)
-                # Only save if the text looks like a full RFP draft
-                # (at least 3 markdown section headings and substantial length)
                 if full_text.count("## ") >= 3 and len(full_text) > 500:
                     try:
-                        existing = get_rfp(rfp_id)
-                        if existing and not existing.get("rfp_content"):
+                        rec = get_rfp(rfp_id)
+                        if rec and not rec.get("rfp_content"):
                             patch_rfp(rfp_id, {"rfp_content": full_text})
                             logging.info(
                                 "Fallback: saved rfp_content from streamed text for RFP %s (%d chars)",
@@ -365,22 +407,24 @@ async def api_chat(body: ChatRequest):
                     except Exception as fb_err:
                         logging.warning("Fallback rfp_content save failed: %s", fb_err)
 
-            # ── Fallback: persist evaluation from streamed text (BUG-2) ─────
+            # ── Fallback: persist evaluation from streamed text ──────────
             if rfp_id and not eval_saved and accumulated_text:
                 full_text = "".join(accumulated_text)
-                # Look for a JSON block that contains a "vendors" key
                 try:
                     import re as _re
-                    json_blocks = _re.findall(r'\{[^{}]*"vendors"[^{}]*\[.*?\]\s*\}', full_text, _re.DOTALL)
+                    json_blocks = _re.findall(
+                        r'\{[^{}]*"vendors"[^{}]*\[.*?\]\s*\}', full_text, _re.DOTALL
+                    )
                     if not json_blocks:
-                        # Try wider search for any JSON object with vendors array
-                        json_blocks = _re.findall(r'\{.*?"vendors"\s*:\s*\[.*?\]\s*\}', full_text, _re.DOTALL)
+                        json_blocks = _re.findall(
+                            r'\{.*?"vendors"\s*:\s*\[.*?\]\s*\}', full_text, _re.DOTALL
+                        )
                     for block in json_blocks:
                         try:
                             eval_data = json.loads(block)
                             if eval_data.get("vendors"):
-                                existing = get_rfp(rfp_id)
-                                if existing and not existing.get("evaluation"):
+                                rec = get_rfp(rfp_id)
+                                if rec and not rec.get("evaluation"):
                                     patch_rfp(rfp_id, {"evaluation": eval_data})
                                     logging.info(
                                         "Fallback: saved evaluation from streamed text for RFP %s",
@@ -521,6 +565,36 @@ async def api_put_guideline(category: str, body: GuidelineUpdateRequest):
     path.write_text(body.content, encoding="utf-8")
     logging.info("Guideline '%s' updated (%d chars)", category, len(body.content))
     return JSONResponse(content=_guideline_record(category))
+
+
+# ── Bid file upload (text extraction) ────────────────────────────────────────
+
+@app.post("/api/extract-bid-text")
+async def api_extract_bid_text(file: UploadFile = File(...)):
+    """Accept a PDF or DOCX file and return the extracted plain text."""
+    filename = (file.filename or "").lower()
+    raw = await file.read()
+
+    if filename.endswith(".pdf"):
+        try:
+            import PyPDF2, io
+            reader = PyPDF2.PdfReader(io.BytesIO(raw))
+            text = "\n".join(page.extract_text() or "" for page in reader.pages)
+        except Exception as e:
+            raise HTTPException(status_code=422, detail=f"Failed to read PDF: {e}")
+
+    elif filename.endswith(".docx"):
+        try:
+            import docx, io
+            doc = docx.Document(io.BytesIO(raw))
+            text = "\n".join(p.text for p in doc.paragraphs)
+        except Exception as e:
+            raise HTTPException(status_code=422, detail=f"Failed to read DOCX: {e}")
+
+    else:
+        raise HTTPException(status_code=400, detail="Only .pdf and .docx files are supported.")
+
+    return JSONResponse(content={"text": text.strip()})
 
 
 # ── Regenerate PDF endpoint ───────────────────────────────────────────────────

@@ -11,7 +11,8 @@
       "Read(//c/Users/hamza/Desktop/LiverX/RFP/rfp_agent/**)",
       "Read(//c/Users/hamza/Desktop/LiverX/RFP/**)",
       "Bash(python -c \"from rfp_agent.i18n import t; print\\(t\\('eval.award_rfp', 'en'\\)\\)\")",
-      "Bash(/c/Users/hamza/AppData/Local/Programs/Python/Python311/python.exe -m pip install playwright -q)"
+      "Bash(/c/Users/hamza/AppData/Local/Programs/Python/Python311/python.exe -m pip install playwright -q)",
+      "Bash(curl -s http://localhost:8000/api/stats)"
     ]
   }
 }

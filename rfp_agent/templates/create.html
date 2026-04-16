@@ -109,14 +109,14 @@
 
 <!-- Sidebar -->
 <aside class="fixed left-0 top-0 h-screen w-64 flex flex-col p-6 bg-slate-50 z-50">
-  <div class="flex flex-col mb-10">
-    <div class="flex items-center gap-3 mb-1">
-      <div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
-        <span class="material-symbols-outlined text-white text-sm" style="font-variation-settings:'FILL' 1">description</span>
-      </div>
-      <h1 class="text-xl font-bold tracking-tight text-blue-900">RFP Director</h1>
+  <div class="flex items-center gap-3 mb-10">
+    <div class="w-10 h-10 rounded-lg bg-white shadow-sm flex items-center justify-center overflow-hidden shrink-0 border border-slate-100">
+      <img alt="Network Safety Logo" class="w-full h-full object-contain p-1" src="/static/logo.png"/>
     </div>
-    <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold ml-1">Enterprise Procurement</p>
+    <div class="flex flex-col overflow-hidden">
+      <h1 class="text-xl font-bold tracking-tight text-blue-900">Network Safety</h1>
+      <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Enterprise Procurement</p>
+    </div>
   </div>
   <nav class="flex-1 space-y-2">
     <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/">
@@ -146,15 +146,25 @@
 <!-- Top bar -->
 <header class="fixed top-0 left-64 right-0 z-40 flex items-center justify-between px-10 py-4 bg-white/80 backdrop-blur-xl border-b border-slate-100">
   <div class="flex items-center gap-2 text-sm text-slate-400">
-    <a href="/" class="hover:text-primary transition-colors">Dashboard</a>
+    <a href="/" class="hover:text-primary transition-colors">{{ t('nav.dashboard', locale) }}</a>
     <span class="material-symbols-outlined text-xs">chevron_right</span>
-    <span class="font-semibold text-primary">New RFP</span>
+    <span class="font-semibold text-primary">{{ t('page.create', locale) }}</span>
   </div>
-  <div class="flex items-center gap-3">
-    <button class="text-slate-400 hover:text-blue-700 transition-all">
-      <span class="material-symbols-outlined">notifications</span>
-    </button>
-    <div class="w-9 h-9 rounded-full bg-primary-container flex items-center justify-center text-white text-xs font-bold">HA</div>
+  <div class="flex items-center gap-6">
+    <!-- Language toggle -->
+    <div class="flex items-center rounded-lg overflow-hidden border border-slate-200 text-[11px] font-bold">
+      <a href="#" onclick="setLang('en');return false;"
+         class="px-2.5 py-1.5 transition-colors {% if locale == 'en' %}bg-primary-container text-white{% else %}text-slate-500 hover:bg-surface-container-low{% endif %}">EN</a>
+      <a href="#" onclick="setLang('ar');return false;"
+         class="px-2.5 py-1.5 transition-colors {% if locale == 'ar' %}bg-primary-container text-white{% else %}text-slate-500 hover:bg-surface-container-low{% endif %}">AR</a>
+    </div>
+    <div class="h-8 w-px bg-outline-variant/20 mx-2"></div>
+    <div class="flex items-center gap-3">
+      <button class="text-slate-400 hover:text-blue-700 transition-all">
+        <span class="material-symbols-outlined">notifications</span>
+      </button>
+      <div class="w-9 h-9 rounded-full bg-primary-container flex items-center justify-center text-white text-xs font-bold">HA</div>
+    </div>
   </div>
 </header>
 
@@ -277,6 +287,11 @@
 </main>
 
 <script>
+  function setLang(locale) {
+    document.cookie = `ui_lang=${locale};path=/;max-age=31536000`;
+    location.reload();
+  }
+
   let selectedLang = 'en';
 
   function selectLang(btn) {

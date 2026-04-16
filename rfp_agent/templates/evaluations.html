@@ -87,13 +87,13 @@
 
 <!-- Side Nav -->
 <aside class="side-nav fixed left-0 top-0 h-full flex flex-col p-6 bg-slate-50 dark:bg-slate-950 font-['Manrope'] antialiased w-64 z-50">
-  <div class="mb-10 flex items-center gap-3">
-    <div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center overflow-hidden">
-      <img alt="RFP Director Logo" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpZLLS4QJDdjky3Llue_mYCs_u0h6BRUK5E0MXQ_48_k1JNpyUZybTatEO5YAVHUVWDIMp1GuTNyUDIJIxXuFTuqx7JUvxyly2FnimyTGUS6jXcdlz8D-876iKfRKvFHjyU43H3AyrLDfaDhBASUPNaJ67WpR90rV3hJDjriLVmu975CmQLdlKgON6JZSZCxdDH2tEjYIEYmp9KTg6aBBkoF97ncEIb-Dc6bwW8RoCyE_8152uCGA1hVvEP14cIf05htQ5c_Hxcws"/>
+  <div class="flex items-center gap-3 mb-10">
+    <div class="w-10 h-10 rounded-lg bg-white shadow-sm flex items-center justify-center overflow-hidden shrink-0 border border-slate-100">
+      <img alt="Network Safety Logo" class="w-full h-full object-contain p-1" src="/static/logo.png"/>
     </div>
-    <div>
-      <h1 class="text-xl font-bold tracking-tight text-blue-900">RFP Director</h1>
-      <p class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold">Enterprise Procurement</p>
+    <div class="flex flex-col overflow-hidden">
+      <h1 class="text-xl font-bold tracking-tight text-blue-900">Network Safety</h1>
+      <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Enterprise Procurement</p>
     </div>
   </div>
   <nav class="flex-1 space-y-2">
@@ -120,16 +120,12 @@
 <!-- Top Nav -->
 <header class="flex justify-between items-center px-8 py-4 sticky top-0 z-40 ml-64 bg-white/70 backdrop-blur-xl">
   <div class="flex items-center gap-4 flex-1 min-w-0">
-    <!-- RFP Selector -->
+    <!-- RFP Selector (Replaced with Page Content) -->
     <div class="flex items-center gap-3">
-      <label class="text-xs font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">{{ t('eval.select_rfp', locale) }}</label>
-      <select id="rfp-selector" onchange="onRfpSelect()"
-              class="bg-surface-container-low border-none rounded-full px-4 py-2 text-sm font-semibold text-primary focus:ring-2 focus:ring-tertiary-fixed-dim min-w-[280px]">
-        <option value="">— {{ t('eval.select_rfp', locale) }} —</option>
-        {% for rfp in rfps %}
-        <option value="{{ rfp.id }}" data-status="{{ rfp.status }}">{{ rfp.title }} ({{ rfp.status | capitalize }})</option>
-        {% endfor %}
-      </select>
+      <button onclick="showRfpSelection()" class="flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-primary uppercase tracking-widest transition-colors">
+        <span class="material-symbols-outlined text-sm">grid_view</span>
+        {{ t('eval.select_rfp', locale) }}
+      </button>
     </div>
   </div>
   <div class="flex items-center gap-6">
@@ -156,32 +152,98 @@
 <!-- Main -->
 <main class="ml-64 p-8 min-h-screen">
 
-  <!-- Choose RFP prompt -->
-  <div id="choose-rfp-state" class="flex flex-col items-center justify-center min-h-[60vh] text-center gap-6">
-    <div class="w-20 h-20 rounded-2xl bg-surface-container-high flex items-center justify-center">
-      <span class="material-symbols-outlined text-4xl text-slate-300">assignment</span>
+  <!-- Choose RFP prompt / Grid -->
+  <div id="choose-rfp-state" class="w-full max-w-6xl mx-auto mt-6">
+    <div class="text-center mb-12">
+      <div class="w-16 h-16 rounded-2xl bg-surface-container-high flex items-center justify-center mx-auto mb-4">
+        <span class="material-symbols-outlined text-3xl text-slate-400">assignment</span>
+      </div>
+      <h3 class="text-3xl font-extrabold text-primary mb-2">Evaluations Dashboard</h3>
+      <p class="text-on-surface-variant max-w-xl mx-auto text-sm">Select an approved RFP below to evaluate vendor bids and determine the optimal choice.</p>
     </div>
-    <div>
-      <h3 class="text-2xl font-extrabold text-primary mb-2">{{ t('eval.choose_rfp_first', locale) }}</h3>
-      <p class="text-on-surface-variant max-w-sm">{{ t('eval.choose_rfp_first', locale) }}</p>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      {% set approved_rfps = rfps | selectattr('status', 'equalto', 'approved') | list %}
+      {% if approved_rfps | length == 0 %}
+        <div class="col-span-full py-16 text-center text-slate-400 bg-surface-container-lowest rounded-3xl border border-dashed border-outline-variant/50">
+          <span class="material-symbols-outlined text-5xl mb-3 opacity-50">inbox</span>
+          <p class="font-medium text-sm">No approved RFPs available for evaluation.</p>
+        </div>
+      {% else %}
+        {% for rfp in approved_rfps %}
+        <div onclick="selectRfpCard('{{ rfp.id }}')"
+             class="bg-surface-container-lowest border border-outline-variant/30 p-8 rounded-3xl hover:shadow-xl transition-all cursor-pointer hover:border-primary-container/30 group relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-primary-fixed/20 rounded-bl-full -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
+          <div class="flex justify-between items-start mb-6 relative z-10">
+            <div class="w-12 h-12 rounded-xl bg-primary-fixed/40 text-primary-fixed-variant flex items-center justify-center">
+               <span class="material-symbols-outlined">description</span>
+            </div>
+            <span class="text-[10px] font-bold px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-md uppercase tracking-widest shadow-sm">Approved</span>
+          </div>
+          <h4 class="text-xl font-bold text-primary mb-3 line-clamp-2 relative z-10 leading-snug group-hover:text-blue-700 transition-colors">{{ rfp.title }}</h4>
+          <p class="text-sm text-on-surface-variant line-clamp-2 mb-6 relative z-10">{{ rfp.description }}</p>
+          <div class="flex items-center justify-between border-t border-outline-variant/10 pt-4 relative z-10">
+            <div class="text-xs text-slate-400 flex items-center gap-1.5 font-medium">
+              <span class="material-symbols-outlined text-[16px]">group</span>
+              {{ rfp.invited_users | length }} Collaborators
+            </div>
+            <span class="material-symbols-outlined text-primary-container transform translate-x-0 group-hover:translate-x-1 transition-transform">arrow_forward</span>
+          </div>
+        </div>
+        {% endfor %}
+      {% endif %}
     </div>
   </div>
 
-  <!-- Empty / no evaluations state -->
-  <div id="empty-state" class="hidden flex flex-col items-center justify-center min-h-[50vh] text-center gap-6">
-    <div class="w-20 h-20 rounded-2xl bg-surface-container-high flex items-center justify-center">
-      <span class="material-symbols-outlined text-4xl text-slate-300">inbox</span>
+  <!-- Bid Submission Form (shown when no evaluation exists) -->
+  <div id="empty-state" class="hidden">
+    <div class="max-w-4xl mx-auto">
+      <!-- Header -->
+      <div class="mb-8">
+        <h2 class="text-3xl font-extrabold text-primary tracking-tight mb-2">{{ t('eval.submit_bids', locale) }}</h2>
+        <p class="text-on-surface-variant text-sm max-w-2xl">{{ t('eval.submit_bids_desc', locale) }}</p>
+      </div>
+
+      <!-- Bid entries container -->
+      <div id="bid-entries" class="space-y-6 mb-6"></div>
+
+      <!-- Add bid button -->
+      <button onclick="addBidEntry()" class="flex items-center gap-2 px-5 py-3 rounded-xl border-2 border-dashed border-outline-variant hover:border-primary-container hover:bg-primary-fixed/20 text-on-surface-variant hover:text-primary transition-all text-sm font-semibold w-full justify-center">
+        <span class="material-symbols-outlined text-lg">add</span>
+        {{ t('eval.add_bid', locale) }}
+      </button>
+
+      <!-- Error message -->
+      <p id="bid-form-error" class="hidden text-error text-sm font-medium mt-4"></p>
+
+      <!-- Submit -->
+      <div class="mt-8 flex items-center justify-between">
+        <p class="text-xs text-on-surface-variant max-w-sm">
+          <span class="material-symbols-outlined text-xs align-middle">info</span>
+          The AI agent will evaluate all bids against your company's Legal, Commercial, Technical, and Financial benchmarks.
+        </p>
+        <button id="evaluate-btn" onclick="submitBidsForEvaluation()"
+          class="flex items-center gap-2 px-8 py-3 hero-gradient text-white font-bold rounded-xl shadow-lg hover:scale-[1.02] transition-transform text-sm">
+          <span class="material-symbols-outlined text-base">analytics</span>
+          {{ t('eval.run_evaluation', locale) }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Processing state -->
+  <div id="processing-state" class="hidden flex flex-col items-center justify-center min-h-[60vh] text-center gap-6">
+    <div class="w-20 h-20 rounded-2xl bg-primary-fixed/40 flex items-center justify-center">
+      <svg class="animate-spin w-10 h-10 text-primary-container" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+      </svg>
     </div>
     <div>
-      <h3 class="text-2xl font-extrabold text-primary mb-2">{{ t('eval.no_bids', locale) }}</h3>
-      <p class="text-on-surface-variant max-w-sm">{{ t('eval.no_bids', locale) }}</p>
+      <h3 class="text-2xl font-extrabold text-primary mb-2">{{ t('eval.processing', locale) }}</h3>
+      <p class="text-on-surface-variant max-w-md">{{ t('eval.processing_desc', locale) }}</p>
     </div>
-    <div class="flex gap-4">
-      <a id="start-eval-link" href="/chat?mode=evaluate"
-         class="px-8 py-3 hero-gradient text-white font-bold rounded-xl shadow-lg hover:scale-[1.02] transition-transform">
-        {{ t('eval.start_evaluation', locale) }}
-      </a>
-    </div>
+    <div id="processing-steps" class="text-left space-y-2 mt-2 text-sm"></div>
   </div>
 
   <!-- Skeleton loader -->
@@ -204,18 +266,20 @@
     <div class="mb-10 flex items-start justify-between">
       <div>
         <div class="flex items-center gap-2 text-primary-container font-medium mb-2 text-sm">
-          <span class="material-symbols-outlined text-sm">arrow_back</span>
-          <span id="eval-project-tag" class="tracking-wider"></span>
+          <button onclick="showRfpSelection()" class="hover:bg-surface-container-high rounded-full p-1 -ml-1 transition-colors flex items-center justify-center">
+            <span class="material-symbols-outlined text-sm">arrow_back</span>
+          </button>
+          <span id="eval-project-tag" class="tracking-wider text-xs font-bold uppercase"></span>
         </div>
         <h2 id="eval-project-title" class="text-4xl font-extrabold text-primary tracking-tight mb-3"></h2>
         <p class="text-on-surface-variant text-base max-w-2xl leading-relaxed">
           Evaluated on <span id="eval-timestamp" class="font-semibold text-primary"></span>
         </p>
       </div>
-      <a id="new-eval-btn" href="/chat?mode=evaluate"
+      <button onclick="showBidForm()"
         class="px-6 py-3 hero-gradient text-white font-bold rounded-xl flex items-center gap-2 hover:scale-[1.02] transition-transform">
-        <span class="material-symbols-outlined">add</span>New Evaluation
-      </a>
+        <span class="material-symbols-outlined">refresh</span>Re-evaluate
+      </button>
     </div>
 
     <!-- AI Recommendation + stats -->
@@ -362,10 +426,252 @@ const RFPS = {{ rfps | tojson }};
 let selectedRfpId = null;
 let evalData = null;
 let heatmapData = null;
+let bidCounter = 0;
 
 const RISK_CLASS = {
   LOW:'risk-low', MODERATE:'risk-moderate', HIGH:'risk-high', CRITICAL:'risk-critical'
 };
+
+// ── Bid form helpers ────────────────────────────────────────────────────────
+
+function addBidEntry() {
+  bidCounter++;
+  const n = bidCounter;
+  const container = document.getElementById('bid-entries');
+  const entry = document.createElement('div');
+  entry.id = `bid-${n}`;
+  entry.className = 'bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-outline-variant/20 relative';
+  entry.innerHTML = `
+    <div class="flex items-center justify-between mb-5">
+      <span class="text-sm font-bold text-primary flex items-center gap-2">
+        <span class="w-7 h-7 rounded-lg bg-primary-container text-white flex items-center justify-center text-xs font-bold">${n}</span>
+        {{ t('eval.bid_number', locale) }} #${n}
+      </span>
+      ${n > 1 ? `<button onclick="removeBidEntry(${n})" class="text-xs text-slate-400 hover:text-error transition-colors flex items-center gap-1 font-medium">
+        <span class="material-symbols-outlined text-sm">close</span>{{ t('eval.remove_bid', locale) }}
+      </button>` : ''}
+    </div>
+    <div class="grid grid-cols-2 gap-4 mb-4">
+      <div>
+        <label class="text-xs font-bold text-slate-500 mb-1.5 block">{{ t('eval.vendor_name', locale) }} *</label>
+        <input type="text" id="bid-${n}-vendor" placeholder="e.g. Acme Corp"
+          class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-container focus:border-transparent"/>
+      </div>
+      <div>
+        <label class="text-xs font-bold text-slate-500 mb-1.5 block">{{ t('eval.company_name', locale) }}</label>
+        <input type="text" id="bid-${n}-company" placeholder="e.g. Acme Solutions Ltd."
+          class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-container focus:border-transparent"/>
+      </div>
+    </div>
+    <div>
+      <div class="flex items-center justify-between mb-1.5">
+        <label class="text-xs font-bold text-slate-500">Bid Content *</label>
+        <label class="flex items-center gap-1.5 text-xs font-medium text-primary-container hover:text-primary cursor-pointer transition-colors">
+          <span class="material-symbols-outlined text-sm">upload_file</span>
+          {{ t('eval.upload_pdf_docx', locale) }}
+          <input type="file" accept=".pdf,.docx" class="hidden" onchange="handleFileUpload(this, ${n})"/>
+        </label>
+      </div>
+      <div id="bid-${n}-file-badge" class="hidden mb-2 flex items-center gap-2 px-3 py-1.5 bg-primary-fixed/30 rounded-lg text-xs font-medium text-primary w-fit">
+        <span class="material-symbols-outlined text-sm">description</span>
+        <span id="bid-${n}-file-name"></span>
+        <button onclick="clearFile(${n})" class="ml-1 text-slate-400 hover:text-error">
+          <span class="material-symbols-outlined text-sm">close</span>
+        </button>
+      </div>
+      <textarea id="bid-${n}-content" rows="6" placeholder="{{ t('eval.paste_bid', locale) }}"
+        class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 text-sm resize-none focus:ring-2 focus:ring-primary-container focus:border-transparent font-mono"></textarea>
+    </div>
+  `;
+  container.appendChild(entry);
+}
+
+function removeBidEntry(n) {
+  const el = document.getElementById(`bid-${n}`);
+  if (el) el.remove();
+}
+
+function clearFile(n) {
+  document.getElementById(`bid-${n}-content`).value = '';
+  document.getElementById(`bid-${n}-file-badge`).classList.add('hidden');
+}
+
+async function handleFileUpload(input, n) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const badge = document.getElementById(`bid-${n}-file-badge`);
+  const nameEl = document.getElementById(`bid-${n}-file-name`);
+  const textarea = document.getElementById(`bid-${n}-content`);
+
+  // Show uploading state
+  nameEl.textContent = `Extracting text from ${file.name}…`;
+  badge.classList.remove('hidden');
+  textarea.value = '';
+  textarea.disabled = true;
+
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await fetch('/api/extract-bid-text', { method: 'POST', body: formData });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || 'Upload failed');
+    }
+    const data = await res.json();
+    textarea.value = data.text;
+    nameEl.textContent = file.name;
+  } catch (err) {
+    showToast('File error: ' + err.message, 'error');
+    badge.classList.add('hidden');
+  } finally {
+    textarea.disabled = false;
+    input.value = '';
+  }
+}
+
+function collectBids() {
+  const entries = document.getElementById('bid-entries').children;
+  const bids = [];
+  for (const entry of entries) {
+    const id = entry.id.replace('bid-', '');
+    const vendor = document.getElementById(`bid-${id}-vendor`)?.value?.trim();
+    const company = document.getElementById(`bid-${id}-company`)?.value?.trim();
+    const content = document.getElementById(`bid-${id}-content`)?.value?.trim();
+    if (vendor || content) {
+      bids.push({ vendor, company, content });
+    }
+  }
+  return bids;
+}
+
+async function submitBidsForEvaluation() {
+  const errEl = document.getElementById('bid-form-error');
+  errEl.classList.add('hidden');
+
+  const bids = collectBids();
+
+  if (bids.length < 2) {
+    errEl.textContent = '{{ t("eval.min_bids_error", locale) }}';
+    errEl.classList.remove('hidden');
+    return;
+  }
+
+  const incomplete = bids.some(b => !b.vendor || !b.content);
+  if (incomplete) {
+    errEl.textContent = '{{ t("eval.fill_all_error", locale) }}';
+    errEl.classList.remove('hidden');
+    return;
+  }
+
+  // Get the RFP details for context
+  const rfp = RFPS.find(r => r.id === selectedRfpId);
+  const rfpTitle = rfp?.title ?? 'Unknown RFP';
+
+  // Compose the message for the agent
+  let message = `Evaluate the following vendor bids for the RFP "${rfpTitle}".\n\n`;
+  message += `RFP Requirements:\n`;
+  if (rfp?.description) message += `- Description: ${rfp.description}\n`;
+  message += `\n--- VENDOR BIDS ---\n\n`;
+
+  bids.forEach((bid, i) => {
+    message += `=== BID ${i + 1}: ${bid.vendor}${bid.company ? ` (${bid.company})` : ''} ===\n`;
+    message += bid.content + '\n\n';
+  });
+
+  message += `\nPlease evaluate ALL bids across the 4 dimensions (Legal, Commercial, Technical, Financial) and provide the final ranking with a recommendation.`;
+
+  // Switch to processing state
+  showProcessingState();
+
+  const sessionId = `eval_${selectedRfpId}_${Date.now()}`;
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: message,
+        session_id: sessionId,
+        rfp_id: selectedRfpId,
+      }),
+    });
+
+    if (!res.ok) throw new Error('Failed to start evaluation');
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        try {
+          const evt = JSON.parse(line.slice(6));
+          if (evt.type === 'status') {
+            addProcessingStep(evt.text);
+          } else if (evt.type === 'done') {
+            // Evaluation finished — load results
+            await loadEvaluation();
+            return;
+          } else if (evt.type === 'error') {
+            throw new Error(evt.text);
+          }
+        } catch (parseErr) {
+          if (parseErr.message && !parseErr.message.includes('JSON')) throw parseErr;
+        }
+      }
+    }
+
+    // Stream ended — try loading evaluation results
+    await loadEvaluation();
+
+  } catch (err) {
+    console.error('Evaluation failed:', err);
+    showToast('Evaluation failed: ' + err.message, 'error');
+    showBidForm();
+  }
+}
+
+function showProcessingState() {
+  document.getElementById('empty-state').classList.add('hidden');
+  document.getElementById('eval-content').classList.add('hidden');
+  document.getElementById('skeleton-state').classList.add('hidden');
+  document.getElementById('processing-state').classList.remove('hidden');
+  document.getElementById('processing-steps').innerHTML = '';
+}
+
+function addProcessingStep(text) {
+  const container = document.getElementById('processing-steps');
+  const step = document.createElement('div');
+  step.className = 'flex items-center gap-2 text-on-surface-variant';
+  step.innerHTML = `<span class="material-symbols-outlined text-sm text-primary-container">check_circle</span>${text}`;
+  container.appendChild(step);
+  container.scrollTop = container.scrollHeight;
+}
+
+function showBidForm() {
+  document.getElementById('processing-state').classList.add('hidden');
+  document.getElementById('eval-content').classList.add('hidden');
+  document.getElementById('skeleton-state').classList.add('hidden');
+  document.getElementById('choose-rfp-state').classList.add('hidden');
+  document.getElementById('empty-state').classList.remove('hidden');
+
+  // Initialize bid entries if empty
+  if (document.getElementById('bid-entries').children.length === 0) {
+    addBidEntry();
+    addBidEntry();
+  }
+}
+
+// ── Evaluation rendering (unchanged) ────────────────────────────────────────
 
 function riskBadge(level) {
   const cls = RISK_CLASS[level?.toUpperCase()] ?? 'risk-unknown';
@@ -402,26 +708,20 @@ function computeOverallRisk(vendor) {
   return tech;
 }
 
-function onRfpSelect() {
-  const sel = document.getElementById('rfp-selector');
-  selectedRfpId = sel.value;
+function showRfpSelection() {
+  document.getElementById('eval-content').classList.add('hidden');
+  document.getElementById('empty-state').classList.add('hidden');
+  document.getElementById('processing-state').classList.add('hidden');
+  document.getElementById('skeleton-state').classList.add('hidden');
+  document.getElementById('choose-rfp-state').classList.remove('hidden');
+  selectedRfpId = null;
+}
 
-  if (!selectedRfpId) {
-    document.getElementById('choose-rfp-state').classList.remove('hidden');
-    document.getElementById('empty-state').classList.add('hidden');
-    document.getElementById('eval-content').classList.add('hidden');
-    document.getElementById('skeleton-state').classList.add('hidden');
-    return;
-  }
-
-  // Update the chat link
-  document.getElementById('start-eval-link').href = `/chat?rfp_id=${selectedRfpId}&mode=evaluate`;
-  document.getElementById('new-eval-btn').href = `/chat?rfp_id=${selectedRfpId}&mode=evaluate`;
-
-  // Check if RFP is already done (awarded)
+function selectRfpCard(id) {
+  selectedRfpId = id;
+  
   const rfp = RFPS.find(r => r.id === selectedRfpId);
   if (rfp && rfp.status === 'done' && rfp.assigned_vendor) {
-    // Show awarded state
     document.getElementById('award-btn').classList.add('hidden');
     document.getElementById('awarded-badge').classList.remove('hidden');
     document.getElementById('awarded-vendor-name').textContent = rfp.assigned_vendor;
@@ -430,7 +730,6 @@ function onRfpSelect() {
     document.getElementById('awarded-badge').classList.add('hidden');
   }
 
-  // Load evaluations
   document.getElementById('choose-rfp-state').classList.add('hidden');
   loadEvaluation();
 }
@@ -454,7 +753,6 @@ function renderEvaluation(data, heatmap) {
 
   const isWinner = (v) => v.name === data.recommendation || v.company === data.recommendation;
 
-  // thead
   let thead = `<tr class="bg-transparent">
     <th class="p-8 text-sm font-bold text-slate-400 tracking-widest uppercase w-1/5">Criteria</th>`;
   vendors.forEach(v => {
@@ -584,25 +882,25 @@ async function loadEvaluation() {
   document.getElementById('skeleton-state').classList.remove('hidden');
   document.getElementById('empty-state').classList.add('hidden');
   document.getElementById('eval-content').classList.add('hidden');
+  document.getElementById('processing-state').classList.add('hidden');
 
   if (!selectedRfpId) {
     btn.querySelector('span').classList.remove('animate-spin');
-    showEmpty();
+    showBidForm();
     return;
   }
 
   try {
-    // Fetch evaluation data specific to the selected RFP
     const [evalRes, hmRes] = await Promise.all([
       fetch(`/api/rfps/${selectedRfpId}/evaluation`),
       fetch(`/api/rfps/${selectedRfpId}/risk-heatmap`),
     ]);
     btn.querySelector('span').classList.remove('animate-spin');
 
-    if (evalRes.status === 204 || !evalRes.ok) { showEmpty(); return; }
+    if (evalRes.status === 204 || !evalRes.ok) { showBidForm(); return; }
     const data = await evalRes.json();
     const heatmap = hmRes.ok && hmRes.status !== 204 ? await hmRes.json() : null;
-    if (!data || !data.vendors?.length) { showEmpty(); return; }
+    if (!data || !data.vendors?.length) { showBidForm(); return; }
 
     evalData = data;
     heatmapData = heatmap;
@@ -614,14 +912,8 @@ async function loadEvaluation() {
   } catch (err) {
     btn.querySelector('span').classList.remove('animate-spin');
     console.error('Failed to load evaluation:', err);
-    showEmpty();
+    showBidForm();
   }
-}
-
-function showEmpty() {
-  document.getElementById('skeleton-state').classList.add('hidden');
-  document.getElementById('eval-content').classList.add('hidden');
-  document.getElementById('empty-state').classList.remove('hidden');
 }
 
 // Award RFP
@@ -637,11 +929,9 @@ async function confirmAward() {
   document.getElementById('award-modal').classList.add('hidden');
   const vendorName = evalData.recommendation;
 
-  // First check if RFP needs to be approved first
   const rfp = RFPS.find(r => r.id === selectedRfpId);
   try {
     if (rfp && rfp.status === 'draft') {
-      // Transition draft → approved first
       const approveRes = await fetch(`/api/rfps/${selectedRfpId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -650,7 +940,6 @@ async function confirmAward() {
       if (!approveRes.ok) throw new Error('Failed to approve RFP');
     }
 
-    // Transition approved → done
     const res = await fetch(`/api/rfps/${selectedRfpId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -664,14 +953,11 @@ async function confirmAward() {
 
     showToast(`RFP awarded to ${vendorName}!`, 'success');
 
-    // Update UI
     document.getElementById('award-btn').classList.add('hidden');
     document.getElementById('awarded-badge').classList.remove('hidden');
     document.getElementById('awarded-vendor-name').textContent = vendorName;
 
-    // Update local data
     if (rfp) { rfp.status = 'done'; rfp.assigned_vendor = vendorName; }
-
   } catch (e) {
     showToast('Award failed: ' + e.message, 'error');
   }
@@ -692,12 +978,6 @@ function showToast(msg, type = 'success') {
   }, 3500);
 }
 
-// Poll every 10s if an RFP is selected
-setInterval(() => {
-  if (!document.hidden && selectedRfpId) loadEvaluation();
-}, 10000);
-</script>
-<script>
 function setLang(locale) {
   document.cookie = `ui_lang=${locale};path=/;max-age=31536000`;
   location.reload();
