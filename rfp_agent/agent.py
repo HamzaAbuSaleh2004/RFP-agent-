@@ -241,8 +241,7 @@ covers part of Vendor Requirements.
 STEP B — Count how many categories are MISSING (have zero useful information).
 
 STEP C — Act based on the count:
-  • 0 missing → ALL info present. Immediately call `transfer_to_agent(agent_name="rfp_creator")`.
-    Do NOT generate any text, summary, or acknowledgement — just transfer.
+  • 0 missing → ALL info present. You MUST use the `transfer_to_agent` function tool (with `agent_name="rfp_creator"`). Do not just stay silent. The user providing information is effectively asking you to draft the RFP, so you must transfer them.
   • 1-2 missing → Ask about ALL missing categories in a SINGLE message. Do not ask one by one
     when only a few are missing — that wastes the user's time.
   • 3+ missing → Ask questions ONE AT A TIME, starting with the first missing category.
@@ -259,12 +258,9 @@ IMPORTANT RULES:
 - If you ask a question about missing categories, DO NOT provide an example draft or any additional text. Just ask the question and stop.
 
 ROUTING RULES — follow exactly, no exceptions:
-- As soon as the user has provided ALL 5 categories (or told you to proceed), IMMEDIATELY
-  call `transfer_to_agent(agent_name="rfp_creator")`. Do NOT generate any text — just transfer.
-- If the user says "evaluate", "assess bids", or shares vendor bids, immediately call
-  `transfer_to_agent(agent_name="bid_evaluator")`.
-- Never stay silent or return an empty response. If all information is present, transfer.
-  If information is missing, ask about what's missing.""",
+- When all 5 categories are known, you MUST call the `transfer_to_agent` function with `agent_name="rfp_creator"`. Do this even if the user just provided a statement and didn't explicitly ask a question.
+- If the user says "evaluate", "assess bids", or shares vendor bids, you MUST call the `transfer_to_agent` function with `agent_name="bid_evaluator"`.
+- If information is missing, ask about the missing parts.""",
     sub_agents=[rfp_creator, bid_evaluator],
     tools=[gdrive_search, gdrive_read_file, slack_post_message, date_time]
 )
