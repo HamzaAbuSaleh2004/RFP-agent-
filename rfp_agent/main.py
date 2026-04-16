@@ -26,7 +26,7 @@ GUIDELINE_FILES = {
 }
 
 from rfp_agent.agent import root_agent
-from rfp_agent.rfp_store import create_rfp, list_rfps, get_rfp, patch_rfp
+from rfp_agent.rfp_store import create_rfp, list_rfps, get_rfp, patch_rfp, delete_rfp
 from rfp_agent.i18n import t, is_rtl, get_locale_from_cookie, all_translations, SUPPORTED_LOCALES
 from google.adk import Runner
 from google.adk.sessions.in_memory_session_service import InMemorySessionService
@@ -177,6 +177,14 @@ async def api_patch_rfp(rfp_id: str, body: PatchRFPRequest):
     if updated is None:
         raise HTTPException(status_code=404, detail="RFP not found")
     return JSONResponse(content=updated)
+
+
+@app.delete("/api/rfps/{rfp_id}")
+async def api_delete_rfp(rfp_id: str):
+    success = delete_rfp(rfp_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="RFP not found")
+    return JSONResponse(content={"detail": "Deleted successfully"})
 
 
 @app.get("/api/rfps/{rfp_id}/evaluation")

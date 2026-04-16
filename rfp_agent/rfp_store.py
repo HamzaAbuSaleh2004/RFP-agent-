@@ -121,3 +121,17 @@ def patch_rfp(rfp_id: str, updates: dict) -> Optional[dict]:
         return r
 
     return None
+
+
+def delete_rfp(rfp_id: str) -> bool:
+    """
+    Delete an RFP from the local store.
+    Returns True if found and deleted, False otherwise.
+    """
+    records = _load()
+    original_len = len(records)
+    records = [r for r in records if r["id"] != rfp_id]
+    if len(records) < original_len:
+        _save(records)
+        return True
+    return False

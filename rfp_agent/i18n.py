@@ -36,8 +36,8 @@ _TRANSLATIONS: dict[str, dict[str, str]] = {
 
     # ── Dashboard headings ────────────────────────────────────────────────────
     "dashboard.welcome":     {"en": "Welcome back, Director.",             "ar": "مرحباً بعودتك، المدير."},
-    "dashboard.efficiency":  {"en": "Your procurement pipeline is at 84% efficiency.",
-                               "ar": "كفاءة خط المشتريات لديك تبلغ 84%."},
+    "dashboard.efficiency":  {"en": "Your procurement pipeline",
+                               "ar": "خط المشتريات"},
     "dashboard.pipeline":    {"en": "RFP Pipeline",                       "ar": "خط طلبات العروض"},
 
     # ── Stats cards ───────────────────────────────────────────────────────────
