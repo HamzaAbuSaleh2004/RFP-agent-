@@ -333,35 +333,105 @@ def code_execution(code: str) -> str:
 
 
 def list_all_rfps() -> str:
-    """Return a JSON summary of all RFPs in the system including status, bids, and evaluation."""
+    """Return a JSON summary of all RFPs including status, bid details, and evaluation highlights."""
     import json as _json
     from .rfp_store import list_rfps as _list
     rfps = _list()
     summary = []
     for r in rfps:
+        bids = r.get("bids") or []
+        latest_bid = max(bids, key=lambda b: b.get("submitted_at", ""), default=None) if bids else None
+        evaluation = r.get("evaluation") or {}
         summary.append({
-            "id":              r.get("id"),
-            "title":           r.get("title"),
-            "description":     r.get("description"),
-            "status":          r.get("status"),
-            "language":        r.get("language"),
-            "assigned_vendor": r.get("assigned_vendor"),
-            "bid_count":       len(r.get("bids") or []),
-            "has_evaluation":  bool(r.get("evaluation")),
-            "created_at":      r.get("created_at"),
-            "updated_at":      r.get("updated_at"),
+            "id":               r.get("id"),
+            "title":            r.get("title"),
+            "description":      r.get("description"),
+            "status":           r.get("status"),
+            "language":         r.get("language"),
+            "assigned_vendor":  r.get("assigned_vendor"),
+            "bid_count":        len(bids),
+            "bids":             [
+                {
+                    "vendor_name":   b.get("vendor_name"),
+                    "amount":        b.get("amount"),
+                    "currency":      b.get("currency", "USD"),
+                    "submitted_at":  b.get("submitted_at"),
+                    "notes":         b.get("notes"),
+                }
+                for b in bids
+            ],
+            "latest_bid_vendor": latest_bid.get("vendor_name") if latest_bid else None,
+            "latest_bid_at":     latest_bid.get("submitted_at") if latest_bid else None,
+            "has_evaluation":    bool(evaluation),
+            "evaluation_recommendation": evaluation.get("recommendation"),
+            "evaluation_contract_value": evaluation.get("contract_value"),
+            "created_at":        r.get("created_at"),
+            "updated_at":        r.get("updated_at"),
         })
     return _json.dumps(summary, indent=2, ensure_ascii=False)
 
 
 def get_rfp_summary(rfp_id: str) -> str:
-    """Return a detailed JSON summary of a single RFP, including bids and evaluation."""
+    """Return a detailed JSON summary of a single RFP, including all bids and full evaluation."""
     import json as _json
     from .rfp_store import get_rfp as _get
     r = _get(rfp_id)
     if r is None:
         return _json.dumps({"error": f"RFP '{rfp_id}' not found"})
     return _json.dumps(r, indent=2, ensure_ascii=False)
+
+
+def get_recent_activity(n: int = 10) -> str:
+    """Return the N most recent bids and evaluations across ALL RFPs, sorted newest first.
+
+    Use this when the user asks about 'the latest bid', 'recent activity', 'what happened
+    recently', or any question that is not scoped to a specific RFP.
+    """
+    import json as _json
+    from .rfp_store import list_rfps as _list
+    events = []
+    for r in _list():
+        rfp_id    = r.get("id")
+        rfp_title = r.get("title", "Untitled")
+
+        for b in (r.get("bids") or []):
+            events.append({
+                "type":         "bid_submitted",
+                "rfp_id":       rfp_id,
+                "rfp_title":    rfp_title,
+                "rfp_status":   r.get("status"),
+                "vendor_name":  b.get("vendor_name"),
+                "amount":       b.get("amount"),
+                "currency":     b.get("currency", "USD"),
+                "notes":        b.get("notes"),
+                "timestamp":    b.get("submitted_at", ""),
+            })
+
+        if r.get("evaluation"):
+            ev = r["evaluation"]
+            events.append({
+                "type":             "evaluation_completed",
+                "rfp_id":           rfp_id,
+                "rfp_title":        rfp_title,
+                "rfp_status":       r.get("status"),
+                "recommendation":   ev.get("recommendation"),
+                "contract_value":   ev.get("contract_value"),
+                "vendor_count":     len(ev.get("vendors") or []),
+                "timestamp":        ev.get("evaluated_at", r.get("updated_at", "")),
+            })
+
+        if r.get("assigned_vendor"):
+            events.append({
+                "type":            "vendor_awarded",
+                "rfp_id":          rfp_id,
+                "rfp_title":       rfp_title,
+                "assigned_vendor": r.get("assigned_vendor"),
+                "timestamp":       r.get("updated_at", ""),
+            })
+
+    events.sort(key=lambda e: e.get("timestamp", ""), reverse=True)
+    return _json.dumps(events[:n], indent=2, ensure_ascii=False)
+
 
 def date_time() -> str:
     """Auto-insert current date, calculate submission deadlines."""

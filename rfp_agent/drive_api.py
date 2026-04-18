@@ -2,10 +2,7 @@
 Google Drive API helper for downloading templates and uploading generated PDFs.
 Uses the same OAuth credentials as the MCP bridge but with write scope.
 """
-import os
-import io
 import json
-import webbrowser
 from pathlib import Path
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
@@ -59,8 +56,15 @@ def _get_service():
 
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
+            try:
+                creds.refresh(Request())
+            except Exception:
+                # Refresh token revoked/expired — delete stale file and re-auth
+                creds = None
+                _cached_service = None
+                if WRITE_TOKEN_PATH.exists():
+                    WRITE_TOKEN_PATH.unlink()
+        if not creds or not creds.valid:
             flow = InstalledAppFlow.from_client_secrets_file(str(CREDENTIALS_PATH), SCOPES)
             creds = flow.run_local_server(port=0)
 

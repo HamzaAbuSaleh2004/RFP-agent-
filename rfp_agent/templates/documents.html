@@ -166,17 +166,17 @@
           <!-- Action Buttons -->
           <div class="grid grid-cols-2 gap-3" id="preview-actions">
             <a id="action-editor" href="#"
-               class="flex items-center justify-center gap-2 px-4 py-3 bg-surface-container-high text-primary font-bold rounded-xl text-xs hover:bg-surface-container-highest transition-all">
+               class="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-br from-primary-container to-primary text-white font-bold rounded-xl text-xs ambient-shadow hover:scale-[1.02] transition-transform">
               <span class="material-symbols-outlined text-lg">edit_document</span>
               {{ t('docs.open_editor', locale) }}
             </a>
             <a id="action-chat" href="#"
-               class="flex items-center justify-center gap-2 px-4 py-3 bg-primary-container text-white font-bold rounded-xl text-xs hover:brightness-110 transition-all">
+               class="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-br from-primary-container to-primary text-white font-bold rounded-xl text-xs ambient-shadow hover:scale-[1.02] transition-transform">
               <span class="material-symbols-outlined text-lg">chat</span>
               {{ t('docs.open_chat', locale) }}
             </a>
             <button id="action-regen" onclick="regenPDF()"
-               class="col-span-2 flex items-center justify-center gap-2 px-4 py-2.5 bg-surface-container text-on-surface-variant font-bold rounded-xl text-xs hover:bg-surface-container-high transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+               class="col-span-2 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-br from-primary-container to-primary text-white font-bold rounded-xl text-xs ambient-shadow hover:scale-[1.02] transition-transform disabled:opacity-40 disabled:cursor-not-allowed">
               <span class="material-symbols-outlined text-base" id="regen-icon">picture_as_pdf</span>
               <span id="regen-label">{{ t('btn.regen_pdf', locale) }}</span>
             </button>

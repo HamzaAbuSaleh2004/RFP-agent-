@@ -29,12 +29,6 @@
   </div>
   <div class="flex items-center gap-6">
     <div class="flex gap-4 items-center">
-      <button class="text-slate-400 hover:text-blue-700 transition-all duration-300" title="Notifications">
-        <span class="material-symbols-outlined">notifications</span>
-      </button>
-      <a href="/assistant" class="text-slate-400 hover:text-blue-700 transition-all duration-300" title="{{ t('nav.assistant', locale) }}">
-        <span class="material-symbols-outlined">help_outline</span>
-      </a>
       <div class="flex items-center rounded-lg overflow-hidden border border-slate-200 text-[11px] font-bold">
         <a href="?lang=en" onclick="setLang('en');return false;"
            class="px-2.5 py-1.5 transition-colors {% if locale == 'en' %}bg-primary-container text-white{% else %}text-slate-500 hover:bg-surface-container-low{% endif %}">EN</a>

@@ -343,7 +343,7 @@
                   class="px-6 py-3 bg-tertiary-fixed-dim text-on-tertiary-fixed font-bold rounded-lg hover:brightness-105 transition-all flex items-center gap-2">
                   <span class="material-symbols-outlined text-sm">emoji_events</span>{{ t('eval.award_rfp', locale) }}
                 </button>
-                <button
+                <button onclick="downloadBrief()"
                   class="px-6 py-3 bg-surface-container-high text-primary font-bold rounded-lg hover:bg-surface-container-highest transition-all">{{ t('eval.download_brief', locale) }}</button>
               </div>
               <!-- Awarded badge (hidden initially) -->
@@ -448,10 +448,8 @@
           <p class="text-xs text-on-surface-variant">{{ t('eval.confirm_vendor', locale) }}</p>
         </div>
       </div>
-      <p class="text-sm text-on-surface-variant mb-4">
-        {{ t('eval.award_question', locale) }} <strong id="modal-vendor-name" class="text-primary"></strong>?
-        {{ t('eval.award_effect', locale) }}
-      </p>
+      <p class="text-xs text-on-surface-variant mb-3">{{ t('eval.award_effect', locale) }}</p>
+      <div id="modal-vendor-list" class="flex flex-col gap-2 mb-4 max-h-52 overflow-y-auto"></div>
       <div class="flex gap-3">
         <button onclick="confirmAward()"
           class="flex-1 py-3 rounded-lg text-sm font-bold text-white bg-emerald-600 hover:brightness-110 transition-all">
@@ -810,7 +808,7 @@
       selectedRfpId = id;
 
       const rfp = RFPS.find(r => r.id === selectedRfpId);
-      if (rfp && rfp.status === 'done' && rfp.assigned_vendor) {
+      if (rfp && rfp.assigned_vendor) {
         document.getElementById('award-btn').classList.add('hidden');
         document.getElementById('awarded-badge').classList.remove('hidden');
         document.getElementById('awarded-vendor-name').textContent = rfp.assigned_vendor;
@@ -1001,15 +999,29 @@
     // Award RFP
     function awardRfp() {
       if (!selectedRfpId) { showToast(I18N.select_first, 'error'); return; }
-      if (!evalData?.recommendation) { showToast(I18N.no_rec, 'error'); return; }
+      if (!evalData?.vendors?.length) { showToast(I18N.no_rec, 'error'); return; }
 
-      document.getElementById('modal-vendor-name').textContent = evalData.recommendation;
+      const recommended = evalData.recommendation;
+      const listHtml = evalData.vendors.map(v => {
+        const isRec = v.name === recommended || v.company === recommended;
+        return `<label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer border transition-all ${isRec ? 'border-primary bg-primary-container/5' : 'border-outline-variant/20 hover:bg-surface-container-low'}">
+          <input type="radio" name="award-vendor" value="${v.name}" ${isRec ? 'checked' : ''} class="accent-primary shrink-0">
+          <div class="min-w-0">
+            <span class="font-bold text-primary text-sm">${v.name}</span>
+            ${v.company ? `<span class="text-xs text-slate-400 ml-1">(${v.company})</span>` : ''}
+            ${isRec ? `<span class="ml-2 text-[10px] font-bold text-emerald-600 uppercase tracking-wide">AI Recommended</span>` : ''}
+          </div>
+        </label>`;
+      }).join('');
+      document.getElementById('modal-vendor-list').innerHTML = listHtml;
       document.getElementById('award-modal').classList.remove('hidden');
     }
 
     async function confirmAward() {
+      const selected = document.querySelector('input[name="award-vendor"]:checked');
+      if (!selected) { showToast('Please select a vendor', 'error'); return; }
+      const vendorName = selected.value;
       document.getElementById('award-modal').classList.add('hidden');
-      const vendorName = evalData.recommendation;
       const rfp = RFPS.find(r => r.id === selectedRfpId);
 
       // Build the transition path: draft -> published -> approved_for_submission
@@ -1043,6 +1055,53 @@
       } catch (e) {
         showToast('Award failed: ' + e.message, 'error');
       }
+    }
+
+    function downloadBrief() {
+      if (!evalData) { showToast('No evaluation data available', 'error'); return; }
+      const rfp = RFPS.find(r => r.id === selectedRfpId);
+      const awardedTo = rfp?.assigned_vendor || evalData.recommendation || '—';
+      const winner = evalData.vendors?.find(v => v.name === evalData.recommendation || v.company === evalData.recommendation);
+      const lines = [
+        'AWARD BRIEF',
+        '═'.repeat(60),
+        '',
+        `Project:          ${evalData.project || '—'}`,
+        `Date:             ${new Date().toLocaleDateString()}`,
+        `Awarded To:       ${awardedTo}`,
+        `Contract Value:   ${evalData.contract_value || 'TBD'}`,
+        '',
+        'RECOMMENDATION RATIONALE',
+        '─'.repeat(60),
+        evalData.recommendation_reason || '—',
+        '',
+      ];
+      if (winner) {
+        lines.push('WINNING VENDOR SCORECARD', '─'.repeat(60));
+        lines.push(`Vendor:           ${winner.name}${winner.company ? ' (' + winner.company + ')' : ''}`);
+        lines.push(`Legal:            ${winner.legal}`);
+        lines.push(`Commercial:       ${winner.commercial}`);
+        lines.push(`Technical Score:  ${winner.technical_score}/100`);
+        lines.push(`Financial:        ${winner.financial}`);
+        if (winner.flags?.length) lines.push(`Flags:            ${winner.flags.join(', ')}`);
+        lines.push('');
+      }
+      if (evalData.vendors?.length) {
+        lines.push('ALL VENDORS SUMMARY', '─'.repeat(60));
+        evalData.vendors.forEach(v => {
+          lines.push(`${v.name}${v.company ? ' (' + v.company + ')' : ''}`);
+          lines.push(`  Legal: ${v.legal}  |  Commercial: ${v.commercial}  |  Technical: ${v.technical_score}/100  |  Financial: ${v.financial}`);
+          if (v.flags?.length) lines.push(`  Flags: ${v.flags.join(', ')}`);
+          lines.push('');
+        });
+      }
+      const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `brief_${(evalData.project || 'evaluation').replace(/\s+/g, '_')}.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
     }
 
     function showToast(msg, type = 'success') {
