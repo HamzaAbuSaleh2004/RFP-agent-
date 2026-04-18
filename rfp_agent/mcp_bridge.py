@@ -81,18 +81,15 @@ async def slack_notify_finance(text: str) -> str:
     """
     return await _slack_post(SLACK_FINANCE_CHANNEL, f"💰 *Finance Update*\n{text}")
 
-async def linear_create_issue(title: str, description: str, team_id: str) -> str:
-    """Create a tracking ticket in Linear for evaluating a specific vendor bid."""
-    key = os.environ.get("LINEAR_API_KEY")
-    if not key:
-        return "ERROR: LINEAR_API_KEY must be set in your .env file."
-        
-    return await _invoke_mcp(
-        command="npx",
-        args=["-y", "@linear/mcp-server"],
-        env={"LINEAR_API_KEY": key},
-        tool_name="linear_createIssue",
-        arguments={"title": title, "description": description, "teamId": team_id}
+async def jira_create_issue(title: str, description: str, project_key: str = "RFP") -> str:
+    """
+    Create a tracking ticket in Jira for a specific vendor bid evaluation or RFP follow-up.
+    Currently runs as a mock — Jira MCP integration is registered but not yet configured.
+    """
+    return (
+        f"[Jira — not configured] Would create issue in project '{project_key}':\n"
+        f"  Title: {title}\n"
+        f"  Description: {description[:200]}{'...' if len(description) > 200 else ''}"
     )
 
 def _read_single_file(file_name: str) -> str:
@@ -194,10 +191,3 @@ def gdrive_search(query: str) -> str:
         import traceback
         return f"Google Drive search error: {e}\n{traceback.format_exc()}"
 
-# ═══════════════════════════════════════════════════════
-# MOCK / COMMUNITY MCP BRIDGES (Pending Official URLs)
-# ═══════════════════════════════════════════════════════
-
-def airtable_add_vendor_record(vendor_name: str, score: int) -> str:
-    """Store vendor comparison matrices and scores into Airtable."""
-    return f"Mock Airtable: Vendor {vendor_name} added with score {score}."

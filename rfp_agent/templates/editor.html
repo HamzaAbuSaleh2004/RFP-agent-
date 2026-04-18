@@ -52,7 +52,7 @@
   .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
 
   /* Split pane */
-  .editor-layout { height: calc(100vh - 120px); display: flex; gap: 1px; background: #e2e8f0; }
+  .editor-layout { height: calc(100vh - 65px - 60px); display: flex; gap: 1px; background: #e2e8f0; }
   .pane          { overflow-y: auto; background: #fff; }
   .pane-editor   { width: 50%; padding: 1.25rem; }
   .pane-preview  { width: 50%; padding: 1.5rem 2rem; }
@@ -89,9 +89,11 @@
   .md-preview strong { font-weight:600; }
 
   /* Status badges */
-  .badge-draft    { background:#dbeafe; color:#1e40af; }
-  .badge-approved { background:#d1fae5; color:#065f46; }
-  .badge-done     { background:#f1f5f9; color:#475569; }
+  .badge-draft                    { background:#dbeafe; color:#1e40af; }
+  .badge-published                { background:#fef3c7; color:#92400e; }
+  .badge-approved_for_submission  { background:#d1fae5; color:#065f46; }
+  .badge-done                     { background:#e0e7ff; color:#3730a3; }
+  .badge-archived                 { background:#f1f5f9; color:#475569; }
 
   /* Toast */
   #toast { transition: opacity .3s, transform .3s; }
@@ -106,11 +108,15 @@
 </head>
 <body class="bg-surface text-on-surface antialiased overflow-hidden">
 
-<!-- ── Top bar ──────────────────────────────────────────────────────────────── -->
-<header class="flex items-center justify-between px-6 py-3 bg-white border-b border-slate-100 z-10 h-[60px]">
-  <!-- Left: back + title + badges -->
+{% include "_sidebar.html" %}
+{% include "_topbar.html" %}
+
+<main class="ml-64">
+
+<!-- ── Editor sub-toolbar ──────────────────────────────────────────────────── -->
+<div class="flex items-center justify-between px-6 py-3 bg-white border-b border-slate-100 h-[60px]">
   <div class="flex items-center gap-4 min-w-0">
-    <a href="/" class="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-primary transition-colors shrink-0">
+    <a href="/documents" class="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-primary transition-colors shrink-0">
       <span class="material-symbols-outlined text-base">arrow_back</span>{{ t('editor.back_dashboard', locale) }}
     </a>
     <div class="h-4 w-px bg-slate-200"></div>
@@ -119,14 +125,13 @@
     </p>
     <span id="status-badge"
           class="badge-{{ rfp.status }} text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full shrink-0">
-      {{ rfp.status }}
+      {{ rfp.status | replace('_', ' ') }}
     </span>
     {% if rfp.language == 'ar' %}
     <span class="text-[10px] font-bold text-slate-400 shrink-0">AR</span>
     {% endif %}
   </div>
 
-  <!-- Right: action buttons -->
   <div class="flex items-center gap-3 shrink-0">
     <a href="/chat?rfp_id={{ rfp.id }}"
        class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold text-secondary bg-surface-container-low hover:bg-surface-container-high transition-all">
@@ -138,9 +143,19 @@
             class="flex items-center gap-1.5 px-5 py-2 rounded-lg text-xs font-bold text-white bg-secondary hover:brightness-110 transition-all">
       <span class="material-symbols-outlined text-sm">save</span>{{ t('btn.save_draft', locale) }}
     </button>
-    <button onclick="approveRfp()" id="approve-btn"
+    <button onclick="publishRfp()" id="approve-btn"
             class="flex items-center gap-1.5 px-5 py-2 rounded-lg text-xs font-bold text-white bg-emerald-600 hover:brightness-110 transition-all">
       <span class="material-symbols-outlined text-sm">check_circle</span>{{ t('btn.approve', locale) }}
+    </button>
+    <button onclick="regeneratePdf()" id="regen-btn"
+            class="flex items-center gap-1.5 px-5 py-2 rounded-lg text-xs font-bold text-white bg-primary-container hover:brightness-110 transition-all">
+      <span class="material-symbols-outlined text-sm" id="regen-icon">picture_as_pdf</span>
+      <span id="regen-label">{{ t('btn.regen_pdf', locale) }}</span>
+    </button>
+    {% elif rfp.status == 'published' %}
+    <button onclick="rollbackToDraft()" id="rollback-btn"
+            class="flex items-center gap-1.5 px-5 py-2 rounded-lg text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 hover:bg-amber-100 transition-all">
+      <span class="material-symbols-outlined text-sm">undo</span>Rollback to Draft
     </button>
     <button onclick="regeneratePdf()" id="regen-btn"
             class="flex items-center gap-1.5 px-5 py-2 rounded-lg text-xs font-bold text-white bg-primary-container hover:brightness-110 transition-all">
@@ -150,14 +165,14 @@
     {% else %}
     <div class="flex items-center gap-2 px-4 py-2 rounded-lg bg-surface-container-low text-xs font-bold text-slate-400">
       <span class="material-symbols-outlined text-sm">lock</span>
-      {{ t('editor.locked', locale) }} {{ rfp.status | capitalize }}
+      {{ t('editor.locked', locale) }} {{ rfp.status | replace('_', ' ') | capitalize }}
     </div>
     {% endif %}
   </div>
-</header>
+</div>
 
-<!-- ── Locked banner (approved/done) ────────────────────────────────────────── -->
-{% if rfp.status != 'draft' %}
+<!-- ── Locked banner ────────────────────────────────────────────────────────── -->
+{% if rfp.status not in ['draft', 'published'] %}
 <div class="flex items-center gap-2 px-6 py-2 bg-amber-50 border-b border-amber-200 text-xs font-bold text-amber-700">
   <span class="material-symbols-outlined text-sm">info</span>
   {{ t('editor.read_only_info', locale) }}
@@ -191,6 +206,8 @@
     {% endif %}
   </div>
 </div>
+
+</main>
 
 <!-- ── Toast ────────────────────────────────────────────────────────────────── -->
 <div id="toast" class="fixed bottom-6 right-6 z-50 opacity-0 translate-y-2 pointer-events-none
@@ -273,13 +290,12 @@ async function saveDraft() {
   }
 }
 
-// ── Approve RFP ─────────────────────────────────────────────────────────────
-async function approveRfp() {
+// ── Publish RFP (draft → published) ─────────────────────────────────────────
+async function publishRfp() {
   const btn = document.getElementById('approve-btn');
   btn.disabled = true;
-  btn.innerHTML = '<span class="material-symbols-outlined text-sm animate-spin">progress_activity</span>Approving…';
+  btn.innerHTML = '<span class="material-symbols-outlined text-sm animate-spin">progress_activity</span>Publishing…';
 
-  // Save content first
   try {
     const content = document.getElementById('md-editor').value;
     await fetch(`/api/rfps/${RFP_ID}`, {
@@ -289,37 +305,65 @@ async function approveRfp() {
     });
   } catch (_) { /* non-fatal */ }
 
-  // Transition to approved
   try {
     const res = await fetch(`/api/rfps/${RFP_ID}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: 'approved' }),
+      body: JSON.stringify({ status: 'published' }),
     });
     if (!res.ok) {
       const err = await res.json();
-      throw new Error(err.detail || 'Failed to approve');
+      throw new Error(err.detail || 'Failed to publish');
     }
-    showToast('RFP approved successfully!', 'success');
+    showToast('RFP published successfully!', 'success');
     setTimeout(() => window.location.reload(), 1200);
   } catch (e) {
-    showToast('Approve failed: ' + e.message, 'error');
+    showToast('Publish failed: ' + e.message, 'error');
     btn.disabled = false;
     btn.innerHTML = '<span class="material-symbols-outlined text-sm">check_circle</span>{{ t("btn.approve", locale) }}';
   }
 }
 
-// ── Regenerate PDF ───────────────────────────────────────────────────────────
-async function regeneratePdf() {
-  // Auto-save first
+// ── Rollback to draft (published → draft) ───────────────────────────────────
+async function rollbackToDraft() {
+  if (!confirm('Roll this RFP back to draft for further edits?')) return;
+  const btn = document.getElementById('rollback-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="material-symbols-outlined text-sm animate-spin">progress_activity</span>Rolling back…';
   try {
-    const content = document.getElementById('md-editor').value;
-    await fetch(`/api/rfps/${RFP_ID}`, {
+    const res = await fetch(`/api/rfps/${RFP_ID}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ rfp_content: content }),
+      body: JSON.stringify({ status: 'draft' }),
     });
-  } catch (_) { /* non-fatal */ }
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.detail || 'Rollback failed');
+    }
+    showToast('Reverted to draft', 'success');
+    setTimeout(() => window.location.reload(), 1000);
+  } catch (e) {
+    showToast('Rollback failed: ' + e.message, 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<span class="material-symbols-outlined text-sm">undo</span>Rollback to Draft';
+  }
+}
+
+// ── Regenerate PDF ───────────────────────────────────────────────────────────
+async function regeneratePdf() {
+  // Auto-save first (only when editor pane exists, i.e. draft)
+  if (IS_DRAFT) {
+    try {
+      const ta = document.getElementById('md-editor');
+      if (ta) {
+        await fetch(`/api/rfps/${RFP_ID}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ rfp_content: ta.value }),
+        });
+      }
+    } catch (_) { /* non-fatal */ }
+  }
 
   const btn   = document.getElementById('regen-btn');
   const icon  = document.getElementById('regen-icon');
@@ -362,12 +406,6 @@ function showToast(msg, type = 'success') {
     t.classList.add('opacity-0', 'translate-y-2', 'pointer-events-none');
     t.classList.remove('opacity-100', 'translate-y-0');
   }, 3500);
-}
-</script>
-<script>
-function setLang(locale) {
-  document.cookie = `ui_lang=${locale};path=/;max-age=31536000`;
-  location.reload();
 }
 </script>
 </body>

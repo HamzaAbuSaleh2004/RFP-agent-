@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html class="light" lang="{{ locale }}" {% if rtl %}dir="rtl"{% endif %}>
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LiverX | AI Assistant</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+{% if rtl %}<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet"/>{% endif %}
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: { extend: { colors: {
+      "on-surface": "#191c1d", "on-surface-variant": "#44474e",
+      "surface": "#f8f9fa", "surface-container-low": "#f3f4f5",
+      "surface-container-lowest": "#ffffff", "surface-container-high": "#e7e8e9",
+      "primary": "#000a1e", "primary-container": "#002147",
+      "secondary-container": "#9fc2fe", "tertiary-fixed-dim": "#fbbc00",
+      "outline-variant": "#c4c6cf",
+    }, fontFamily: { headline: ["Manrope"], body: ["Inter"] } } }
+  }
+</script>
+<style>
+  body { font-family: {% if rtl %}'Cairo', {% endif %}'Inter', sans-serif; overflow: hidden; }
+  h1, h2, h3 { font-family: {% if rtl %}'Cairo', {% endif %}'Manrope', sans-serif; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400; }
+  .markdown-body h2 { font-weight:700; font-size:1.1rem; margin:.6rem 0 .3rem; color:#002147; }
+  .markdown-body h3 { font-weight:600; font-size:.95rem; margin:.5rem 0 .2rem; }
+  .markdown-body p  { margin-bottom:.5rem; line-height:1.65; }
+  .markdown-body ul,.markdown-body ol { padding-left:1.4rem; margin-bottom:.5rem; }
+  .markdown-body li { margin-bottom:.2rem; }
+  .markdown-body code { background:#f1f5f9; padding:.1rem .3rem; border-radius:.2rem; font-size:.85em; }
+  .markdown-body table { width:100%; border-collapse:collapse; margin:.6rem 0; font-size:.83rem; }
+  .markdown-body th { background:#f0f4f8; text-align:left; padding:.4rem .65rem; border:1px solid #d1d5db; font-weight:600; }
+  .markdown-body td { padding:.35rem .65rem; border:1px solid #e5e7eb; }
+  {% if rtl %}
+  .ml-64 { margin-left: 0 !important; margin-right: 16rem; }
+  aside { left: auto !important; right: 0; }
+  .chat-user-msg { direction: rtl; text-align: right; }
+  .chat-agent-msg { direction: rtl; text-align: right; }
+  #chat-input { direction: rtl; text-align: right; }
+  {% endif %}
+  @media (max-width: 767px) {
+    aside { display: none !important; }
+    main, .ml-64 { margin-left: 0 !important; }
+  }
+</style>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+
+{% set active_nav = 'assistant' %}
+{% include "_sidebar.html" %}
+{% include "_topbar.html" %}
+
+<main class="ml-64 px-10 pb-6 flex gap-6 overflow-hidden" style="height:calc(100vh - 65px);" {% if rtl %}dir="rtl"{% endif %}>
+  <section class="flex-grow flex flex-col gap-4 max-w-5xl min-h-0 overflow-hidden pt-4 mx-auto w-full">
+    <div class="mb-1 shrink-0">
+      <h1 class="text-2xl font-extrabold tracking-tight text-primary">{{ t('nav.assistant', locale) }}</h1>
+      <p class="text-sm text-on-surface-variant mt-1">Ask anything about your RFPs, documents, or procurement workflow.</p>
+    </div>
+
+    <div class="flex-1 bg-surface-container-lowest rounded-3xl p-6 flex flex-col shadow-sm min-h-0 overflow-hidden">
+      <div id="chat-messages" class="flex-1 overflow-y-auto space-y-6 pr-2 min-h-0"></div>
+
+      <div class="mt-4 pt-4 border-t border-slate-100">
+        <div class="relative">
+          <textarea id="chat-input" rows="2"
+            class="w-full bg-surface-container-low border-none rounded-2xl py-4 px-6 {% if rtl %}pl-16{% else %}pr-16{% endif %} text-primary focus:ring-2 focus:ring-primary-container/40 transition-all resize-none overflow-y-auto leading-relaxed"
+            placeholder="Ask the assistant…" style="min-height:72px;max-height:200px;" {% if rtl %}dir="rtl"{% endif %}></textarea>
+          <button id="send-button"
+            class="absolute {% if rtl %}left-3{% else %}right-3{% endif %} bottom-3 w-10 h-10 bg-primary-container text-white rounded-xl flex items-center justify-center shadow-lg hover:brightness-110 transition-all">
+            <span class="material-symbols-outlined">send</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+  const chatMessages = document.getElementById('chat-messages');
+  const chatInput    = document.getElementById('chat-input');
+  const sendButton   = document.getElementById('send-button');
+  const IS_RTL       = {{ rtl | tojson }};
+  const SESSION_ID   = 'general_' + Math.random().toString(36).slice(2, 10);
+
+  function escapeHtml(s) {
+    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function appendUserMessage(text) {
+    const div = document.createElement('div');
+    div.className = IS_RTL
+      ? 'chat-user-msg flex flex-col items-start gap-2 ml-12'
+      : 'flex flex-col items-end gap-2 ml-12';
+    div.innerHTML = `
+      <div class="bg-primary text-white p-5 rounded-2xl ${IS_RTL ? 'rounded-tl-none' : 'rounded-tr-none'} shadow-md max-w-[85%]">
+        <p class="leading-relaxed text-sm">${escapeHtml(text)}</p>
+      </div>
+      <span class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold px-2">You</span>
+    `;
+    chatMessages.appendChild(div);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function createAgentBubble() {
+    const container = document.createElement('div');
+    container.className = IS_RTL
+      ? 'chat-agent-msg flex flex-col items-end gap-3 mr-12'
+      : 'flex flex-col items-start gap-3 mr-12';
+    container.innerHTML = `
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 bg-tertiary-fixed-dim rounded-full flex items-center justify-center">
+          <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings:'FILL' 1;">auto_awesome</span>
+        </div>
+        <span class="text-[10px] uppercase tracking-widest text-primary font-bold agent-status">Assistant • Thinking…</span>
+      </div>
+      <div class="bg-surface-container-low p-6 rounded-3xl ${IS_RTL ? 'rounded-tr-none' : 'rounded-tl-none'} w-full">
+        <div class="markdown-body text-sm text-on-surface leading-relaxed"></div>
+      </div>
+    `;
+    chatMessages.appendChild(container);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    return {
+      contentDiv: container.querySelector('.markdown-body'),
+      statusSpan: container.querySelector('.agent-status'),
+    };
+  }
+
+  function showWelcome() {
+    const c = createAgentBubble();
+    c.statusSpan.textContent = 'Assistant • Ready';
+    c.contentDiv.innerHTML = marked.parse(
+      "Hi — I'm the LiverX procurement assistant.\n\n" +
+      "I can help with:\n\n" +
+      "- Listing or summarising your active RFPs\n" +
+      "- Looking up vendors, statuses, deadlines\n" +
+      "- Searching templates and shared Drive folders\n" +
+      "- Answering general questions about your procurement workflow\n\n" +
+      "What can I help you with?"
+    );
+  }
+  showWelcome();
+
+  async function sendMessage() {
+    const text = chatInput.value.trim();
+    if (!text) return;
+    appendUserMessage(text);
+    chatInput.value = '';
+    chatInput.style.height = '72px';
+    chatInput.disabled = true;
+    sendButton.disabled = true;
+
+    const ui = createAgentBubble();
+    let buffer = '';
+
+    try {
+      const res = await fetch('/api/assistant/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, session_id: SESSION_ID }),
+      });
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder('utf-8');
+      let sseBuf = '';
+
+      function processBlock(block) {
+        for (const line of block.split('\n')) {
+          if (!line.startsWith('data: ')) continue;
+          let data;
+          try { data = JSON.parse(line.substring(6)); } catch (_) { continue; }
+          if (data.type === 'chunk') {
+            buffer += data.text;
+            ui.contentDiv.innerHTML = marked.parse(buffer);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+          } else if (data.type === 'status') {
+            ui.statusSpan.textContent = 'Assistant • ' + data.text;
+          } else if (data.type === 'done') {
+            ui.statusSpan.textContent = 'Assistant • Completed';
+          } else if (data.type === 'error') {
+            buffer += '\n\n**Error:** ' + data.text;
+            ui.contentDiv.innerHTML = marked.parse(buffer);
+          }
+        }
+      }
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        sseBuf += decoder.decode(value, { stream: true });
+        const events = sseBuf.split('\n\n');
+        sseBuf = events.pop();
+        for (const ev of events) if (ev.trim()) processBlock(ev);
+      }
+      if (sseBuf.trim()) processBlock(sseBuf);
+    } catch (e) {
+      ui.statusSpan.textContent = 'Assistant • Error';
+      ui.contentDiv.innerHTML = '<span class="text-red-500">Failed to reach the assistant backend.</span>';
+    } finally {
+      chatInput.disabled = false;
+      sendButton.disabled = false;
+      chatInput.focus();
+    }
+  }
+
+  sendButton.addEventListener('click', sendMessage);
+  chatInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+  chatInput.addEventListener('input', () => {
+    chatInput.style.height = 'auto';
+    chatInput.style.height = Math.min(chatInput.scrollHeight, 200) + 'px';
+  });
+  chatInput.focus();
+</script>
+</body>
+</html>

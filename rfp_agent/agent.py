@@ -11,11 +11,11 @@ from google.adk.agents import Agent
 from .custom_tools import (
     create_rfp_pdf, code_execution, date_time, calculate_pwin,
     fmp_get_financials, risk_heatmap, store_evaluation_results,
-    read_local_templates,
+    read_local_templates, list_all_rfps, get_rfp_summary,
 )
 from .mcp_bridge import (
     slack_post_message, slack_alert_legal, slack_notify_finance,
-    linear_create_issue, airtable_add_vendor_record,
+    jira_create_issue,
     gdrive_search, gdrive_read_file,
 )
 
@@ -188,7 +188,7 @@ MANDATORY FINAL TOOLS (in order):
     tools=[
         read_local_templates, gdrive_search, gdrive_read_file,
         code_execution, calculate_pwin,
-        airtable_add_vendor_record, linear_create_issue,
+        jira_create_issue,
         fmp_get_financials, slack_notify_finance, slack_alert_legal,
         risk_heatmap, store_evaluation_results, date_time,
     ]
@@ -208,7 +208,7 @@ root_agent = Agent(
 
 1. CREATE RFP — hand off to `rfp_creator`.
    Company templates (Legal, Economic, Compliance, Design) are loaded automatically from the
-   local company_templates/ folder — do NOT ask the user about templates.
+   local assets/ folder — do NOT ask the user about templates.
    Google Drive is used only to search past RFPs for reference and to upload the finished PDF.
 
 2. EVALUATE BIDS — hand off to `bid_evaluator` once the user shares bids and RFP requirements.
@@ -260,7 +260,53 @@ IMPORTANT RULES:
 ROUTING RULES — follow exactly, no exceptions:
 - When all 5 categories are known, you MUST call the `transfer_to_agent` function with `agent_name="rfp_creator"`. Do this even if the user just provided a statement and didn't explicitly ask a question.
 - If the user says "evaluate", "assess bids", or shares vendor bids, you MUST call the `transfer_to_agent` function with `agent_name="bid_evaluator"`.
-- If information is missing, ask about the missing parts.""",
+- If the user explicitly says "draft the RFP", "proceed", "go ahead", "use defaults", "fill in the rest", "just write it", or any phrasing that authorizes drafting, you MUST IMMEDIATELY call `transfer_to_agent` with `agent_name="rfp_creator"`. Do NOT reply with text. Do NOT say "agent completed". Do NOT say "I will hand off". Just CALL the function.
+- If information is missing, ask about the missing parts.
+
+═══ HARD STOP — PREVENT SILENT FAILURES ═══
+You are FORBIDDEN from ending a turn with text like "agent completed", "handing off", "I'll transfer you", "ready to draft", or any acknowledgement that does not actually invoke the `transfer_to_agent` tool. The ONLY way to hand off is by CALLING the function. If you intend to hand off, do NOT speak — call `transfer_to_agent` immediately.""",
     sub_agents=[rfp_creator, bid_evaluator],
     tools=[gdrive_search, gdrive_read_file, slack_post_message, date_time]
+)
+
+# ═══════════════════════════════════════════════════════
+# GENERAL ASSISTANT AGENT (system-wide Q&A)
+# ═══════════════════════════════════════════════════════
+
+general_assistant = Agent(
+    name="general_assistant",
+    model="gemini-2.5-flash",
+    description="General-purpose assistant for answering questions about any RFP or bid in the system.",
+    instruction="""You are LiverX's procurement AI assistant. You help users explore and understand
+ALL RFPs and bids in the system. You are conversational, concise, and always ground your answers
+in actual data from the system — never invent facts.
+
+CAPABILITIES:
+- Answer questions about any RFP (status, timeline, vendors, budget, evaluation results, bids)
+- Compare RFPs or vendors across the portfolio
+- Surface metrics: how many RFPs are in each status, which are nearing deadline, which have bids
+- Search the company asset library (templates, guidelines, branding) when asked
+- Search Google Drive for past RFPs or external references
+
+TOOLS:
+- `list_all_rfps` — get a JSON summary of every RFP. Always call this first when the user asks
+  a portfolio-level question ("how many", "which", "show me all", "compare").
+- `get_rfp_summary(rfp_id)` — get full detail for one RFP including all bids, evaluation, status.
+  Call this when the user asks about a specific RFP by ID, title, or after narrowing down
+  from `list_all_rfps`.
+- `read_local_templates` — read the company's local asset templates and guidelines.
+- `gdrive_search` / `gdrive_read_file` — search and fetch documents from Google Drive.
+- `date_time` — get the current date for deadline calculations.
+
+STYLE:
+- Direct, professional, brief. Answer the question first, then offer related insight.
+- Use markdown tables for comparisons.
+- If the user asks about a vague RFP ("the marketing one"), call `list_all_rfps` and infer the match.
+- If you cannot find the answer in the data, say so plainly. Do NOT fabricate.
+- For RFP-creation or bid-evaluation requests, tell the user to use the dedicated workflow on the
+  RFP page — you are read-only assistance, not the operating agent.""",
+    tools=[
+        list_all_rfps, get_rfp_summary, read_local_templates,
+        gdrive_search, gdrive_read_file, date_time,
+    ]
 )

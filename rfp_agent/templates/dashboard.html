@@ -108,76 +108,9 @@
 </style>
 </head>
 <body class="bg-surface text-on-surface antialiased overflow-x-hidden">
-<!-- SideNavBar Shell -->
-<aside class="fixed left-0 top-0 h-full flex flex-col p-6 h-screen w-64 bg-slate-50 dark:bg-slate-950 font-['Manrope'] antialiased">
-  <div class="flex items-center gap-3 mb-10">
-    <div class="w-10 h-10 rounded-lg bg-white shadow-sm flex items-center justify-center overflow-hidden shrink-0 border border-slate-100">
-      <img alt="Network Safety Logo" class="w-full h-full object-contain p-1" src="/static/logo.png"/>
-    </div>
-    <div class="flex flex-col overflow-hidden">
-      <h1 class="text-xl font-bold tracking-tight text-blue-900">Network Safety</h1>
-      <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Enterprise Procurement</p>
-    </div>
-  </div>
-  <nav class="flex-1 space-y-2">
-<!-- Active Tab: Dashboard -->
-<a class="flex items-center gap-3 px-4 py-3 text-blue-950 dark:text-white font-semibold bg-white dark:bg-blue-900/30 rounded-lg shadow-sm transition-transform duration-150 active:scale-95" href="/">
-<span class="material-symbols-outlined text-blue-900" data-icon="dashboard">dashboard</span>
-<span class="text-sm">{{ t('nav.dashboard', locale) }}</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-blue-900 dark:hover:text-blue-200 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors" href="/documents">
-<span class="material-symbols-outlined" data-icon="description">description</span>
-<span class="text-sm">{{ t('nav.documents', locale) }}</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-blue-900 dark:hover:text-blue-200 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors" href="/evaluations">
-<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
-<span class="text-sm">{{ t('nav.evaluations', locale) }}</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-blue-900 dark:hover:text-blue-200 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors" href="/settings">
-<span class="material-symbols-outlined" data-icon="settings">settings</span>
-<span class="text-sm">{{ t('nav.settings', locale) }}</span>
-</a>
-</nav>
-<div class="mt-auto">
-<a href="/create" class="block w-full bg-primary-container text-white py-3 rounded-lg font-bold text-sm shadow-lg hover:brightness-110 transition-all text-center">
-                {{ t('nav.create_rfp', locale) }}
-            </a>
-</div>
-</aside>
-<!-- TopNavBar Shell -->
-<header class="flex justify-between items-center px-8 py-4 sticky top-0 z-40 ml-64 bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl">
-<div class="flex items-center w-1/3 min-w-0">
-<div class="relative w-full max-w-sm">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg" data-icon="search">search</span>
-<input class="w-full bg-surface-container-low border-none rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-tertiary-fixed-dim transition-all" placeholder="{{ t('form.search', locale) }}" type="text"/>
-</div>
-</div>
-<div class="flex items-center gap-6">
-<div class="flex gap-4 items-center">
-<button class="text-slate-400 hover:text-blue-700 transition-all duration-300">
-<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
-</button>
-<button class="text-slate-400 hover:text-blue-700 transition-all duration-300">
-<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
-</button>
-<!-- Language toggle -->
-<div class="flex items-center rounded-lg overflow-hidden border border-slate-200 text-[11px] font-bold">
-  <a href="?lang=en" onclick="setLang('en');return false;"
-     class="px-2.5 py-1.5 transition-colors {% if locale == 'en' %}bg-primary-container text-white{% else %}text-slate-500 hover:bg-surface-container-low{% endif %}">EN</a>
-  <a href="?lang=ar" onclick="setLang('ar');return false;"
-     class="px-2.5 py-1.5 transition-colors {% if locale == 'ar' %}bg-primary-container text-white{% else %}text-slate-500 hover:bg-surface-container-low{% endif %}">AR</a>
-</div>
-</div>
-<div class="h-8 w-[1px] bg-outline-variant/20"></div>
-<div class="flex items-center gap-3">
-<div class="text-right">
-<p class="text-xs font-bold text-primary">Alex Sterling</p>
-<p class="text-[10px] text-slate-400">Executive Director</p>
-</div>
-<img alt="Executive User Profile" class="w-9 h-9 rounded-full object-cover ring-2 ring-surface-container-high" data-alt="professional portrait of a corporate executive in a modern bright office setting soft lighting high-end aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTcWdH7qA3eeGEQCR1saQUN_SAuXVa7cwjbM_FTISLKJQYrX2WaRmNJhpxvErwrgczJ4WjAvPhY-zUE1WIWL85H4wxB_PNVfMaSkNjLn_Coi7GhtUb0ExOfCimWCwdbBTI4bkbNZda80DOWx1P9KI4juMXoLbgAJT8BqRrQUGA8m1-J5kGFOtkqFEF2s2-i04Xk6XXkb0SGX6c3PPrDF4cyzee4Pl4C-NSHyPpZjwTwMMmZENOZvagk03QCcljIXmQbx-6lT9fbDA"/>
-</div>
-</div>
-</header>
+{% set active_nav = 'dashboard' %}
+{% include "_sidebar.html" %}
+{% include "_topbar.html" %}
 <!-- Main Content Canvas -->
 <main class="ml-64 p-6 min-h-screen max-w-[calc(100vw-16rem)] overflow-x-hidden">
 <!-- Hero Action Section: Editorial Layout -->
@@ -255,11 +188,13 @@
   <!-- Section header + filter tabs -->
   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-1">
     <h3 class="text-xl font-bold text-primary">{{ t('dashboard.pipeline', locale) }}</h3>
-    <div id="filter-tabs" class="flex gap-2">
-      <button onclick="setFilter('all')"      data-filter="all"      class="filter-tab active-tab px-4 py-1.5 rounded-full text-xs font-bold transition-all">{{ t('filter.all', locale) }}</button>
-      <button onclick="setFilter('draft')"    data-filter="draft"    class="filter-tab px-4 py-1.5 rounded-full text-xs font-bold transition-all text-slate-500 bg-surface-container-low hover:bg-surface-container-high">{{ t('filter.draft', locale) }}</button>
-      <button onclick="setFilter('approved')" data-filter="approved" class="filter-tab px-4 py-1.5 rounded-full text-xs font-bold transition-all text-slate-500 bg-surface-container-low hover:bg-surface-container-high">{{ t('filter.approved', locale) }}</button>
-      <button onclick="setFilter('done')"     data-filter="done"     class="filter-tab px-4 py-1.5 rounded-full text-xs font-bold transition-all text-slate-500 bg-surface-container-low hover:bg-surface-container-high">{{ t('filter.done', locale) }}</button>
+    <div id="filter-tabs" class="flex flex-wrap gap-2">
+      <button onclick="setFilter('all')"                     data-filter="all"                     class="filter-tab active-tab px-4 py-1.5 rounded-full text-xs font-bold transition-all">{{ t('filter.all', locale) }}</button>
+      <button onclick="setFilter('draft')"                   data-filter="draft"                   class="filter-tab px-4 py-1.5 rounded-full text-xs font-bold transition-all text-slate-500 bg-surface-container-low hover:bg-surface-container-high">{{ t('filter.draft', locale) }}</button>
+      <button onclick="setFilter('published')"               data-filter="published"               class="filter-tab px-4 py-1.5 rounded-full text-xs font-bold transition-all text-slate-500 bg-surface-container-low hover:bg-surface-container-high">{{ t('filter.published', locale) }}</button>
+      <button onclick="setFilter('approved_for_submission')" data-filter="approved_for_submission" class="filter-tab px-4 py-1.5 rounded-full text-xs font-bold transition-all text-slate-500 bg-surface-container-low hover:bg-surface-container-high">{{ t('filter.approved_for_submission', locale) }}</button>
+      <button onclick="setFilter('done')"                    data-filter="done"                    class="filter-tab px-4 py-1.5 rounded-full text-xs font-bold transition-all text-slate-500 bg-surface-container-low hover:bg-surface-container-high">{{ t('filter.done', locale) }}</button>
+      <button onclick="setFilter('archived')"                data-filter="archived"                class="filter-tab px-4 py-1.5 rounded-full text-xs font-bold transition-all text-slate-500 bg-surface-container-low hover:bg-surface-container-high">{{ t('filter.archived', locale) }}</button>
     </div>
   </div>
 
@@ -287,9 +222,11 @@
     background: #002147;
     color: #fff;
   }
-  .status-badge-draft    { background:#dbeafe; color:#1e40af; }
-  .status-badge-approved { background:#d1fae5; color:#065f46; }
-  .status-badge-done     { background:#f1f5f9; color:#475569; }
+  .status-badge-draft                   { background:#dbeafe; color:#1e40af; }
+  .status-badge-published               { background:#fef3c7; color:#92400e; }
+  .status-badge-approved_for_submission { background:#d1fae5; color:#065f46; }
+  .status-badge-done                    { background:#f1f5f9; color:#475569; }
+  .status-badge-archived                { background:#e2e8f0; color:#334155; }
 </style>
 
 <script>
@@ -306,9 +243,11 @@
   }
 
   const STATUS_LABELS = {
-    draft:    '{{ t("status.draft", locale) }}',
-    approved: '{{ t("status.approved", locale) }}',
-    done:     '{{ t("status.done", locale) }}',
+    draft:                   '{{ t("status.draft", locale) }}',
+    published:               '{{ t("status.published", locale) }}',
+    approved_for_submission: '{{ t("status.approved_for_submission", locale) }}',
+    done:                    '{{ t("status.done", locale) }}',
+    archived:                '{{ t("status.archived", locale) }}',
   };
   function statusBadge(status) {
     return `<span class="status-badge-${status} text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full">
@@ -354,11 +293,18 @@
       const inviteCount = (rfp.invited_users || []).length;
       const link = cardLink(rfp);
       const isDraft = rfp.status === 'draft';
+      const accent = {
+        draft: 'bg-blue-400',
+        published: 'bg-amber-400',
+        approved_for_submission: 'bg-emerald-400',
+        done: 'bg-slate-400',
+        archived: 'bg-slate-300',
+      }[rfp.status] || 'bg-slate-300';
       return `
         <div onclick="window.location.href='${link}'"
            class="group flex flex-col h-full bg-surface-container-lowest rounded-2xl ambient-shadow hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer overflow-hidden">
           <!-- Color accent bar -->
-          <div class="h-1 shrink-0 ${isDraft ? 'bg-blue-400' : rfp.status === 'approved' ? 'bg-emerald-400' : 'bg-slate-300'}"></div>
+          <div class="h-1 shrink-0 ${accent}"></div>
           <div class="p-5 flex flex-col flex-1">
             <!-- Top row: status + lang -->
             <div class="flex items-center justify-between mb-3">
@@ -416,27 +362,5 @@
   renderRFPs();
 })();
 </script>
-<!-- Bottom Feature Callout -->
-<footer class="mt-16 rounded-2xl bg-primary overflow-hidden relative min-h-[180px] flex items-center">
-<div class="absolute inset-0 bg-gradient-to-r from-primary to-transparent z-10"></div>
-<img class="absolute inset-0 w-full h-full object-cover opacity-30" data-alt="abstract architectural lines in deep navy and glowing gold representing network and structure" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFfwCIH1mTqVlO0n0_jYsweKJQD5GHFZSKOVdWat4VV95bC6ylfxt7b9MiXlGFKoXBtpUYNCCMc0DSZDMXXtN4XD2wRWOEn-UgbPUqvT8WcTG0H_Q0-uVzx_94ab9vhjqN7gK3sc8NvW70iOKWXBBfPClyXQL25crmg8msxtGNX-0HaOpudOHRE-6X6Z77bx5DgQxhMs012jxT6erLla4KcuAcmOw8P8cgHVJjs4NlXnUp3KeODtOI-_Nvi8lCYdDvjM_wj_l2OuY"/>
-<div class="relative z-20 px-8 py-8 flex flex-col lg:flex-row justify-between items-center w-full gap-6">
-<div class="max-w-xl min-w-0">
-<span class="px-2 py-1 bg-tertiary-fixed-dim text-on-tertiary-fixed text-[10px] font-black rounded uppercase mb-4 inline-block">New Feature</span>
-<h4 class="text-2xl font-extrabold text-white mb-2">Advanced Vendor Analytics is now live.</h4>
-<p class="text-slate-400 font-medium">Identify cost-saving opportunities and historical vendor performance with our new proprietary scoring engine.</p>
-</div>
-<button class="whitespace-nowrap bg-white text-primary px-8 py-4 rounded-xl font-bold hover:bg-tertiary-fixed-dim hover:text-on-tertiary-fixed transition-all">
-                    Explore Analytics
-                </button>
-</div>
-</footer>
 </main>
-<script>
-// Language toggle — persists choice in cookie and reloads the page
-function setLang(locale) {
-  document.cookie = `ui_lang=${locale};path=/;max-age=31536000`;
-  location.reload();
-}
-</script>
 </body></html>

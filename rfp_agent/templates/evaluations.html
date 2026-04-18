@@ -1,447 +1,511 @@
 <!DOCTYPE html>
-<html class="light" lang="{{ locale }}" {% if rtl %}dir="rtl"{% endif %}>
+<html class="light" lang="{{ locale }}" {% if rtl %}dir="rtl" {% endif %}>
+
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-{% if rtl %}<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet"/>{% endif %}
-<title>RFP Director | {{ t('page.evaluations', locale) }}</title>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<script id="tailwind-config">
-  tailwind.config = {
-    darkMode: "class",
-    theme: {
-      extend: {
-        colors: {
-          "inverse-on-surface":"#f0f1f2","inverse-surface":"#2e3132",
-          "tertiary-fixed-dim":"#fbbc00","on-surface":"#191c1d",
-          "on-tertiary-fixed-variant":"#5c4300","surface-container-lowest":"#ffffff",
-          "on-primary":"#ffffff","surface-container":"#edeeef",
-          "on-tertiary":"#ffffff","surface":"#f8f9fa",
-          "tertiary-fixed":"#ffdfa0","background":"#f8f9fa",
-          "on-tertiary-container":"#ae8100","tertiary-container":"#2d1f00",
-          "surface-bright":"#f8f9fa","surface-container-high":"#e7e8e9",
-          "primary-fixed-dim":"#aec7f6","secondary-fixed":"#d5e3ff",
-          "on-surface-variant":"#44474e","surface-tint":"#465f88",
-          "secondary-fixed-dim":"#a7c8ff","surface-container-highest":"#e1e3e4",
-          "on-secondary-fixed-variant":"#1f477b","outline":"#74777f",
-          "error":"#ba1a1a","outline-variant":"#c4c6cf",
-          "on-background":"#191c1d","surface-dim":"#d9dadb",
-          "on-error":"#ffffff","on-secondary-container":"#294f83",
-          "error-container":"#ffdad6","surface-variant":"#e1e3e4",
-          "on-primary-container":"#708ab5","on-error-container":"#93000a",
-          "on-primary-fixed":"#001b3d","on-secondary-fixed":"#001b3c",
-          "on-tertiary-fixed":"#261a00","primary":"#000a1e",
-          "secondary":"#3a5f94","surface-container-low":"#f3f4f5",
-          "tertiary":"#100900","inverse-primary":"#aec7f6",
-          "primary-fixed":"#d6e3ff","secondary-container":"#9fc2fe",
-          "primary-container":"#002147","on-primary-fixed-variant":"#2d476f",
-          "on-secondary":"#ffffff"
-        },
-        borderRadius: { DEFAULT:"0.125rem", lg:"0.25rem", xl:"0.5rem", full:"0.75rem" },
-        fontFamily: { headline:["Manrope"], body:["Inter"], label:["Inter"] }
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  {% if rtl %}
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />{%
+  endif %}
+  <title>RFP Director | {{ t('page.evaluations', locale) }}</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "inverse-on-surface": "#f0f1f2", "inverse-surface": "#2e3132",
+            "tertiary-fixed-dim": "#fbbc00", "on-surface": "#191c1d",
+            "on-tertiary-fixed-variant": "#5c4300", "surface-container-lowest": "#ffffff",
+            "on-primary": "#ffffff", "surface-container": "#edeeef",
+            "on-tertiary": "#ffffff", "surface": "#f8f9fa",
+            "tertiary-fixed": "#ffdfa0", "background": "#f8f9fa",
+            "on-tertiary-container": "#ae8100", "tertiary-container": "#2d1f00",
+            "surface-bright": "#f8f9fa", "surface-container-high": "#e7e8e9",
+            "primary-fixed-dim": "#aec7f6", "secondary-fixed": "#d5e3ff",
+            "on-surface-variant": "#44474e", "surface-tint": "#465f88",
+            "secondary-fixed-dim": "#a7c8ff", "surface-container-highest": "#e1e3e4",
+            "on-secondary-fixed-variant": "#1f477b", "outline": "#74777f",
+            "error": "#ba1a1a", "outline-variant": "#c4c6cf",
+            "on-background": "#191c1d", "surface-dim": "#d9dadb",
+            "on-error": "#ffffff", "on-secondary-container": "#294f83",
+            "error-container": "#ffdad6", "surface-variant": "#e1e3e4",
+            "on-primary-container": "#708ab5", "on-error-container": "#93000a",
+            "on-primary-fixed": "#001b3d", "on-secondary-fixed": "#001b3c",
+            "on-tertiary-fixed": "#261a00", "primary": "#000a1e",
+            "secondary": "#3a5f94", "surface-container-low": "#f3f4f5",
+            "tertiary": "#100900", "inverse-primary": "#aec7f6",
+            "primary-fixed": "#d6e3ff", "secondary-container": "#9fc2fe",
+            "primary-container": "#002147", "on-primary-fixed-variant": "#2d476f",
+            "on-secondary": "#ffffff"
+          },
+          borderRadius: { DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem" },
+          fontFamily: { headline: ["Manrope"], body: ["Inter"], label: ["Inter"] }
+        }
       }
     }
-  }
-</script>
-<style>
-  body { font-family: {% if rtl %}'Cairo', {% endif %}'Inter', sans-serif; }
-  h1,h2,h3,h4 { font-family: {% if rtl %}'Cairo', {% endif %}'Manrope', sans-serif; }
-  {% if rtl %}
-  .ml-64 { margin-left: 0 !important; margin-right: 16rem; }
-  aside.side-nav { left: auto !important; right: 0; }
-  {% endif %}
-  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-  .hero-gradient { background: linear-gradient(135deg, #002147 0%, #000a1e 100%); }
-  .ghost-border { border: 1px solid rgba(196,198,207,0.15); }
-  .glass-effect { background: rgba(243,244,245,0.7); backdrop-filter: blur(24px); }
-  .risk-low      { background:#dcfce7; color:#166534; }
-  .risk-moderate { background:#fef9c3; color:#854d0e; }
-  .risk-high     { background:#fee2e2; color:#991b1b; }
-  .risk-critical { background:#fce7f3; color:#9d174d; }
-  .risk-unknown  { background:#f1f5f9; color:#64748b; }
-  @keyframes pulse-ring { 0%{transform:scale(.8);opacity:1} 100%{transform:scale(2);opacity:0} }
-  .pulse-dot::before {
-    content:''; position:absolute; inset:0; border-radius:9999px;
-    background:inherit; animation:pulse-ring 1.8s ease-out infinite;
-  }
-  @keyframes shimmer { 0%{background-position:-400px 0} 100%{background-position:400px 0} }
-  .skeleton {
-    background: linear-gradient(90deg,#e2e8f0 25%,#f1f5f9 50%,#e2e8f0 75%);
-    background-size: 800px 100%; animation: shimmer 1.4s infinite linear; border-radius: 6px;
-  }
+  </script>
+  <style>
+    body { font-family: {% if rtl %}'Cairo', {% endif %}'Inter', sans-serif; }
+    h1, h2, h3, h4 { font-family: {% if rtl %}'Cairo', {% endif %}'Manrope', sans-serif; }
+    {% if rtl %}
+    .ml-64 { margin-left: 0 !important; margin-right: 16rem; }
+    aside.side-nav { left: auto !important; right: 0; }
+    {% endif %}
 
-  /* Toast */
-  #toast { transition: opacity .3s, transform .3s; }
-  /* BUG-5: responsive sidebar -- hide on mobile */
-  @media (max-width: 767px) {
-    aside { display: none !important; }
-    header { margin-left: 0 !important; left: 0 !important; right: 0 !important; width: 100% !important; }
-    main, .ml-64 { margin-left: 0 !important; }
-    body { overflow-x: hidden; }
-  }
-</style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+
+    .hero-gradient {
+      background: linear-gradient(135deg, #002147 0%, #000a1e 100%);
+    }
+
+    .ghost-border {
+      border: 1px solid rgba(196, 198, 207, 0.15);
+    }
+
+    .glass-effect {
+      background: rgba(243, 244, 245, 0.7);
+      backdrop-filter: blur(24px);
+    }
+
+    .risk-low {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .risk-moderate {
+      background: #fef9c3;
+      color: #854d0e;
+    }
+
+    .risk-high {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .risk-critical {
+      background: #fce7f3;
+      color: #9d174d;
+    }
+
+    .risk-unknown {
+      background: #f1f5f9;
+      color: #64748b;
+    }
+
+    @keyframes pulse-ring {
+      0% {
+        transform: scale(.8);
+        opacity: 1
+      }
+
+      100% {
+        transform: scale(2);
+        opacity: 0
+      }
+    }
+
+    .pulse-dot::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 9999px;
+      background: inherit;
+      animation: pulse-ring 1.8s ease-out infinite;
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: -400px 0
+      }
+
+      100% {
+        background-position: 400px 0
+      }
+    }
+
+    .skeleton {
+      background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+      background-size: 800px 100%;
+      animation: shimmer 1.4s infinite linear;
+      border-radius: 6px;
+    }
+
+    /* Toast */
+    #toast {
+      transition: opacity .3s, transform .3s;
+    }
+
+    /* BUG-5: responsive sidebar -- hide on mobile */
+    @media (max-width: 767px) {
+      aside {
+        display: none !important;
+      }
+
+      header {
+        margin-left: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+      }
+
+      main,
+      .ml-64 {
+        margin-left: 0 !important;
+      }
+
+      body {
+        overflow-x: hidden;
+      }
+    }
+  </style>
 </head>
+
 <body class="bg-surface text-on-surface antialiased overflow-x-hidden">
+  {% set active_nav = 'evaluations' %}
+  {% include "_sidebar.html" %}
+  {% include "_topbar.html" %}
 
-<!-- Side Nav -->
-<aside class="side-nav fixed left-0 top-0 h-full flex flex-col p-6 bg-slate-50 dark:bg-slate-950 font-['Manrope'] antialiased w-64 z-50">
-  <div class="flex items-center gap-3 mb-10">
-    <div class="w-10 h-10 rounded-lg bg-white shadow-sm flex items-center justify-center overflow-hidden shrink-0 border border-slate-100">
-      <img alt="Network Safety Logo" class="w-full h-full object-contain p-1" src="/static/logo.png"/>
-    </div>
-    <div class="flex flex-col overflow-hidden">
-      <h1 class="text-xl font-bold tracking-tight text-blue-900">Network Safety</h1>
-      <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Enterprise Procurement</p>
-    </div>
-  </div>
-  <nav class="flex-1 space-y-2">
-    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/">
-      <span class="material-symbols-outlined">dashboard</span><span class="font-medium">{{ t('nav.dashboard', locale) }}</span>
-    </a>
-    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/documents">
-      <span class="material-symbols-outlined">description</span><span class="font-medium">{{ t('nav.documents', locale) }}</span>
-    </a>
-    <a class="flex items-center gap-3 px-4 py-3 text-blue-950 font-semibold bg-white rounded-lg shadow-sm" href="/evaluations">
-      <span class="material-symbols-outlined">analytics</span><span class="font-medium">{{ t('nav.evaluations', locale) }}</span>
-    </a>
-    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/settings">
-      <span class="material-symbols-outlined">settings</span><span class="font-medium">{{ t('nav.settings', locale) }}</span>
-    </a>
-  </nav>
-  <div class="mt-auto">
-    <a href="/create" class="block w-full py-4 bg-primary-container text-white font-bold rounded-xl shadow-lg text-center text-sm hover:brightness-110 transition-all">
-      {{ t('nav.create_rfp', locale) }}
-    </a>
-  </div>
-</aside>
-
-<!-- Top Nav -->
-<header class="flex justify-between items-center px-8 py-4 sticky top-0 z-40 ml-64 bg-white/70 backdrop-blur-xl">
-  <div class="flex items-center gap-4 flex-1 min-w-0">
-    <!-- RFP Selector (Replaced with Page Content) -->
-    <div class="flex items-center gap-3">
-      <button onclick="showRfpSelection()" class="flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-primary uppercase tracking-widest transition-colors">
-        <span class="material-symbols-outlined text-sm">grid_view</span>
-        {{ t('eval.select_rfp', locale) }}
-      </button>
-    </div>
-  </div>
-  <div class="flex items-center gap-6">
-    <!-- Language toggle -->
-    <div class="flex items-center rounded-lg overflow-hidden border border-slate-200 text-[11px] font-bold">
-      <a href="#" onclick="setLang('en');return false;"
-         class="px-2.5 py-1.5 transition-colors {% if locale == 'en' %}bg-primary-container text-white{% else %}text-slate-500 hover:bg-surface-container-low{% endif %}">EN</a>
-      <a href="#" onclick="setLang('ar');return false;"
-         class="px-2.5 py-1.5 transition-colors {% if locale == 'ar' %}bg-primary-container text-white{% else %}text-slate-500 hover:bg-surface-container-low{% endif %}">AR</a>
-    </div>
-    <div class="h-8 w-px bg-outline-variant/20 mx-2"></div>
-    <!-- Live indicator -->
-    <div class="flex items-center gap-2 text-xs font-bold text-slate-400">
-      <span class="relative w-2 h-2 rounded-full bg-emerald-400 pulse-dot"></span>
-      <span id="live-status">Live</span>
-    </div>
+  <!-- Sub-toolbar -->
+  <div class="ml-64 flex justify-between items-center px-8 py-3 bg-surface-container-low/60 border-b border-slate-100">
+    <button onclick="showRfpSelection()"
+      class="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-primary uppercase tracking-widest transition-colors">
+      <span class="material-symbols-outlined text-sm">grid_view</span>
+      {{ t('eval.select_rfp', locale) }}
+    </button>
     <button id="refresh-btn" onclick="loadEvaluation()" title="Refresh"
       class="p-2 rounded-full hover:bg-surface-container-high transition-colors text-slate-400 hover:text-primary">
       <span class="material-symbols-outlined text-lg">refresh</span>
     </button>
   </div>
-</header>
 
-<!-- Main -->
-<main class="ml-64 p-8 min-h-screen">
+  <!-- Main -->
+  <main class="ml-64 p-8 min-h-screen">
 
-  <!-- Choose RFP prompt / Grid -->
-  <div id="choose-rfp-state" class="w-full max-w-6xl mx-auto mt-6">
-    <div class="text-center mb-12">
-      <div class="w-16 h-16 rounded-2xl bg-surface-container-high flex items-center justify-center mx-auto mb-4">
-        <span class="material-symbols-outlined text-3xl text-slate-400">assignment</span>
-      </div>
-      <h3 class="text-3xl font-extrabold text-primary mb-2">Evaluations Dashboard</h3>
-      <p class="text-on-surface-variant max-w-xl mx-auto text-sm">Select an approved RFP below to evaluate vendor bids and determine the optimal choice.</p>
-    </div>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-      {% set approved_rfps = rfps | selectattr('status', 'equalto', 'approved') | list %}
-      {% if approved_rfps | length == 0 %}
-        <div class="col-span-full py-16 text-center text-slate-400 bg-surface-container-lowest rounded-3xl border border-dashed border-outline-variant/50">
-          <span class="material-symbols-outlined text-5xl mb-3 opacity-50">inbox</span>
-          <p class="font-medium text-sm">No approved RFPs available for evaluation.</p>
+    <!-- Choose RFP prompt / Grid -->
+    <div id="choose-rfp-state" class="w-full max-w-6xl mx-auto mt-6">
+      <div class="text-center mb-12">
+        <div class="w-16 h-16 rounded-2xl bg-surface-container-high flex items-center justify-center mx-auto mb-4">
+          <span class="material-symbols-outlined text-3xl text-slate-400">assignment</span>
         </div>
-      {% else %}
-        {% for rfp in approved_rfps %}
+        <h3 class="text-3xl font-extrabold text-primary mb-2">Evaluations Dashboard</h3>
+        <p class="text-on-surface-variant max-w-xl mx-auto text-sm">Select a published RFP below to evaluate vendor bids
+          and determine the optimal choice.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        {% set published_rfps = rfps | selectattr('status', 'in', ['published', 'approved_for_submission']) | list %}
+        {% if published_rfps | length == 0 %}
+        <div
+          class="col-span-full py-16 text-center text-slate-400 bg-surface-container-lowest rounded-3xl border border-dashed border-outline-variant/50">
+          <span class="material-symbols-outlined text-5xl mb-3 opacity-50">inbox</span>
+          <p class="font-medium text-sm">No published RFPs available for evaluation.</p>
+        </div>
+        {% else %}
+        {% for rfp in published_rfps %}
         <div onclick="selectRfpCard('{{ rfp.id }}')"
-             class="bg-surface-container-lowest border border-outline-variant/30 p-8 rounded-3xl hover:shadow-xl transition-all cursor-pointer hover:border-primary-container/30 group relative overflow-hidden">
-          <div class="absolute top-0 right-0 w-32 h-32 bg-primary-fixed/20 rounded-bl-full -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
-          <div class="flex justify-between items-start mb-6 relative z-10">
-            <div class="w-12 h-12 rounded-xl bg-primary-fixed/40 text-primary-fixed-variant flex items-center justify-center">
-               <span class="material-symbols-outlined">description</span>
-            </div>
-            <span class="text-[10px] font-bold px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-md uppercase tracking-widest shadow-sm">Approved</span>
+          class="bg-surface-container-lowest border border-outline-variant/30 p-8 rounded-3xl hover:shadow-xl transition-all cursor-pointer hover:border-primary-container/30 group relative overflow-hidden">
+          <div
+            class="absolute top-0 right-0 w-32 h-32 bg-primary-fixed/20 rounded-bl-full -mr-10 -mt-10 transition-transform group-hover:scale-110">
           </div>
-          <h4 class="text-xl font-bold text-primary mb-3 line-clamp-2 relative z-10 leading-snug group-hover:text-blue-700 transition-colors">{{ rfp.title }}</h4>
+          <div class="flex justify-between items-start mb-6 relative z-10">
+            <div
+              class="w-12 h-12 rounded-xl bg-primary-fixed/40 text-primary-fixed-variant flex items-center justify-center">
+              <span class="material-symbols-outlined">description</span>
+            </div>
+            <span
+              class="text-[10px] font-bold px-2.5 py-1 {{ 'bg-amber-100 text-amber-700' if rfp.status == 'published' else 'bg-emerald-100 text-emerald-700' }} rounded-md uppercase tracking-widest shadow-sm">{{
+              t('status.' + rfp.status, locale) }}</span>
+          </div>
+          <h4
+            class="text-xl font-bold text-primary mb-3 line-clamp-2 relative z-10 leading-snug group-hover:text-blue-700 transition-colors">
+            {{ rfp.title }}</h4>
           <p class="text-sm text-on-surface-variant line-clamp-2 mb-6 relative z-10">{{ rfp.description }}</p>
           <div class="flex items-center justify-between border-t border-outline-variant/10 pt-4 relative z-10">
             <div class="text-xs text-slate-400 flex items-center gap-1.5 font-medium">
               <span class="material-symbols-outlined text-[16px]">group</span>
               {{ rfp.invited_users | length }} Collaborators
             </div>
-            <span class="material-symbols-outlined text-primary-container transform translate-x-0 group-hover:translate-x-1 transition-transform">arrow_forward</span>
+            <span
+              class="material-symbols-outlined text-primary-container transform translate-x-0 group-hover:translate-x-1 transition-transform">arrow_forward</span>
           </div>
         </div>
         {% endfor %}
-      {% endif %}
+        {% endif %}
+      </div>
     </div>
-  </div>
 
-  <!-- Bid Submission Form (shown when no evaluation exists) -->
-  <div id="empty-state" class="hidden">
-    <div class="max-w-4xl mx-auto">
+    <!-- Bid Submission Form (shown when no evaluation exists) -->
+    <div id="empty-state" class="hidden">
+      <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8">
+          <h2 class="text-3xl font-extrabold text-primary tracking-tight mb-2">{{ t('eval.submit_bids', locale) }}</h2>
+          <p class="text-on-surface-variant text-sm max-w-2xl">{{ t('eval.submit_bids_desc', locale) }}</p>
+        </div>
+
+        <!-- Bid entries container -->
+        <div id="bid-entries" class="space-y-6 mb-6"></div>
+
+        <!-- Add bid button -->
+        <button onclick="addBidEntry()"
+          class="flex items-center gap-2 px-5 py-3 rounded-xl border-2 border-dashed border-outline-variant hover:border-primary-container hover:bg-primary-fixed/20 text-on-surface-variant hover:text-primary transition-all text-sm font-semibold w-full justify-center">
+          <span class="material-symbols-outlined text-lg">add</span>
+          {{ t('eval.add_bid', locale) }}
+        </button>
+
+        <!-- Error message -->
+        <p id="bid-form-error" class="hidden text-error text-sm font-medium mt-4"></p>
+
+        <!-- Submit -->
+        <div class="mt-8 flex items-center justify-between">
+          <p class="text-xs text-on-surface-variant max-w-sm">
+            <span class="material-symbols-outlined text-xs align-middle">info</span>
+            The AI agent will evaluate all bids against your company's Legal, Commercial, Technical, and Financial
+            benchmarks.
+          </p>
+          <button id="evaluate-btn" onclick="submitBidsForEvaluation()"
+            class="flex items-center gap-2 px-8 py-3 hero-gradient text-white font-bold rounded-xl shadow-lg hover:scale-[1.02] transition-transform text-sm">
+            <span class="material-symbols-outlined text-base">analytics</span>
+            {{ t('eval.run_evaluation', locale) }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Processing state -->
+    <div id="processing-state" class="hidden flex flex-col items-center justify-center min-h-[60vh] text-center gap-6">
+      <div class="w-20 h-20 rounded-2xl bg-primary-fixed/40 flex items-center justify-center">
+        <svg class="animate-spin w-10 h-10 text-primary-container" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+        </svg>
+      </div>
+      <div>
+        <h3 class="text-2xl font-extrabold text-primary mb-2">{{ t('eval.processing', locale) }}</h3>
+        <p class="text-on-surface-variant max-w-md">{{ t('eval.processing_desc', locale) }}</p>
+      </div>
+      <div id="processing-steps" class="text-left space-y-2 mt-2 text-sm"></div>
+    </div>
+
+    <!-- Skeleton loader -->
+    <div id="skeleton-state" class="hidden">
+      <div class="mb-10">
+        <div class="skeleton h-8 w-96 mb-3"></div>
+        <div class="skeleton h-4 w-2/3"></div>
+      </div>
+      <div class="grid grid-cols-12 gap-8 mb-10">
+        <div class="col-span-8 skeleton h-48 rounded-xl"></div>
+        <div class="col-span-4 flex flex-col gap-4">
+          <div class="skeleton h-20 rounded-xl flex-1"></div>
+          <div class="skeleton h-20 rounded-xl flex-1"></div>
+        </div>
+      </div>
+      <div class="skeleton h-96 rounded-2xl"></div>
+    </div>
+
+    <!-- Loaded content -->
+    <div id="eval-content" class="hidden">
+
       <!-- Header -->
-      <div class="mb-8">
-        <h2 class="text-3xl font-extrabold text-primary tracking-tight mb-2">{{ t('eval.submit_bids', locale) }}</h2>
-        <p class="text-on-surface-variant text-sm max-w-2xl">{{ t('eval.submit_bids_desc', locale) }}</p>
+      <div class="mb-10 flex items-start justify-between">
+        <div>
+          <div class="flex items-center gap-2 text-primary-container font-medium mb-2 text-sm">
+            <button onclick="showRfpSelection()"
+              class="hover:bg-surface-container-high rounded-full p-1 -ml-1 transition-colors flex items-center justify-center">
+              <span class="material-symbols-outlined text-sm">arrow_back</span>
+            </button>
+            <span id="eval-project-tag" class="tracking-wider text-xs font-bold uppercase"></span>
+          </div>
+          <h2 id="eval-project-title" class="text-4xl font-extrabold text-primary tracking-tight mb-3"></h2>
+          <p class="text-on-surface-variant text-base max-w-2xl leading-relaxed">
+            Evaluated on <span id="eval-timestamp" class="font-semibold text-primary"></span>
+          </p>
+        </div>
+        <button onclick="showBidForm()"
+          class="px-6 py-3 hero-gradient text-white font-bold rounded-xl flex items-center gap-2 hover:scale-[1.02] transition-transform">
+          <span class="material-symbols-outlined">refresh</span>Re-evaluate
+        </button>
       </div>
 
-      <!-- Bid entries container -->
-      <div id="bid-entries" class="space-y-6 mb-6"></div>
+      <!-- AI Recommendation + stats -->
+      <section class="mb-10 grid grid-cols-12 gap-6">
+        <div
+          class="col-span-12 lg:col-span-8 glass-effect p-8 rounded-xl border border-white/40 shadow-xl relative overflow-hidden">
+          <div class="absolute top-0 {% if rtl %}left-0{% else %}right-0{% endif %} p-6 opacity-10">
+            <span class="material-symbols-outlined text-8xl"
+              style="font-variation-settings:'FILL' 1;">auto_awesome</span>
+          </div>
+          <div class="flex items-start gap-6 relative z-10">
+            <div
+              class="w-16 h-16 rounded-full bg-tertiary-fixed-dim flex items-center justify-center shadow-lg flex-shrink-0">
+              <span class="material-symbols-outlined text-on-tertiary-fixed text-3xl">lightbulb</span>
+            </div>
+            <div>
+              <div
+                class="inline-flex items-center gap-2 px-3 py-1 bg-tertiary-container/10 text-on-tertiary-container rounded-full text-xs font-bold mb-4">
+                <span class="material-symbols-outlined text-[14px]">auto_awesome</span>AI RECOMMENDATION
+              </div>
+              <h3 id="rec-name" class="text-3xl font-bold text-primary mb-3"></h3>
+              <p id="rec-reason" class="text-on-surface-variant text-base leading-relaxed mb-6"></p>
+              <div class="flex gap-4">
+                <button id="award-btn" onclick="awardRfp()"
+                  class="px-6 py-3 bg-tertiary-fixed-dim text-on-tertiary-fixed font-bold rounded-lg hover:brightness-105 transition-all flex items-center gap-2">
+                  <span class="material-symbols-outlined text-sm">emoji_events</span>{{ t('eval.award_rfp', locale) }}
+                </button>
+                <button
+                  class="px-6 py-3 bg-surface-container-high text-primary font-bold rounded-lg hover:bg-surface-container-highest transition-all">Download
+                  Brief</button>
+              </div>
+              <!-- Awarded badge (hidden initially) -->
+              <div id="awarded-badge"
+                class="hidden mt-4 flex items-center gap-2 px-4 py-2 bg-emerald-50 border border-emerald-200 rounded-lg">
+                <span class="material-symbols-outlined text-emerald-600">verified</span>
+                <span class="text-sm font-bold text-emerald-700">{{ t('eval.awarded_to', locale) }}: <span
+                    id="awarded-vendor-name"></span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-span-12 lg:col-span-4 flex flex-col gap-4">
+          <div id="contract-value-card"
+            class="hidden bg-primary-container p-6 rounded-xl text-white flex-1 flex flex-col justify-center">
+            <span class="text-on-primary-container font-bold tracking-widest text-xs block mb-1">TOTAL CONTRACT
+              VALUE</span>
+            <span id="contract-value" class="text-4xl font-extrabold tracking-tight"></span>
+          </div>
+          <div class="bg-surface-container-lowest p-6 rounded-xl ghost-border flex-1 flex flex-col justify-center">
+            <span class="text-slate-400 font-bold tracking-widest text-xs block mb-1">EVALUATION STATUS</span>
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-tertiary-fixed-dim"></span>
+              <span class="text-2xl font-bold text-primary">Final Comparison</span>
+            </div>
+          </div>
+          <div class="bg-surface-container-lowest p-6 rounded-xl ghost-border flex items-center gap-4">
+            <span class="material-symbols-outlined text-primary-container text-3xl">groups</span>
+            <div>
+              <span id="vendor-count" class="text-3xl font-extrabold text-primary"></span>
+              <span class="text-sm text-slate-400 {% if rtl %}mr-1{% else %}ml-1{% endif %}">vendors evaluated</span>
+            </div>
+          </div>
+        </div>
+      </section>
 
-      <!-- Add bid button -->
-      <button onclick="addBidEntry()" class="flex items-center gap-2 px-5 py-3 rounded-xl border-2 border-dashed border-outline-variant hover:border-primary-container hover:bg-primary-fixed/20 text-on-surface-variant hover:text-primary transition-all text-sm font-semibold w-full justify-center">
-        <span class="material-symbols-outlined text-lg">add</span>
-        {{ t('eval.add_bid', locale) }}
-      </button>
+      <!-- Comparison Matrix -->
+      <section class="bg-surface-container-low rounded-2xl p-1 overflow-hidden mb-10">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse" id="vendor-table">
+            <thead id="vendor-thead"></thead>
+            <tbody id="vendor-tbody"></tbody>
+          </table>
+        </div>
+      </section>
 
-      <!-- Error message -->
-      <p id="bid-form-error" class="hidden text-error text-sm font-medium mt-4"></p>
+      <!-- Risk Heatmap -->
+      <section class="mb-10">
+        <div class="flex items-center justify-between mb-6 px-1">
+          <div>
+            <h3 class="text-xl font-bold text-primary">Risk Heatmap</h3>
+            <p class="text-sm text-on-surface-variant">Per-dimension risk exposure across all vendors</p>
+          </div>
+          <div class="flex gap-2 text-xs font-bold">
+            <span class="px-2 py-1 risk-low rounded">LOW</span>
+            <span class="px-2 py-1 risk-moderate rounded">MODERATE</span>
+            <span class="px-2 py-1 risk-high rounded">HIGH</span>
+            <span class="px-2 py-1 risk-critical rounded">CRITICAL</span>
+          </div>
+        </div>
+        <div id="risk-heatmap-container" class="overflow-x-auto"></div>
+      </section>
 
-      <!-- Submit -->
-      <div class="mt-8 flex items-center justify-between">
-        <p class="text-xs text-on-surface-variant max-w-sm">
-          <span class="material-symbols-outlined text-xs align-middle">info</span>
-          The AI agent will evaluate all bids against your company's Legal, Commercial, Technical, and Financial benchmarks.
-        </p>
-        <button id="evaluate-btn" onclick="submitBidsForEvaluation()"
-          class="flex items-center gap-2 px-8 py-3 hero-gradient text-white font-bold rounded-xl shadow-lg hover:scale-[1.02] transition-transform text-sm">
-          <span class="material-symbols-outlined text-base">analytics</span>
-          {{ t('eval.run_evaluation', locale) }}
+      <!-- Bottom bento -->
+      <div class="grid grid-cols-12 gap-6">
+        <div class="col-span-12 md:col-span-4 bg-white p-6 rounded-xl ghost-border">
+          <h4 class="font-bold text-primary mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-blue-600">trending_up</span>Risk Exposure
+          </h4>
+          <div id="risk-summary-list" class="space-y-4"></div>
+        </div>
+        <div class="col-span-12 md:col-span-8 bg-primary-container p-6 rounded-xl flex items-center justify-between">
+          <div class="flex items-center gap-6">
+            <div class="w-16 h-16 rounded-lg bg-white/10 flex items-center justify-center text-white">
+              <span class="material-symbols-outlined text-3xl">insights</span>
+            </div>
+            <div>
+              <h4 class="font-bold text-white text-lg">Predictive Score Trend</h4>
+              <p id="trend-text" class="text-on-primary-container text-sm"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed bottom-6 {% if rtl %}left-6{% else %}right-6{% endif %} z-50 opacity-0 translate-y-2 pointer-events-none
+     flex items-center gap-3 px-5 py-3.5 rounded-xl shadow-xl text-sm font-bold text-white max-w-sm">
+    <span class="material-symbols-outlined text-base" id="toast-icon">check_circle</span>
+    <span id="toast-msg"></span>
+  </div>
+
+  <!-- Award confirmation modal -->
+  <div id="award-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
+          <span class="material-symbols-outlined text-amber-600 text-2xl">emoji_events</span>
+        </div>
+        <div>
+          <p class="font-bold text-primary text-lg">{{ t('eval.award_rfp', locale) }}</p>
+          <p class="text-xs text-on-surface-variant">Confirm vendor selection and close the RFP.</p>
+        </div>
+      </div>
+      <p class="text-sm text-on-surface-variant mb-4">
+        Award this RFP to <strong id="modal-vendor-name" class="text-primary"></strong>?
+        This will mark the RFP as done and assign the vendor.
+      </p>
+      <div class="flex gap-3">
+        <button onclick="confirmAward()"
+          class="flex-1 py-3 rounded-lg text-sm font-bold text-white bg-emerald-600 hover:brightness-110 transition-all">
+          Confirm Award
+        </button>
+        <button onclick="document.getElementById('award-modal').classList.add('hidden')"
+          class="flex-1 py-3 rounded-lg text-sm font-bold text-primary bg-surface-container-high hover:bg-surface-container-highest transition-all">
+          {{ t('btn.cancel', locale) }}
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Processing state -->
-  <div id="processing-state" class="hidden flex flex-col items-center justify-center min-h-[60vh] text-center gap-6">
-    <div class="w-20 h-20 rounded-2xl bg-primary-fixed/40 flex items-center justify-center">
-      <svg class="animate-spin w-10 h-10 text-primary-container" fill="none" viewBox="0 0 24 24">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-      </svg>
-    </div>
-    <div>
-      <h3 class="text-2xl font-extrabold text-primary mb-2">{{ t('eval.processing', locale) }}</h3>
-      <p class="text-on-surface-variant max-w-md">{{ t('eval.processing_desc', locale) }}</p>
-    </div>
-    <div id="processing-steps" class="text-left space-y-2 mt-2 text-sm"></div>
-  </div>
+  <script>
+    const RFPS = {{ rfps | tojson }};
+    let selectedRfpId = null;
+    let evalData = null;
+    let heatmapData = null;
+    let bidCounter = 0;
 
-  <!-- Skeleton loader -->
-  <div id="skeleton-state" class="hidden">
-    <div class="mb-10"><div class="skeleton h-8 w-96 mb-3"></div><div class="skeleton h-4 w-2/3"></div></div>
-    <div class="grid grid-cols-12 gap-8 mb-10">
-      <div class="col-span-8 skeleton h-48 rounded-xl"></div>
-      <div class="col-span-4 flex flex-col gap-4">
-        <div class="skeleton h-20 rounded-xl flex-1"></div>
-        <div class="skeleton h-20 rounded-xl flex-1"></div>
-      </div>
-    </div>
-    <div class="skeleton h-96 rounded-2xl"></div>
-  </div>
+    const RISK_CLASS = {
+      LOW: 'risk-low', MODERATE: 'risk-moderate', HIGH: 'risk-high', CRITICAL: 'risk-critical'
+    };
 
-  <!-- Loaded content -->
-  <div id="eval-content" class="hidden">
+    // ── Bid form helpers ────────────────────────────────────────────────────────
 
-    <!-- Header -->
-    <div class="mb-10 flex items-start justify-between">
-      <div>
-        <div class="flex items-center gap-2 text-primary-container font-medium mb-2 text-sm">
-          <button onclick="showRfpSelection()" class="hover:bg-surface-container-high rounded-full p-1 -ml-1 transition-colors flex items-center justify-center">
-            <span class="material-symbols-outlined text-sm">arrow_back</span>
-          </button>
-          <span id="eval-project-tag" class="tracking-wider text-xs font-bold uppercase"></span>
-        </div>
-        <h2 id="eval-project-title" class="text-4xl font-extrabold text-primary tracking-tight mb-3"></h2>
-        <p class="text-on-surface-variant text-base max-w-2xl leading-relaxed">
-          Evaluated on <span id="eval-timestamp" class="font-semibold text-primary"></span>
-        </p>
-      </div>
-      <button onclick="showBidForm()"
-        class="px-6 py-3 hero-gradient text-white font-bold rounded-xl flex items-center gap-2 hover:scale-[1.02] transition-transform">
-        <span class="material-symbols-outlined">refresh</span>Re-evaluate
-      </button>
-    </div>
-
-    <!-- AI Recommendation + stats -->
-    <section class="mb-10 grid grid-cols-12 gap-6">
-      <div class="col-span-12 lg:col-span-8 glass-effect p-8 rounded-xl border border-white/40 shadow-xl relative overflow-hidden">
-        <div class="absolute top-0 {% if rtl %}left-0{% else %}right-0{% endif %} p-6 opacity-10">
-          <span class="material-symbols-outlined text-8xl" style="font-variation-settings:'FILL' 1;">auto_awesome</span>
-        </div>
-        <div class="flex items-start gap-6 relative z-10">
-          <div class="w-16 h-16 rounded-full bg-tertiary-fixed-dim flex items-center justify-center shadow-lg flex-shrink-0">
-            <span class="material-symbols-outlined text-on-tertiary-fixed text-3xl">lightbulb</span>
-          </div>
-          <div>
-            <div class="inline-flex items-center gap-2 px-3 py-1 bg-tertiary-container/10 text-on-tertiary-container rounded-full text-xs font-bold mb-4">
-              <span class="material-symbols-outlined text-[14px]">auto_awesome</span>AI RECOMMENDATION
-            </div>
-            <h3 id="rec-name" class="text-3xl font-bold text-primary mb-3"></h3>
-            <p id="rec-reason" class="text-on-surface-variant text-base leading-relaxed mb-6"></p>
-            <div class="flex gap-4">
-              <button id="award-btn" onclick="awardRfp()"
-                class="px-6 py-3 bg-tertiary-fixed-dim text-on-tertiary-fixed font-bold rounded-lg hover:brightness-105 transition-all flex items-center gap-2">
-                <span class="material-symbols-outlined text-sm">emoji_events</span>{{ t('eval.award_rfp', locale) }}
-              </button>
-              <button class="px-6 py-3 bg-surface-container-high text-primary font-bold rounded-lg hover:bg-surface-container-highest transition-all">Download Brief</button>
-            </div>
-            <!-- Awarded badge (hidden initially) -->
-            <div id="awarded-badge" class="hidden mt-4 flex items-center gap-2 px-4 py-2 bg-emerald-50 border border-emerald-200 rounded-lg">
-              <span class="material-symbols-outlined text-emerald-600">verified</span>
-              <span class="text-sm font-bold text-emerald-700">{{ t('eval.awarded_to', locale) }}: <span id="awarded-vendor-name"></span></span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-span-12 lg:col-span-4 flex flex-col gap-4">
-        <div id="contract-value-card" class="hidden bg-primary-container p-6 rounded-xl text-white flex-1 flex flex-col justify-center">
-          <span class="text-on-primary-container font-bold tracking-widest text-xs block mb-1">TOTAL CONTRACT VALUE</span>
-          <span id="contract-value" class="text-4xl font-extrabold tracking-tight"></span>
-        </div>
-        <div class="bg-surface-container-lowest p-6 rounded-xl ghost-border flex-1 flex flex-col justify-center">
-          <span class="text-slate-400 font-bold tracking-widest text-xs block mb-1">EVALUATION STATUS</span>
-          <div class="flex items-center gap-2">
-            <span class="w-3 h-3 rounded-full bg-tertiary-fixed-dim"></span>
-            <span class="text-2xl font-bold text-primary">Final Comparison</span>
-          </div>
-        </div>
-        <div class="bg-surface-container-lowest p-6 rounded-xl ghost-border flex items-center gap-4">
-          <span class="material-symbols-outlined text-primary-container text-3xl">groups</span>
-          <div>
-            <span id="vendor-count" class="text-3xl font-extrabold text-primary"></span>
-            <span class="text-sm text-slate-400 {% if rtl %}mr-1{% else %}ml-1{% endif %}">vendors evaluated</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Comparison Matrix -->
-    <section class="bg-surface-container-low rounded-2xl p-1 overflow-hidden mb-10">
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse" id="vendor-table">
-          <thead id="vendor-thead"></thead>
-          <tbody id="vendor-tbody"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- Risk Heatmap -->
-    <section class="mb-10">
-      <div class="flex items-center justify-between mb-6 px-1">
-        <div>
-          <h3 class="text-xl font-bold text-primary">Risk Heatmap</h3>
-          <p class="text-sm text-on-surface-variant">Per-dimension risk exposure across all vendors</p>
-        </div>
-        <div class="flex gap-2 text-xs font-bold">
-          <span class="px-2 py-1 risk-low rounded">LOW</span>
-          <span class="px-2 py-1 risk-moderate rounded">MODERATE</span>
-          <span class="px-2 py-1 risk-high rounded">HIGH</span>
-          <span class="px-2 py-1 risk-critical rounded">CRITICAL</span>
-        </div>
-      </div>
-      <div id="risk-heatmap-container" class="overflow-x-auto"></div>
-    </section>
-
-    <!-- Bottom bento -->
-    <div class="grid grid-cols-12 gap-6">
-      <div class="col-span-12 md:col-span-4 bg-white p-6 rounded-xl ghost-border">
-        <h4 class="font-bold text-primary mb-4 flex items-center gap-2">
-          <span class="material-symbols-outlined text-blue-600">trending_up</span>Risk Exposure
-        </h4>
-        <div id="risk-summary-list" class="space-y-4"></div>
-      </div>
-      <div class="col-span-12 md:col-span-8 bg-primary-container p-6 rounded-xl flex items-center justify-between">
-        <div class="flex items-center gap-6">
-          <div class="w-16 h-16 rounded-lg bg-white/10 flex items-center justify-center text-white">
-            <span class="material-symbols-outlined text-3xl">insights</span>
-          </div>
-          <div>
-            <h4 class="font-bold text-white text-lg">Predictive Score Trend</h4>
-            <p id="trend-text" class="text-on-primary-container text-sm"></p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</main>
-
-<!-- Toast -->
-<div id="toast" class="fixed bottom-6 {% if rtl %}left-6{% else %}right-6{% endif %} z-50 opacity-0 translate-y-2 pointer-events-none
-     flex items-center gap-3 px-5 py-3.5 rounded-xl shadow-xl text-sm font-bold text-white max-w-sm">
-  <span class="material-symbols-outlined text-base" id="toast-icon">check_circle</span>
-  <span id="toast-msg"></span>
-</div>
-
-<!-- Award confirmation modal -->
-<div id="award-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-  <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4">
-    <div class="flex items-center gap-3 mb-4">
-      <div class="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
-        <span class="material-symbols-outlined text-amber-600 text-2xl">emoji_events</span>
-      </div>
-      <div>
-        <p class="font-bold text-primary text-lg">{{ t('eval.award_rfp', locale) }}</p>
-        <p class="text-xs text-on-surface-variant">Confirm vendor selection and close the RFP.</p>
-      </div>
-    </div>
-    <p class="text-sm text-on-surface-variant mb-4">
-      Award this RFP to <strong id="modal-vendor-name" class="text-primary"></strong>?
-      This will mark the RFP as done and assign the vendor.
-    </p>
-    <div class="flex gap-3">
-      <button onclick="confirmAward()"
-        class="flex-1 py-3 rounded-lg text-sm font-bold text-white bg-emerald-600 hover:brightness-110 transition-all">
-        Confirm Award
-      </button>
-      <button onclick="document.getElementById('award-modal').classList.add('hidden')"
-        class="flex-1 py-3 rounded-lg text-sm font-bold text-primary bg-surface-container-high hover:bg-surface-container-highest transition-all">
-        {{ t('btn.cancel', locale) }}
-      </button>
-    </div>
-  </div>
-</div>
-
-<script>
-const RFPS = {{ rfps | tojson }};
-let selectedRfpId = null;
-let evalData = null;
-let heatmapData = null;
-let bidCounter = 0;
-
-const RISK_CLASS = {
-  LOW:'risk-low', MODERATE:'risk-moderate', HIGH:'risk-high', CRITICAL:'risk-critical'
-};
-
-// ── Bid form helpers ────────────────────────────────────────────────────────
-
-function addBidEntry() {
-  bidCounter++;
-  const n = bidCounter;
-  const container = document.getElementById('bid-entries');
-  const entry = document.createElement('div');
-  entry.id = `bid-${n}`;
-  entry.className = 'bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-outline-variant/20 relative';
-  entry.innerHTML = `
+    function addBidEntry() {
+      bidCounter++;
+      const n = bidCounter;
+      const container = document.getElementById('bid-entries');
+      const entry = document.createElement('div');
+      entry.id = `bid-${n}`;
+      entry.className = 'bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-outline-variant/20 relative';
+      entry.innerHTML = `
     <div class="flex items-center justify-between mb-5">
       <span class="text-sm font-bold text-primary flex items-center gap-2">
         <span class="w-7 h-7 rounded-lg bg-primary-container text-white flex items-center justify-center text-xs font-bold">${n}</span>
@@ -483,281 +547,281 @@ function addBidEntry() {
         class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 text-sm resize-none focus:ring-2 focus:ring-primary-container focus:border-transparent font-mono"></textarea>
     </div>
   `;
-  container.appendChild(entry);
-}
-
-function removeBidEntry(n) {
-  const el = document.getElementById(`bid-${n}`);
-  if (el) el.remove();
-}
-
-function clearFile(n) {
-  document.getElementById(`bid-${n}-content`).value = '';
-  document.getElementById(`bid-${n}-file-badge`).classList.add('hidden');
-}
-
-async function handleFileUpload(input, n) {
-  const file = input.files[0];
-  if (!file) return;
-
-  const badge = document.getElementById(`bid-${n}-file-badge`);
-  const nameEl = document.getElementById(`bid-${n}-file-name`);
-  const textarea = document.getElementById(`bid-${n}-content`);
-
-  // Show uploading state
-  nameEl.textContent = `Extracting text from ${file.name}…`;
-  badge.classList.remove('hidden');
-  textarea.value = '';
-  textarea.disabled = true;
-
-  try {
-    const formData = new FormData();
-    formData.append('file', file);
-    const res = await fetch('/api/extract-bid-text', { method: 'POST', body: formData });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.detail || 'Upload failed');
+      container.appendChild(entry);
     }
-    const data = await res.json();
-    textarea.value = data.text;
-    nameEl.textContent = file.name;
-  } catch (err) {
-    showToast('File error: ' + err.message, 'error');
-    badge.classList.add('hidden');
-  } finally {
-    textarea.disabled = false;
-    input.value = '';
-  }
-}
 
-function collectBids() {
-  const entries = document.getElementById('bid-entries').children;
-  const bids = [];
-  for (const entry of entries) {
-    const id = entry.id.replace('bid-', '');
-    const vendor = document.getElementById(`bid-${id}-vendor`)?.value?.trim();
-    const company = document.getElementById(`bid-${id}-company`)?.value?.trim();
-    const content = document.getElementById(`bid-${id}-content`)?.value?.trim();
-    if (vendor || content) {
-      bids.push({ vendor, company, content });
+    function removeBidEntry(n) {
+      const el = document.getElementById(`bid-${n}`);
+      if (el) el.remove();
     }
-  }
-  return bids;
-}
 
-async function submitBidsForEvaluation() {
-  const errEl = document.getElementById('bid-form-error');
-  errEl.classList.add('hidden');
+    function clearFile(n) {
+      document.getElementById(`bid-${n}-content`).value = '';
+      document.getElementById(`bid-${n}-file-badge`).classList.add('hidden');
+    }
 
-  const bids = collectBids();
+    async function handleFileUpload(input, n) {
+      const file = input.files[0];
+      if (!file) return;
 
-  if (bids.length < 2) {
-    errEl.textContent = '{{ t("eval.min_bids_error", locale) }}';
-    errEl.classList.remove('hidden');
-    return;
-  }
+      const badge = document.getElementById(`bid-${n}-file-badge`);
+      const nameEl = document.getElementById(`bid-${n}-file-name`);
+      const textarea = document.getElementById(`bid-${n}-content`);
 
-  const incomplete = bids.some(b => !b.vendor || !b.content);
-  if (incomplete) {
-    errEl.textContent = '{{ t("eval.fill_all_error", locale) }}';
-    errEl.classList.remove('hidden');
-    return;
-  }
+      // Show uploading state
+      nameEl.textContent = `Extracting text from ${file.name}…`;
+      badge.classList.remove('hidden');
+      textarea.value = '';
+      textarea.disabled = true;
 
-  // Get the RFP details for context
-  const rfp = RFPS.find(r => r.id === selectedRfpId);
-  const rfpTitle = rfp?.title ?? 'Unknown RFP';
-
-  // Compose the message for the agent
-  let message = `Evaluate the following vendor bids for the RFP "${rfpTitle}".\n\n`;
-  message += `RFP Requirements:\n`;
-  if (rfp?.description) message += `- Description: ${rfp.description}\n`;
-  message += `\n--- VENDOR BIDS ---\n\n`;
-
-  bids.forEach((bid, i) => {
-    message += `=== BID ${i + 1}: ${bid.vendor}${bid.company ? ` (${bid.company})` : ''} ===\n`;
-    message += bid.content + '\n\n';
-  });
-
-  message += `\nPlease evaluate ALL bids across the 4 dimensions (Legal, Commercial, Technical, Financial) and provide the final ranking with a recommendation.`;
-
-  // Switch to processing state
-  showProcessingState();
-
-  const sessionId = `eval_${selectedRfpId}_${Date.now()}`;
-
-  try {
-    const res = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        message: message,
-        session_id: sessionId,
-        rfp_id: selectedRfpId,
-      }),
-    });
-
-    if (!res.ok) throw new Error('Failed to start evaluation');
-
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = '';
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      buffer += decoder.decode(value, { stream: true });
-
-      const lines = buffer.split('\n');
-      buffer = lines.pop();
-
-      for (const line of lines) {
-        if (!line.startsWith('data: ')) continue;
-        try {
-          const evt = JSON.parse(line.slice(6));
-          if (evt.type === 'status') {
-            addProcessingStep(evt.text);
-          } else if (evt.type === 'done') {
-            // Evaluation finished — load results
-            await loadEvaluation();
-            return;
-          } else if (evt.type === 'error') {
-            throw new Error(evt.text);
-          }
-        } catch (parseErr) {
-          if (parseErr.message && !parseErr.message.includes('JSON')) throw parseErr;
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        const res = await fetch('/api/extract-bid-text', { method: 'POST', body: formData });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.detail || 'Upload failed');
         }
+        const data = await res.json();
+        textarea.value = data.text;
+        nameEl.textContent = file.name;
+      } catch (err) {
+        showToast('File error: ' + err.message, 'error');
+        badge.classList.add('hidden');
+      } finally {
+        textarea.disabled = false;
+        input.value = '';
       }
     }
 
-    // Stream ended — try loading evaluation results
-    await loadEvaluation();
+    function collectBids() {
+      const entries = document.getElementById('bid-entries').children;
+      const bids = [];
+      for (const entry of entries) {
+        const id = entry.id.replace('bid-', '');
+        const vendor = document.getElementById(`bid-${id}-vendor`)?.value?.trim();
+        const company = document.getElementById(`bid-${id}-company`)?.value?.trim();
+        const content = document.getElementById(`bid-${id}-content`)?.value?.trim();
+        if (vendor || content) {
+          bids.push({ vendor, company, content });
+        }
+      }
+      return bids;
+    }
 
-  } catch (err) {
-    console.error('Evaluation failed:', err);
-    showToast('Evaluation failed: ' + err.message, 'error');
-    showBidForm();
-  }
-}
+    async function submitBidsForEvaluation() {
+      const errEl = document.getElementById('bid-form-error');
+      errEl.classList.add('hidden');
 
-function showProcessingState() {
-  document.getElementById('empty-state').classList.add('hidden');
-  document.getElementById('eval-content').classList.add('hidden');
-  document.getElementById('skeleton-state').classList.add('hidden');
-  document.getElementById('processing-state').classList.remove('hidden');
-  document.getElementById('processing-steps').innerHTML = '';
-}
+      const bids = collectBids();
 
-function addProcessingStep(text) {
-  const container = document.getElementById('processing-steps');
-  const step = document.createElement('div');
-  step.className = 'flex items-center gap-2 text-on-surface-variant';
-  step.innerHTML = `<span class="material-symbols-outlined text-sm text-primary-container">check_circle</span>${text}`;
-  container.appendChild(step);
-  container.scrollTop = container.scrollHeight;
-}
+      if (bids.length < 2) {
+        errEl.textContent = '{{ t("eval.min_bids_error", locale) }}';
+        errEl.classList.remove('hidden');
+        return;
+      }
 
-function showBidForm() {
-  document.getElementById('processing-state').classList.add('hidden');
-  document.getElementById('eval-content').classList.add('hidden');
-  document.getElementById('skeleton-state').classList.add('hidden');
-  document.getElementById('choose-rfp-state').classList.add('hidden');
-  document.getElementById('empty-state').classList.remove('hidden');
+      const incomplete = bids.some(b => !b.vendor || !b.content);
+      if (incomplete) {
+        errEl.textContent = '{{ t("eval.fill_all_error", locale) }}';
+        errEl.classList.remove('hidden');
+        return;
+      }
 
-  // Initialize bid entries if empty
-  if (document.getElementById('bid-entries').children.length === 0) {
-    addBidEntry();
-    addBidEntry();
-  }
-}
+      // Get the RFP details for context
+      const rfp = RFPS.find(r => r.id === selectedRfpId);
+      const rfpTitle = rfp?.title ?? 'Unknown RFP';
 
-// ── Evaluation rendering (unchanged) ────────────────────────────────────────
+      // Compose the message for the agent
+      let message = `Evaluate the following vendor bids for the RFP "${rfpTitle}".\n\n`;
+      message += `RFP Requirements:\n`;
+      if (rfp?.description) message += `- Description: ${rfp.description}\n`;
+      message += `\n--- VENDOR BIDS ---\n\n`;
 
-function riskBadge(level) {
-  const cls = RISK_CLASS[level?.toUpperCase()] ?? 'risk-unknown';
-  return `<span class="px-2 py-0.5 rounded text-xs font-bold ${cls}">${level ?? 'N/A'}</span>`;
-}
+      bids.forEach((bid, i) => {
+        message += `=== BID ${i + 1}: ${bid.vendor}${bid.company ? ` (${bid.company})` : ''} ===\n`;
+        message += bid.content + '\n\n';
+      });
 
-function passFail(status) {
-  const pass = String(status).toUpperCase() === 'PASS';
-  return pass
-    ? `<div class="inline-flex items-center gap-1 px-3 py-1 bg-green-100/50 text-green-700 rounded-lg font-bold text-xs">
+      message += `\nPlease evaluate ALL bids across the 4 dimensions (Legal, Commercial, Technical, Financial) and provide the final ranking with a recommendation.`;
+
+      // Switch to processing state
+      showProcessingState();
+
+      const sessionId = `eval_${selectedRfpId}_${Date.now()}`;
+
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: message,
+            session_id: sessionId,
+            rfp_id: selectedRfpId,
+          }),
+        });
+
+        if (!res.ok) throw new Error('Failed to start evaluation');
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+
+          const lines = buffer.split('\n');
+          buffer = lines.pop();
+
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue;
+            try {
+              const evt = JSON.parse(line.slice(6));
+              if (evt.type === 'status') {
+                addProcessingStep(evt.text);
+              } else if (evt.type === 'done') {
+                // Evaluation finished — load results
+                await loadEvaluation();
+                return;
+              } else if (evt.type === 'error') {
+                throw new Error(evt.text);
+              }
+            } catch (parseErr) {
+              if (parseErr.message && !parseErr.message.includes('JSON')) throw parseErr;
+            }
+          }
+        }
+
+        // Stream ended — try loading evaluation results
+        await loadEvaluation();
+
+      } catch (err) {
+        console.error('Evaluation failed:', err);
+        showToast('Evaluation failed: ' + err.message, 'error');
+        showBidForm();
+      }
+    }
+
+    function showProcessingState() {
+      document.getElementById('empty-state').classList.add('hidden');
+      document.getElementById('eval-content').classList.add('hidden');
+      document.getElementById('skeleton-state').classList.add('hidden');
+      document.getElementById('processing-state').classList.remove('hidden');
+      document.getElementById('processing-steps').innerHTML = '';
+    }
+
+    function addProcessingStep(text) {
+      const container = document.getElementById('processing-steps');
+      const step = document.createElement('div');
+      step.className = 'flex items-center gap-2 text-on-surface-variant';
+      step.innerHTML = `<span class="material-symbols-outlined text-sm text-primary-container">check_circle</span>${text}`;
+      container.appendChild(step);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function showBidForm() {
+      document.getElementById('processing-state').classList.add('hidden');
+      document.getElementById('eval-content').classList.add('hidden');
+      document.getElementById('skeleton-state').classList.add('hidden');
+      document.getElementById('choose-rfp-state').classList.add('hidden');
+      document.getElementById('empty-state').classList.remove('hidden');
+
+      // Initialize bid entries if empty
+      if (document.getElementById('bid-entries').children.length === 0) {
+        addBidEntry();
+        addBidEntry();
+      }
+    }
+
+    // ── Evaluation rendering (unchanged) ────────────────────────────────────────
+
+    function riskBadge(level) {
+      const cls = RISK_CLASS[level?.toUpperCase()] ?? 'risk-unknown';
+      return `<span class="px-2 py-0.5 rounded text-xs font-bold ${cls}">${level ?? 'N/A'}</span>`;
+    }
+
+    function passFail(status) {
+      const pass = String(status).toUpperCase() === 'PASS';
+      return pass
+        ? `<div class="inline-flex items-center gap-1 px-3 py-1 bg-green-100/50 text-green-700 rounded-lg font-bold text-xs">
          <span class="material-symbols-outlined text-sm">check_circle</span>PASS</div>`
-    : `<div class="inline-flex items-center gap-1 px-3 py-1 bg-red-100/50 text-red-700 rounded-lg font-bold text-xs">
+        : `<div class="inline-flex items-center gap-1 px-3 py-1 bg-red-100/50 text-red-700 rounded-lg font-bold text-xs">
          <span class="material-symbols-outlined text-sm">cancel</span>FAIL</div>`;
-}
+    }
 
-function techBar(score) {
-  const pct = Math.min(Math.max(Number(score)||0,0),100);
-  const color = pct >= 80 ? 'bg-tertiary-fixed-dim' : pct >= 60 ? 'bg-amber-400' : 'bg-red-400';
-  return `<div class="flex flex-col items-center gap-2">
+    function techBar(score) {
+      const pct = Math.min(Math.max(Number(score) || 0, 0), 100);
+      const color = pct >= 80 ? 'bg-tertiary-fixed-dim' : pct >= 60 ? 'bg-amber-400' : 'bg-red-400';
+      return `<div class="flex flex-col items-center gap-2">
     <div class="text-3xl font-bold text-primary">${pct}</div>
     <div class="w-full max-w-[100px] h-1.5 bg-slate-200 rounded-full overflow-hidden">
       <div class="${color} h-full" style="width:${pct}%"></div>
     </div>
   </div>`;
-}
+    }
 
-function computeOverallRisk(vendor) {
-  const fails = ['legal','commercial','financial']
-    .filter(d => String(vendor[d]).toUpperCase() === 'FAIL').length;
-  const s = Number(vendor.technical_score||0);
-  const tech = s >= 80 ? 'LOW' : s >= 60 ? 'MODERATE' : 'HIGH';
-  if (fails >= 2) return 'CRITICAL';
-  if (fails === 1) return tech === 'HIGH' ? 'HIGH' : 'MODERATE';
-  return tech;
-}
+    function computeOverallRisk(vendor) {
+      const fails = ['legal', 'commercial', 'financial']
+        .filter(d => String(vendor[d]).toUpperCase() === 'FAIL').length;
+      const s = Number(vendor.technical_score || 0);
+      const tech = s >= 80 ? 'LOW' : s >= 60 ? 'MODERATE' : 'HIGH';
+      if (fails >= 2) return 'CRITICAL';
+      if (fails === 1) return tech === 'HIGH' ? 'HIGH' : 'MODERATE';
+      return tech;
+    }
 
-function showRfpSelection() {
-  document.getElementById('eval-content').classList.add('hidden');
-  document.getElementById('empty-state').classList.add('hidden');
-  document.getElementById('processing-state').classList.add('hidden');
-  document.getElementById('skeleton-state').classList.add('hidden');
-  document.getElementById('choose-rfp-state').classList.remove('hidden');
-  selectedRfpId = null;
-}
+    function showRfpSelection() {
+      document.getElementById('eval-content').classList.add('hidden');
+      document.getElementById('empty-state').classList.add('hidden');
+      document.getElementById('processing-state').classList.add('hidden');
+      document.getElementById('skeleton-state').classList.add('hidden');
+      document.getElementById('choose-rfp-state').classList.remove('hidden');
+      selectedRfpId = null;
+    }
 
-function selectRfpCard(id) {
-  selectedRfpId = id;
-  
-  const rfp = RFPS.find(r => r.id === selectedRfpId);
-  if (rfp && rfp.status === 'done' && rfp.assigned_vendor) {
-    document.getElementById('award-btn').classList.add('hidden');
-    document.getElementById('awarded-badge').classList.remove('hidden');
-    document.getElementById('awarded-vendor-name').textContent = rfp.assigned_vendor;
-  } else {
-    document.getElementById('award-btn').classList.remove('hidden');
-    document.getElementById('awarded-badge').classList.add('hidden');
-  }
+    function selectRfpCard(id) {
+      selectedRfpId = id;
 
-  document.getElementById('choose-rfp-state').classList.add('hidden');
-  loadEvaluation();
-}
+      const rfp = RFPS.find(r => r.id === selectedRfpId);
+      if (rfp && rfp.status === 'done' && rfp.assigned_vendor) {
+        document.getElementById('award-btn').classList.add('hidden');
+        document.getElementById('awarded-badge').classList.remove('hidden');
+        document.getElementById('awarded-vendor-name').textContent = rfp.assigned_vendor;
+      } else {
+        document.getElementById('award-btn').classList.remove('hidden');
+        document.getElementById('awarded-badge').classList.add('hidden');
+      }
 
-function renderEvaluation(data, heatmap) {
-  document.getElementById('eval-project-tag').textContent = `PROJECT — ${data.project}`;
-  document.getElementById('eval-project-title').textContent = data.project;
-  document.getElementById('eval-timestamp').textContent =
-    data.evaluated_at ? new Date(data.evaluated_at).toLocaleString() : 'Unknown';
+      document.getElementById('choose-rfp-state').classList.add('hidden');
+      loadEvaluation();
+    }
 
-  document.getElementById('rec-name').textContent = data.recommendation ?? '—';
-  document.getElementById('rec-reason').textContent = data.recommendation_reason ?? '';
+    function renderEvaluation(data, heatmap) {
+      document.getElementById('eval-project-tag').textContent = `PROJECT — ${data.project}`;
+      document.getElementById('eval-project-title').textContent = data.project;
+      document.getElementById('eval-timestamp').textContent =
+        data.evaluated_at ? new Date(data.evaluated_at).toLocaleString() : 'Unknown';
 
-  if (data.contract_value) {
-    document.getElementById('contract-value').textContent = data.contract_value;
-    document.getElementById('contract-value-card').classList.remove('hidden');
-  }
+      document.getElementById('rec-name').textContent = data.recommendation ?? '—';
+      document.getElementById('rec-reason').textContent = data.recommendation_reason ?? '';
 
-  const vendors = data.vendors ?? [];
-  document.getElementById('vendor-count').textContent = vendors.length;
+      if (data.contract_value) {
+        document.getElementById('contract-value').textContent = data.contract_value;
+        document.getElementById('contract-value-card').classList.remove('hidden');
+      }
 
-  const isWinner = (v) => v.name === data.recommendation || v.company === data.recommendation;
+      const vendors = data.vendors ?? [];
+      document.getElementById('vendor-count').textContent = vendors.length;
 
-  let thead = `<tr class="bg-transparent">
+      const isWinner = (v) => v.name === data.recommendation || v.company === data.recommendation;
+
+      let thead = `<tr class="bg-transparent">
     <th class="p-8 text-sm font-bold text-slate-400 tracking-widest uppercase w-1/5">Criteria</th>`;
-  vendors.forEach(v => {
-    const winner = isWinner(v);
-    thead += `<th class="p-8 w-1/${vendors.length+1} ${winner ? 'bg-surface-container-lowest shadow-xl relative' : ''}">
+      vendors.forEach(v => {
+        const winner = isWinner(v);
+        thead += `<th class="p-8 w-1/${vendors.length + 1} ${winner ? 'bg-surface-container-lowest shadow-xl relative' : ''}">
       ${winner ? `<div class="absolute top-0 left-1/2 -translate-x-1/2 bg-tertiary-fixed-dim px-4 py-1 rounded-b-lg text-xs font-bold text-on-tertiary-fixed">OPTIMAL CHOICE</div>` : ''}
       <div class="flex flex-col items-center pt-4">
         <div class="w-12 h-12 rounded-full ${winner ? 'hero-gradient' : 'bg-slate-200'} mb-4 flex items-center justify-center ${winner ? 'text-white' : 'text-slate-500'} font-bold text-lg">
@@ -767,221 +831,217 @@ function renderEvaluation(data, heatmap) {
         <span class="text-sm text-slate-500">${v.company ?? ''}</span>
       </div>
     </th>`;
-  });
-  thead += '</tr>';
-  document.getElementById('vendor-thead').innerHTML = thead;
+      });
+      thead += '</tr>';
+      document.getElementById('vendor-thead').innerHTML = thead;
 
-  const rows = [
-    { key:'legal', label:'Legal Compliance', sub:'GDPR & ISO Compliance', icon:'gavel', render: v => passFail(v.legal) },
-    { key:'commercial', label:'Commercial Terms', sub:'MSAs & SLAs', icon:'handshake', render: v => passFail(v.commercial) },
-    { key:'technical', label:'Technical Capability', sub:'Performance Score (0-100)', icon:'settings_suggest', render: v => techBar(v.technical_score) },
-    { key:'financial', label:'Financial Stability', sub:'Credit & Revenue Check', icon:'monetization_on', render: v => passFail(v.financial) },
-  ];
+      const rows = [
+        { key: 'legal', label: 'Legal Compliance', sub: 'GDPR & ISO Compliance', icon: 'gavel', render: v => passFail(v.legal) },
+        { key: 'commercial', label: 'Commercial Terms', sub: 'MSAs & SLAs', icon: 'handshake', render: v => passFail(v.commercial) },
+        { key: 'technical', label: 'Technical Capability', sub: 'Performance Score (0-100)', icon: 'settings_suggest', render: v => techBar(v.technical_score) },
+        { key: 'financial', label: 'Financial Stability', sub: 'Credit & Revenue Check', icon: 'monetization_on', render: v => passFail(v.financial) },
+      ];
 
-  let tbody = '';
-  rows.forEach(row => {
-    tbody += `<tr class="hover:bg-white/40 transition-colors">
+      let tbody = '';
+      rows.forEach(row => {
+        tbody += `<tr class="hover:bg-white/40 transition-colors">
       <td class="p-8 border-t border-outline-variant/10">
         <div class="flex items-center gap-3">
           <span class="material-symbols-outlined text-slate-400">${row.icon}</span>
           <div><div class="font-bold text-primary">${row.label}</div><div class="text-xs text-slate-500">${row.sub}</div></div>
         </div>
       </td>`;
-    vendors.forEach(v => {
-      const winner = isWinner(v);
-      tbody += `<td class="p-8 border-t border-outline-variant/10 text-center ${winner ? 'bg-surface-container-lowest' : ''}">${row.render(v)}</td>`;
-    });
-    tbody += '</tr>';
-  });
+        vendors.forEach(v => {
+          const winner = isWinner(v);
+          tbody += `<td class="p-8 border-t border-outline-variant/10 text-center ${winner ? 'bg-surface-container-lowest' : ''}">${row.render(v)}</td>`;
+        });
+        tbody += '</tr>';
+      });
 
-  const hasFlags = vendors.some(v => v.flags?.length);
-  if (hasFlags) {
-    tbody += `<tr class="hover:bg-white/40 transition-colors">
+      const hasFlags = vendors.some(v => v.flags?.length);
+      if (hasFlags) {
+        tbody += `<tr class="hover:bg-white/40 transition-colors">
       <td class="p-8 border-t border-outline-variant/10">
         <div class="flex items-center gap-3">
           <span class="material-symbols-outlined text-slate-400">flag</span>
           <div><div class="font-bold text-primary">Flags</div><div class="text-xs text-slate-500">Risk indicators</div></div>
         </div>
       </td>`;
-    vendors.forEach(v => {
-      const winner = isWinner(v);
-      const flags = v.flags ?? [];
-      tbody += `<td class="p-8 border-t border-outline-variant/10 text-center ${winner ? 'bg-surface-container-lowest' : ''}">
+        vendors.forEach(v => {
+          const winner = isWinner(v);
+          const flags = v.flags ?? [];
+          tbody += `<td class="p-8 border-t border-outline-variant/10 text-center ${winner ? 'bg-surface-container-lowest' : ''}">
         ${flags.length ? flags.map(f => `<div class="text-xs text-amber-700 bg-amber-50 rounded px-2 py-1 mb-1">${f}</div>`).join('') : '<span class="text-xs text-slate-300">—</span>'}
       </td>`;
-    });
-    tbody += '</tr>';
-  }
+        });
+        tbody += '</tr>';
+      }
 
-  document.getElementById('vendor-tbody').innerHTML = tbody;
+      document.getElementById('vendor-tbody').innerHTML = tbody;
 
-  // Risk heatmap
-  const dims = ['Legal','Commercial','Technical','Financial','Overall'];
-  const dimKeys = ['legal','commercial','technical','financial','overall'];
-  const riskData = {};
-  vendors.forEach(v => {
-    if (heatmap && heatmap[v.name]) {
-      riskData[v.name] = heatmap[v.name];
-    } else {
-      const overall = computeOverallRisk(v);
-      const s = Number(v.technical_score||0);
-      riskData[v.name] = {
-        legal: String(v.legal).toUpperCase() === 'PASS' ? 'LOW' : 'HIGH',
-        commercial: String(v.commercial).toUpperCase() === 'PASS' ? 'LOW' : 'HIGH',
-        technical: s >= 80 ? 'LOW' : s >= 60 ? 'MODERATE' : 'HIGH',
-        financial: String(v.financial).toUpperCase() === 'PASS' ? 'LOW' : 'HIGH',
-        overall,
-      };
-    }
-  });
-
-  let heatTable = `<table class="w-full text-sm border-collapse rounded-xl overflow-hidden">
-    <thead><tr><th class="p-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest bg-surface-container-low">Dimension</th>`;
-  vendors.forEach(v => {
-    heatTable += `<th class="p-4 text-center text-xs font-bold text-slate-500 uppercase bg-surface-container-low">${v.name}<br><span class="font-normal normal-case text-slate-400">${v.company ?? ''}</span></th>`;
-  });
-  heatTable += `</tr></thead><tbody>`;
-  dims.forEach((dim, i) => {
-    const dk = dimKeys[i];
-    const isOverall = dk === 'overall';
-    heatTable += `<tr class="${isOverall ? 'border-t-2 border-slate-200' : ''}">
-      <td class="p-4 font-semibold text-primary bg-surface-container-low/50 ${isOverall ? 'font-extrabold' : ''}">${dim}</td>`;
-    vendors.forEach(v => {
-      const level = (riskData[v.name]?.[dk] ?? 'UNKNOWN').toUpperCase();
-      const cls = RISK_CLASS[level] ?? 'risk-unknown';
-      heatTable += `<td class="p-4 text-center"><span class="inline-block px-3 py-1 rounded-lg text-xs font-bold ${cls} w-24">${level}</span></td>`;
-    });
-    heatTable += '</tr>';
-  });
-  heatTable += '</tbody></table>';
-  document.getElementById('risk-heatmap-container').innerHTML = heatTable;
-
-  // Risk summary
-  const RISK_COLOR = { LOW:'text-green-600', MODERATE:'text-amber-600', HIGH:'text-red-600', CRITICAL:'text-pink-700' };
-  let summary = '';
-  vendors.forEach(v => {
-    const level = (riskData[v.name]?.overall ?? computeOverallRisk(v)).toUpperCase();
-    summary += `<div class="flex justify-between items-center">
-      <span class="text-sm text-on-surface-variant">${v.name}</span>
-      <span class="text-xs font-bold ${RISK_COLOR[level]??'text-slate-400'}">${level}</span>
-    </div>`;
-  });
-  document.getElementById('risk-summary-list').innerHTML = summary;
-
-  // Trend
-  const best = vendors.reduce((a,b) => (Number(b.technical_score) > Number(a.technical_score) ? b : a), vendors[0]);
-  document.getElementById('trend-text').textContent = best
-    ? `${best.name} leads with a Technical Score of ${best.technical_score}.`
-    : '';
-}
-
-async function loadEvaluation() {
-  const btn = document.getElementById('refresh-btn');
-  btn.querySelector('span').classList.add('animate-spin');
-
-  document.getElementById('skeleton-state').classList.remove('hidden');
-  document.getElementById('empty-state').classList.add('hidden');
-  document.getElementById('eval-content').classList.add('hidden');
-  document.getElementById('processing-state').classList.add('hidden');
-
-  if (!selectedRfpId) {
-    btn.querySelector('span').classList.remove('animate-spin');
-    showBidForm();
-    return;
-  }
-
-  try {
-    const [evalRes, hmRes] = await Promise.all([
-      fetch(`/api/rfps/${selectedRfpId}/evaluation`),
-      fetch(`/api/rfps/${selectedRfpId}/risk-heatmap`),
-    ]);
-    btn.querySelector('span').classList.remove('animate-spin');
-
-    if (evalRes.status === 204 || !evalRes.ok) { showBidForm(); return; }
-    const data = await evalRes.json();
-    const heatmap = hmRes.ok && hmRes.status !== 204 ? await hmRes.json() : null;
-    if (!data || !data.vendors?.length) { showBidForm(); return; }
-
-    evalData = data;
-    heatmapData = heatmap;
-
-    document.getElementById('skeleton-state').classList.add('hidden');
-    document.getElementById('eval-content').classList.remove('hidden');
-    renderEvaluation(data, heatmap);
-    document.getElementById('live-status').textContent = 'Updated ' + new Date().toLocaleTimeString();
-  } catch (err) {
-    btn.querySelector('span').classList.remove('animate-spin');
-    console.error('Failed to load evaluation:', err);
-    showBidForm();
-  }
-}
-
-// Award RFP
-function awardRfp() {
-  if (!selectedRfpId) { showToast('Please select an RFP first', 'error'); return; }
-  if (!evalData?.recommendation) { showToast('No recommendation available', 'error'); return; }
-
-  document.getElementById('modal-vendor-name').textContent = evalData.recommendation;
-  document.getElementById('award-modal').classList.remove('hidden');
-}
-
-async function confirmAward() {
-  document.getElementById('award-modal').classList.add('hidden');
-  const vendorName = evalData.recommendation;
-
-  const rfp = RFPS.find(r => r.id === selectedRfpId);
-  try {
-    if (rfp && rfp.status === 'draft') {
-      const approveRes = await fetch(`/api/rfps/${selectedRfpId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'approved' }),
+      // Risk heatmap
+      const dims = ['Legal', 'Commercial', 'Technical', 'Financial', 'Overall'];
+      const dimKeys = ['legal', 'commercial', 'technical', 'financial', 'overall'];
+      const riskData = {};
+      vendors.forEach(v => {
+        if (heatmap && heatmap[v.name]) {
+          riskData[v.name] = heatmap[v.name];
+        } else {
+          const overall = computeOverallRisk(v);
+          const s = Number(v.technical_score || 0);
+          riskData[v.name] = {
+            legal: String(v.legal).toUpperCase() === 'PASS' ? 'LOW' : 'HIGH',
+            commercial: String(v.commercial).toUpperCase() === 'PASS' ? 'LOW' : 'HIGH',
+            technical: s >= 80 ? 'LOW' : s >= 60 ? 'MODERATE' : 'HIGH',
+            financial: String(v.financial).toUpperCase() === 'PASS' ? 'LOW' : 'HIGH',
+            overall,
+          };
+        }
       });
-      if (!approveRes.ok) throw new Error('Failed to approve RFP');
+
+      let heatTable = `<table class="w-full text-sm border-collapse rounded-xl overflow-hidden">
+    <thead><tr><th class="p-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest bg-surface-container-low">Dimension</th>`;
+      vendors.forEach(v => {
+        heatTable += `<th class="p-4 text-center text-xs font-bold text-slate-500 uppercase bg-surface-container-low">${v.name}<br><span class="font-normal normal-case text-slate-400">${v.company ?? ''}</span></th>`;
+      });
+      heatTable += `</tr></thead><tbody>`;
+      dims.forEach((dim, i) => {
+        const dk = dimKeys[i];
+        const isOverall = dk === 'overall';
+        heatTable += `<tr class="${isOverall ? 'border-t-2 border-slate-200' : ''}">
+      <td class="p-4 font-semibold text-primary bg-surface-container-low/50 ${isOverall ? 'font-extrabold' : ''}">${dim}</td>`;
+        vendors.forEach(v => {
+          const level = (riskData[v.name]?.[dk] ?? 'UNKNOWN').toUpperCase();
+          const cls = RISK_CLASS[level] ?? 'risk-unknown';
+          heatTable += `<td class="p-4 text-center"><span class="inline-block px-3 py-1 rounded-lg text-xs font-bold ${cls} w-24">${level}</span></td>`;
+        });
+        heatTable += '</tr>';
+      });
+      heatTable += '</tbody></table>';
+      document.getElementById('risk-heatmap-container').innerHTML = heatTable;
+
+      // Risk summary
+      const RISK_COLOR = { LOW: 'text-green-600', MODERATE: 'text-amber-600', HIGH: 'text-red-600', CRITICAL: 'text-pink-700' };
+      let summary = '';
+      vendors.forEach(v => {
+        const level = (riskData[v.name]?.overall ?? computeOverallRisk(v)).toUpperCase();
+        summary += `<div class="flex justify-between items-center">
+      <span class="text-sm text-on-surface-variant">${v.name}</span>
+      <span class="text-xs font-bold ${RISK_COLOR[level] ?? 'text-slate-400'}">${level}</span>
+    </div>`;
+      });
+      document.getElementById('risk-summary-list').innerHTML = summary;
+
+      // Trend
+      const best = vendors.reduce((a, b) => (Number(b.technical_score) > Number(a.technical_score) ? b : a), vendors[0]);
+      document.getElementById('trend-text').textContent = best
+        ? `${best.name} leads with a Technical Score of ${best.technical_score}.`
+        : '';
     }
 
-    const res = await fetch(`/api/rfps/${selectedRfpId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: 'done', assigned_vendor: vendorName }),
-    });
+    async function loadEvaluation() {
+      const btn = document.getElementById('refresh-btn');
+      btn.querySelector('span').classList.add('animate-spin');
 
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.detail || 'Failed to award RFP');
+      document.getElementById('skeleton-state').classList.remove('hidden');
+      document.getElementById('empty-state').classList.add('hidden');
+      document.getElementById('eval-content').classList.add('hidden');
+      document.getElementById('processing-state').classList.add('hidden');
+
+      if (!selectedRfpId) {
+        btn.querySelector('span').classList.remove('animate-spin');
+        showBidForm();
+        return;
+      }
+
+      try {
+        const [evalRes, hmRes] = await Promise.all([
+          fetch(`/api/rfps/${selectedRfpId}/evaluation`),
+          fetch(`/api/rfps/${selectedRfpId}/risk-heatmap`),
+        ]);
+        btn.querySelector('span').classList.remove('animate-spin');
+
+        if (evalRes.status === 204 || !evalRes.ok) { showBidForm(); return; }
+        const data = await evalRes.json();
+        const heatmap = hmRes.ok && hmRes.status !== 204 ? await hmRes.json() : null;
+        if (!data || !data.vendors?.length) { showBidForm(); return; }
+
+        evalData = data;
+        heatmapData = heatmap;
+
+        document.getElementById('skeleton-state').classList.add('hidden');
+        document.getElementById('eval-content').classList.remove('hidden');
+        renderEvaluation(data, heatmap);
+      } catch (err) {
+        btn.querySelector('span').classList.remove('animate-spin');
+        console.error('Failed to load evaluation:', err);
+        showBidForm();
+      }
     }
 
-    showToast(`RFP awarded to ${vendorName}!`, 'success');
+    // Award RFP
+    function awardRfp() {
+      if (!selectedRfpId) { showToast('Please select an RFP first', 'error'); return; }
+      if (!evalData?.recommendation) { showToast('No recommendation available', 'error'); return; }
 
-    document.getElementById('award-btn').classList.add('hidden');
-    document.getElementById('awarded-badge').classList.remove('hidden');
-    document.getElementById('awarded-vendor-name').textContent = vendorName;
+      document.getElementById('modal-vendor-name').textContent = evalData.recommendation;
+      document.getElementById('award-modal').classList.remove('hidden');
+    }
 
-    if (rfp) { rfp.status = 'done'; rfp.assigned_vendor = vendorName; }
-  } catch (e) {
-    showToast('Award failed: ' + e.message, 'error');
-  }
-}
+    async function confirmAward() {
+      document.getElementById('award-modal').classList.add('hidden');
+      const vendorName = evalData.recommendation;
+      const rfp = RFPS.find(r => r.id === selectedRfpId);
 
-function showToast(msg, type = 'success') {
-  const t = document.getElementById('toast');
-  const ic = document.getElementById('toast-icon');
-  t.className = t.className.replace(/bg-\S+/g, '');
-  if (type === 'success') { t.classList.add('bg-emerald-600'); ic.textContent = 'check_circle'; }
-  else { t.classList.add('bg-red-600'); ic.textContent = 'error'; }
-  document.getElementById('toast-msg').textContent = msg;
-  t.classList.remove('opacity-0','translate-y-2','pointer-events-none');
-  t.classList.add('opacity-100','translate-y-0');
-  setTimeout(() => {
-    t.classList.add('opacity-0','translate-y-2','pointer-events-none');
-    t.classList.remove('opacity-100','translate-y-0');
-  }, 3500);
-}
+      // Build the transition path: draft -> published -> approved_for_submission
+      // Each PATCH must go through one allowed transition at a time.
+      const path = [];
+      if (rfp && rfp.status === 'draft') path.push({ status: 'published' });
+      if (!rfp || rfp.status !== 'approved_for_submission')
+        path.push({ status: 'approved_for_submission', assigned_vendor: vendorName });
+      else
+        path.push({ assigned_vendor: vendorName });
 
-function setLang(locale) {
-  document.cookie = `ui_lang=${locale};path=/;max-age=31536000`;
-  location.reload();
-}
-</script>
+      try {
+        for (const body of path) {
+          const res = await fetch(`/api/rfps/${selectedRfpId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+          });
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.detail || 'Award transition failed');
+          }
+        }
+
+        showToast(`RFP awarded to ${vendorName}!`, 'success');
+        document.getElementById('award-btn').classList.add('hidden');
+        document.getElementById('awarded-badge').classList.remove('hidden');
+        document.getElementById('awarded-vendor-name').textContent = vendorName;
+
+        if (rfp) { rfp.status = 'approved_for_submission'; rfp.assigned_vendor = vendorName; }
+      } catch (e) {
+        showToast('Award failed: ' + e.message, 'error');
+      }
+    }
+
+    function showToast(msg, type = 'success') {
+      const t = document.getElementById('toast');
+      const ic = document.getElementById('toast-icon');
+      t.className = t.className.replace(/bg-\S+/g, '');
+      if (type === 'success') { t.classList.add('bg-emerald-600'); ic.textContent = 'check_circle'; }
+      else { t.classList.add('bg-red-600'); ic.textContent = 'error'; }
+      document.getElementById('toast-msg').textContent = msg;
+      t.classList.remove('opacity-0', 'translate-y-2', 'pointer-events-none');
+      t.classList.add('opacity-100', 'translate-y-0');
+      setTimeout(() => {
+        t.classList.add('opacity-0', 'translate-y-2', 'pointer-events-none');
+        t.classList.remove('opacity-100', 'translate-y-0');
+      }, 3500);
+    }
+
+  </script>
 </body>
+
 </html>

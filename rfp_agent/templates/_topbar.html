@@ -1,0 +1,109 @@
+{# Shared top bar with functional search.
+   Optional context: page_title (string) — shows next to slogan. #}
+<header class="flex justify-between items-center px-8 py-4 sticky top-0 z-40 ml-64 bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl border-b border-slate-100">
+  <div class="flex items-center gap-6 w-1/2 min-w-0">
+    <div class="hidden md:flex flex-col leading-tight shrink-0">
+      <span class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">LiverX</span>
+      <span class="text-sm font-bold text-primary">{{ t('header.slogan', locale) }}</span>
+    </div>
+    <div class="relative w-full max-w-md" id="topbar-search-wrap">
+      <span class="absolute left-3 top-1/2 -translate-y-1/2 flex items-center pointer-events-none">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs>
+            <linearGradient id="gem-grad" x1="4" y1="4" x2="20" y2="20" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="#4285F4"/>
+              <stop offset="0.52" stop-color="#7B6EE0"/>
+              <stop offset="1" stop-color="#9168C0"/>
+            </linearGradient>
+          </defs>
+          <path d="M12 2 C12 7 7 12 2 12 C7 12 12 17 12 22 C12 17 17 12 22 12 C17 12 12 7 12 2 Z" fill="url(#gem-grad)"/>
+        </svg>
+      </span>
+      <input id="topbar-search-input" autocomplete="off"
+             class="w-full bg-surface-container-low border-none rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-primary-container/40 transition-all"
+             placeholder="{{ t('form.search', locale) }}" type="text"/>
+      <div id="topbar-search-results"
+           class="hidden absolute top-full left-0 right-0 mt-2 bg-white border border-slate-200 rounded-xl shadow-xl max-h-80 overflow-auto z-50">
+      </div>
+    </div>
+  </div>
+  <div class="flex items-center gap-6">
+    <div class="flex gap-4 items-center">
+      <button class="text-slate-400 hover:text-blue-700 transition-all duration-300" title="Notifications">
+        <span class="material-symbols-outlined">notifications</span>
+      </button>
+      <a href="/assistant" class="text-slate-400 hover:text-blue-700 transition-all duration-300" title="{{ t('nav.assistant', locale) }}">
+        <span class="material-symbols-outlined">help_outline</span>
+      </a>
+      <div class="flex items-center rounded-lg overflow-hidden border border-slate-200 text-[11px] font-bold">
+        <a href="?lang=en" onclick="setLang('en');return false;"
+           class="px-2.5 py-1.5 transition-colors {% if locale == 'en' %}bg-primary-container text-white{% else %}text-slate-500 hover:bg-surface-container-low{% endif %}">EN</a>
+        <a href="?lang=ar" onclick="setLang('ar');return false;"
+           class="px-2.5 py-1.5 transition-colors {% if locale == 'ar' %}bg-primary-container text-white{% else %}text-slate-500 hover:bg-surface-container-low{% endif %}">AR</a>
+      </div>
+    </div>
+    <div class="h-8 w-[1px] bg-outline-variant/20"></div>
+    <div class="flex items-center gap-3">
+      <div class="text-right hidden sm:block">
+        <p class="text-xs font-bold text-primary">Alex Sterling</p>
+        <p class="text-[10px] text-slate-400">Executive Director</p>
+      </div>
+      <div class="w-9 h-9 rounded-full bg-primary-container text-white flex items-center justify-center text-xs font-bold ring-2 ring-surface-container-high">AS</div>
+    </div>
+  </div>
+</header>
+<script>
+  function setLang(locale) {
+    document.cookie = `ui_lang=${locale};path=/;max-age=31536000`;
+    location.reload();
+  }
+  (function initSearch() {
+    const input = document.getElementById('topbar-search-input');
+    const out   = document.getElementById('topbar-search-results');
+    if (!input || !out) return;
+    let timer = null;
+
+    function statusOf(rfp) {
+      const map = { draft:'Draft', published:'Published', approved_for_submission:'Approved', done:'Done', archived:'Archived' };
+      return map[rfp.status] || rfp.status;
+    }
+
+    function render(items) {
+      if (!items.length) {
+        out.innerHTML = `<div class="px-4 py-3 text-xs text-slate-400">No matches</div>`;
+        out.classList.remove('hidden');
+        return;
+      }
+      out.innerHTML = items.map(r => {
+        const target = r.status === 'draft' ? `/chat?rfp_id=${r.id}` : `/editor/${r.id}`;
+        const safe = (s) => (s || '').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        return `<a href="${target}" class="block px-4 py-3 hover:bg-slate-50 border-b border-slate-100 last:border-0">
+                  <div class="flex items-center justify-between gap-3 mb-0.5">
+                    <span class="text-sm font-semibold text-primary truncate">${safe(r.title)}</span>
+                    <span class="text-[10px] uppercase tracking-wider text-slate-500 shrink-0">${statusOf(r)}</span>
+                  </div>
+                  <p class="text-[11px] text-slate-500 truncate">${safe(r.snippet)}</p>
+                </a>`;
+      }).join('');
+      out.classList.remove('hidden');
+    }
+
+    input.addEventListener('input', (e) => {
+      const q = e.target.value.trim();
+      clearTimeout(timer);
+      if (!q) { out.classList.add('hidden'); return; }
+      timer = setTimeout(async () => {
+        try {
+          const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+          if (!res.ok) return;
+          render(await res.json());
+        } catch (_) { /* ignore */ }
+      }, 180);
+    });
+
+    document.addEventListener('click', (e) => {
+      const wrap = document.getElementById('topbar-search-wrap');
+      if (wrap && !wrap.contains(e.target)) out.classList.add('hidden');
+    });
+  })();
+</script>

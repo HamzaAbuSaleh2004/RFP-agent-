@@ -24,6 +24,10 @@ _TRANSLATIONS: dict[str, dict[str, str]] = {
     "nav.settings":     {"en": "Settings",     "ar": "الإعدادات"},
     "nav.flowchart":    {"en": "Flowchart",    "ar": "مخطط التدفق"},
     "nav.create_rfp":   {"en": "Create RFP",   "ar": "إنشاء طلب عروض"},
+    "nav.assistant":    {"en": "AI Assistant", "ar": "المساعد الذكي"},
+
+    # ── Header ────────────────────────────────────────────────────────────────
+    "header.slogan":    {"en": "Your procurement AI", "ar": "ذكاء اصطناعي للمشتريات"},
 
     # ── Page titles ───────────────────────────────────────────────────────────
     "page.dashboard":    {"en": "Enterprise Procurement Dashboard",  "ar": "لوحة تحكم المشتريات"},
@@ -35,10 +39,10 @@ _TRANSLATIONS: dict[str, dict[str, str]] = {
     "page.editor":       {"en": "RFP Editor",                       "ar": "محرر طلب العروض"},
 
     # ── Dashboard headings ────────────────────────────────────────────────────
-    "dashboard.welcome":     {"en": "Welcome back, Director.",             "ar": "مرحباً بعودتك، المدير."},
-    "dashboard.efficiency":  {"en": "Your procurement pipeline",
-                               "ar": "خط المشتريات"},
-    "dashboard.pipeline":    {"en": "RFP Pipeline",                       "ar": "خط طلبات العروض"},
+    "dashboard.welcome":     {"en": "Welcome back, Alex.",             "ar": "مرحباً بعودتك، أليكس."},
+    "dashboard.efficiency":  {"en": "Your AI Procurement Hub.",
+                               "ar": "منصة المشتريات بالذكاء الاصطناعي"},
+    "dashboard.pipeline":    {"en": "My Space",                            "ar": "مساحتي"},
 
     # ── Stats cards ───────────────────────────────────────────────────────────
     "stats.active_rfps":         {"en": "Active RFPs",           "ar": "طلبات عروض نشطة"},
@@ -48,15 +52,19 @@ _TRANSLATIONS: dict[str, dict[str, str]] = {
                                    "ar": "ملفات PDF تم إنشاؤها ورفعها إلى Drive"},
 
     # ── Filter tabs ───────────────────────────────────────────────────────────
-    "filter.all":      {"en": "All",      "ar": "الكل"},
-    "filter.draft":    {"en": "Draft",    "ar": "مسودة"},
-    "filter.approved": {"en": "Approved", "ar": "معتمد"},
-    "filter.done":     {"en": "Done",     "ar": "منتهي"},
+    "filter.all":                     {"en": "All",                     "ar": "الكل"},
+    "filter.draft":                   {"en": "Draft",                   "ar": "مسودة"},
+    "filter.published":               {"en": "Published",               "ar": "منشور"},
+    "filter.approved_for_submission": {"en": "Approved",                "ar": "معتمد"},
+    "filter.done":                    {"en": "Done",                    "ar": "منتهي"},
+    "filter.archived":                {"en": "Archived",                "ar": "مؤرشف"},
 
     # ── Status labels ─────────────────────────────────────────────────────────
-    "status.draft":    {"en": "Draft",    "ar": "مسودة"},
-    "status.approved": {"en": "Approved", "ar": "معتمد"},
-    "status.done":     {"en": "Done",     "ar": "منتهي"},
+    "status.draft":                   {"en": "Draft",                   "ar": "مسودة"},
+    "status.published":               {"en": "Published",               "ar": "منشور"},
+    "status.approved_for_submission": {"en": "Approved for Submission", "ar": "معتمد للتقديم"},
+    "status.done":                    {"en": "Done",                    "ar": "منتهي"},
+    "status.archived":                {"en": "Archived",                "ar": "مؤرشف"},
 
     # ── RFP card actions ──────────────────────────────────────────────────────
     "card.continue": {"en": "Continue", "ar": "متابعة"},

@@ -15,9 +15,9 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 OUTPUT_DIR      = Path(__file__).parent.parent / "output"
-TEMPLATES_DIR   = Path(__file__).parent.parent / "company_templates"
+TEMPLATES_DIR   = Path(__file__).parent.parent / "assets"
 
-# Map URL category slug → filename stem in company_templates/
+# Map URL category slug → filename stem in assets/
 GUIDELINE_FILES = {
     "legal":      "legal_guidelines.md",
     "commercial": "commercial_guidelines.md",
@@ -25,8 +25,8 @@ GUIDELINE_FILES = {
     "financial":  "financial_guidelines.md",
 }
 
-from rfp_agent.agent import root_agent
-from rfp_agent.rfp_store import create_rfp, list_rfps, get_rfp, patch_rfp, delete_rfp
+from rfp_agent.agent import root_agent, general_assistant
+from rfp_agent.rfp_store import create_rfp, list_rfps, get_rfp, patch_rfp, delete_rfp, append_bid
 from rfp_agent.i18n import t, is_rtl, get_locale_from_cookie, all_translations, SUPPORTED_LOCALES
 from google.adk import Runner
 from google.adk.sessions.in_memory_session_service import InMemorySessionService
@@ -52,6 +52,27 @@ def _locale(request: Request) -> str:
 # Initialize once so session memory persists across requests
 session_service = InMemorySessionService()
 runner = Runner(agent=root_agent, app_name="rfp_agent", session_service=session_service)
+general_runner = Runner(
+    agent=general_assistant, app_name="rfp_agent_general", session_service=session_service
+)
+
+
+# ── Integration status (single source of truth for settings + chat page) ──────
+
+import os as _os
+
+def _integration_status() -> dict:
+    """Report which third-party integrations are configured.
+
+    Mocked services that do not require API keys still report as `configured`
+    so the UI can show them as available — they just produce mock results.
+    """
+    return {
+        "slack":  {"configured": bool(_os.environ.get("SLACK_BOT_TOKEN") and _os.environ.get("SLACK_TEAM_ID")), "mock": False},
+        "drive":  {"configured": True, "mock": False},
+        "fmp":    {"configured": True, "mock": True},   # always-on mock
+        "jira":   {"configured": False, "mock": True},  # registered but not configured
+    }
 
 
 # ── Pydantic schemas ─────────────────────────────────────────────────────────
@@ -81,6 +102,21 @@ class ChatRequest(BaseModel):
     message: str
     session_id: str = "default_session"
     rfp_id: Optional[str] = None
+
+
+class GeneralChatRequest(BaseModel):
+    message: str
+    session_id: str = "general_default"
+
+
+class BidRequest(BaseModel):
+    vendor_name: str
+    contact: Optional[str] = None
+    amount: Optional[float] = None
+    currency: Optional[str] = "USD"
+    proposal_text: Optional[str] = None
+    file_name: Optional[str] = None
+    notes: Optional[str] = None
 
 
 # ── Page routes ───────────────────────────────────────────────────────────────
@@ -603,6 +639,122 @@ async def api_extract_bid_text(file: UploadFile = File(...)):
         raise HTTPException(status_code=400, detail="Only .pdf and .docx files are supported.")
 
     return JSONResponse(content={"text": text.strip()})
+
+
+# ── Bids (per-RFP append + list) ──────────────────────────────────────────────
+
+@app.post("/api/rfps/{rfp_id}/bids")
+async def api_append_bid(rfp_id: str, body: BidRequest):
+    bid_payload = body.model_dump(exclude_none=True)
+    updated = append_bid(rfp_id, bid_payload)
+    if updated is None:
+        raise HTTPException(status_code=404, detail="RFP not found")
+    return JSONResponse(content=updated, status_code=201)
+
+
+@app.get("/api/rfps/{rfp_id}/bids")
+async def api_list_bids(rfp_id: str):
+    rfp = get_rfp(rfp_id)
+    if rfp is None:
+        raise HTTPException(status_code=404, detail="RFP not found")
+    return JSONResponse(content=rfp.get("bids", []))
+
+
+# ── Archive convenience endpoints ─────────────────────────────────────────────
+
+@app.post("/api/rfps/{rfp_id}/archive")
+async def api_archive_rfp(rfp_id: str):
+    try:
+        updated = patch_rfp(rfp_id, {"status": "archived"})
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    if updated is None:
+        raise HTTPException(status_code=404, detail="RFP not found")
+    return JSONResponse(content=updated)
+
+
+@app.get("/api/rfps/archived/list")
+async def api_list_archived():
+    return JSONResponse(content=[r for r in list_rfps() if r["status"] == "archived"])
+
+
+# ── Search ────────────────────────────────────────────────────────────────────
+
+@app.get("/api/search")
+async def api_search(q: str = "", limit: int = 20):
+    """Search RFPs by id, title, description, vendor, status. Case-insensitive substring."""
+    needle = (q or "").strip().lower()
+    if not needle:
+        return JSONResponse(content=[])
+    results = []
+    for r in list_rfps():
+        haystack = " ".join(str(r.get(k) or "") for k in
+                            ("id", "title", "description", "assigned_vendor", "status")).lower()
+        if needle in haystack:
+            results.append({
+                "id":     r["id"],
+                "title":  r["title"],
+                "status": r["status"],
+                "snippet": (r.get("description") or "")[:140],
+            })
+        if len(results) >= limit:
+            break
+    return JSONResponse(content=results)
+
+
+# ── Integrations status ───────────────────────────────────────────────────────
+
+@app.get("/api/integrations")
+async def api_integrations():
+    return JSONResponse(content=_integration_status())
+
+
+# ── General assistant page + chat ─────────────────────────────────────────────
+
+@app.get("/assistant", response_class=HTMLResponse)
+async def get_assistant(request: Request):
+    locale = _locale(request)
+    return templates.TemplateResponse("assistant.html", {
+        "request": request, "locale": locale, "rtl": is_rtl(locale),
+    })
+
+
+@app.post("/api/assistant/chat")
+async def api_assistant_chat(body: GeneralChatRequest):
+    user_input = body.message
+    session_id = body.session_id
+
+    async def event_generator():
+        existing = await session_service.get_session(
+            app_name="rfp_agent_general", user_id="user1", session_id=session_id
+        )
+        if existing is None:
+            await session_service.create_session(
+                app_name="rfp_agent_general", user_id="user1", session_id=session_id
+            )
+        message = Content(role="user", parts=[Part(text=user_input)])
+        try:
+            async for event in general_runner.run_async(
+                user_id="user1", session_id=session_id, new_message=message,
+            ):
+                try:
+                    fn_calls = event.get_function_calls()
+                except Exception:
+                    fn_calls = []
+                if fn_calls:
+                    for call in fn_calls:
+                        yield f"data: {json.dumps({'type': 'status', 'text': f'Running tool: {call.name}'})}\n\n"
+                if event.content and event.content.parts:
+                    for part in event.content.parts:
+                        text = getattr(part, "text", None)
+                        if text:
+                            yield f"data: {json.dumps({'type': 'chunk', 'text': text})}\n\n"
+            yield f"data: {json.dumps({'type': 'done'})}\n\n"
+        except Exception as e:
+            logging.error("General assistant error", exc_info=True)
+            yield f"data: {json.dumps({'type': 'error', 'text': str(e)})}\n\n"
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
 
 
 # ── Regenerate PDF endpoint ───────────────────────────────────────────────────

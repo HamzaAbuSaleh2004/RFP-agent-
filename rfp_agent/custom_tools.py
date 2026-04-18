@@ -2,7 +2,7 @@ from datetime import datetime
 from pathlib import Path
 
 OUTPUT_DIR    = Path(r"c:\Users\hamza\Desktop\LiverX\RFP\output")
-TEMPLATES_DIR = Path(r"c:\Users\hamza\Desktop\LiverX\RFP\company_templates")
+TEMPLATES_DIR = Path(r"c:\Users\hamza\Desktop\LiverX\RFP\assets")
 
 
 # ═══════════════════════════════════════════════════════
@@ -34,7 +34,7 @@ def _extract_file_text(path: Path, cap: int = 12_000) -> str:
 
 def read_local_templates() -> str:
     """
-    Read all company templates from the local company_templates/ folder and
+    Read all company templates from the local assets/ folder and
     return their combined content in one call.
 
     Template matching is by filename keyword (case-insensitive):
@@ -55,7 +55,7 @@ def read_local_templates() -> str:
 
     if not TEMPLATES_DIR.exists():
         return (
-            "company_templates/ folder not found. "
+            "assets/ folder not found. "
             f"Create it at {TEMPLATES_DIR} and place your template files inside."
         )
 
@@ -75,7 +75,7 @@ def read_local_templates() -> str:
 
     if not sections:
         return (
-            "No templates found in company_templates/. "
+            "No templates found in assets/. "
             "Add files whose names contain 'design', 'legal', 'economic', or 'compliance' "
             "(PDF, DOCX, TXT, or MD)."
         )
@@ -331,6 +331,38 @@ def code_execution(code: str) -> str:
     """Run Python to calculate cost breakdowns, weighted scoring models."""
     return "Live calculation results returned."
 
+
+def list_all_rfps() -> str:
+    """Return a JSON summary of all RFPs in the system including status, bids, and evaluation."""
+    import json as _json
+    from .rfp_store import list_rfps as _list
+    rfps = _list()
+    summary = []
+    for r in rfps:
+        summary.append({
+            "id":              r.get("id"),
+            "title":           r.get("title"),
+            "description":     r.get("description"),
+            "status":          r.get("status"),
+            "language":        r.get("language"),
+            "assigned_vendor": r.get("assigned_vendor"),
+            "bid_count":       len(r.get("bids") or []),
+            "has_evaluation":  bool(r.get("evaluation")),
+            "created_at":      r.get("created_at"),
+            "updated_at":      r.get("updated_at"),
+        })
+    return _json.dumps(summary, indent=2, ensure_ascii=False)
+
+
+def get_rfp_summary(rfp_id: str) -> str:
+    """Return a detailed JSON summary of a single RFP, including bids and evaluation."""
+    import json as _json
+    from .rfp_store import get_rfp as _get
+    r = _get(rfp_id)
+    if r is None:
+        return _json.dumps({"error": f"RFP '{rfp_id}' not found"})
+    return _json.dumps(r, indent=2, ensure_ascii=False)
+
 def date_time() -> str:
     """Auto-insert current date, calculate submission deadlines."""
     return datetime.now().isoformat()
@@ -362,7 +394,7 @@ def create_rfp_pdf(
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     output_path = str(OUTPUT_DIR / output_filename)
 
-    # ── 1. Load design template from local company_templates/ folder ─────────
+    # ── 1. Load design template from local assets/ folder ─────────
     DEFAULT_TEMPLATE = {"primary": (14, 124, 163), "secondary": (240, 248, 252),
                         "accent": (0, 163, 216), "logo_path": None, "company_name": "OurCompany"}
     template_info  = DEFAULT_TEMPLATE.copy()
@@ -384,7 +416,7 @@ def create_rfp_pdf(
             template_info = parse_template(str(design_file))
         else:
             template_warning = (
-                "\nNote: No design_template.pdf found in company_templates/ — "
+                "\nNote: No design_template.pdf found in assets/ — "
                 "PDF generated with default branding."
             )
 

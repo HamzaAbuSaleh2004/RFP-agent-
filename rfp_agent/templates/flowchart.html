@@ -1,12 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RFP Agent — System Flowchart</title>
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
       background: #0d1117;
@@ -23,15 +30,31 @@
       align-items: center;
       gap: 14px;
     }
+
     header .logo {
-      width: 36px; height: 36px;
+      width: 36px;
+      height: 36px;
       background: linear-gradient(135deg, #1f6feb, #388bfd);
       border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px; font-weight: 700; color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
     }
-    header h1 { font-size: 20px; font-weight: 600; color: #e6edf3; }
-    header span { font-size: 13px; color: #8b949e; margin-left: 4px; }
+
+    header h1 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #e6edf3;
+    }
+
+    header span {
+      font-size: 13px;
+      color: #8b949e;
+      margin-left: 4px;
+    }
 
     nav {
       display: flex;
@@ -41,6 +64,7 @@
       border-bottom: 1px solid #30363d;
       flex-wrap: wrap;
     }
+
     nav button {
       padding: 6px 16px;
       border-radius: 6px;
@@ -51,7 +75,9 @@
       cursor: pointer;
       transition: all 0.15s;
     }
-    nav button:hover, nav button.active {
+
+    nav button:hover,
+    nav button.active {
       background: #1f6feb;
       border-color: #1f6feb;
       color: #fff;
@@ -61,7 +87,10 @@
       padding: 24px 32px;
       overflow: auto;
     }
-    .diagram-container.hidden { display: none; }
+
+    .diagram-container.hidden {
+      display: none;
+    }
 
     .diagram-title {
       font-size: 14px;
@@ -88,567 +117,591 @@
       padding: 12px 32px 20px;
       font-size: 12px;
     }
+
     .legend-item {
       display: flex;
       align-items: center;
       gap: 6px;
       color: #8b949e;
     }
+
     .legend-dot {
-      width: 12px; height: 12px;
+      width: 12px;
+      height: 12px;
       border-radius: 3px;
       flex-shrink: 0;
     }
+
     /* BUG-5: responsive sidebar -- hide on mobile */
-  @media (max-width: 767px) {
-    aside { display: none !important; }
-    header { margin-left: 0 !important; left: 0 !important; right: 0 !important; width: 100% !important; }
-    main, .ml-64 { margin-left: 0 !important; }
-    body { overflow-x: hidden; }
-  }
-</style>
+    @media (max-width: 767px) {
+      aside {
+        display: none !important;
+      }
+
+      header {
+        margin-left: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+      }
+
+      main,
+      .ml-64 {
+        margin-left: 0 !important;
+      }
+
+      body {
+        overflow-x: hidden;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<header>
-  <div class="logo">R</div>
-  <div>
-    <h1>RFP Director — System Architecture</h1>
-    <span>Multi-Agent Procurement Automation Platform</span>
+  <header>
+    <div class="logo">R</div>
+    <div>
+      <h1>RFP Director — System Architecture</h1>
+      <span>Multi-Agent Procurement Automation Platform</span>
+    </div>
+  </header>
+
+  <nav>
+    <button class="active" onclick="show('full')">Full System</button>
+    <button onclick="show('web')">Web Layer</button>
+    <button onclick="show('rfp-flow')">RFP Creation Flow</button>
+    <button onclick="show('eval-flow')">Bid Evaluation Flow</button>
+    <button onclick="show('integrations')">External Integrations</button>
+  </nav>
+
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#1f6feb"></div>User / Browser
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#388bfd"></div>FastAPI Server
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#3fb950"></div>AI Agents (Gemini 2.5 Flash)
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#d29922"></div>Tools / Functions
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#da3633"></div>External APIs
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#8957e5"></div>Storage / Output
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#f0883e"></div>MCP Bridges (Slack, Linear)
+    </div>
   </div>
-</header>
 
-<nav>
-  <button class="active" onclick="show('full')">Full System</button>
-  <button onclick="show('web')">Web Layer</button>
-  <button onclick="show('rfp-flow')">RFP Creation Flow</button>
-  <button onclick="show('eval-flow')">Bid Evaluation Flow</button>
-  <button onclick="show('integrations')">External Integrations</button>
-</nav>
+  <!-- ── FULL SYSTEM ──────────────────────────────────────────────────── -->
+  <div id="pane-full" class="diagram-container">
+    <div class="diagram-title">Complete System Overview</div>
+    <div class="mermaid">
+      flowchart TD
+      %% ── USER LAYER ──────────────────────────────────
+      User(["👤 User\nWeb Browser"])
 
-<div class="legend">
-  <div class="legend-item"><div class="legend-dot" style="background:#1f6feb"></div>User / Browser</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#388bfd"></div>FastAPI Server</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#3fb950"></div>AI Agents (Gemini 2.5 Flash)</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#d29922"></div>Tools / Functions</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#da3633"></div>External APIs</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#8957e5"></div>Storage / Output</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#f0883e"></div>MCP Bridges (Slack, Linear)</div>
-</div>
+      %% ── WEB PAGES ────────────────────────────────────
+      subgraph WEB ["🌐 FastAPI Web Server (main.py · port 8000)"]
+      direction TB
+      Dashboard["/ Dashboard\nStats Overview"]
+      ChatUI["/chat\nRFP Chat Interface"]
+      DocsUI["/documents\nDocument Library"]
+      EvalUI["/evaluations\nEvaluation Dashboard"]
+      API_Chat["POST /api/chat\nSSE Streaming"]
+      API_Evals["GET /api/evaluations"]
+      API_Heatmap["GET /api/risk-heatmap"]
+      API_Stats["GET /api/stats"]
+      end
 
-<!-- ── FULL SYSTEM ──────────────────────────────────────────────────── -->
-<div id="pane-full" class="diagram-container">
-  <div class="diagram-title">Complete System Overview</div>
-  <div class="mermaid">
-flowchart TD
-  %% ── USER LAYER ──────────────────────────────────
-  User(["👤 User\nWeb Browser"])
+      %% ── ADK RUNNER ──────────────────────────────────
+      subgraph ADK ["🤖 Google ADK Runner (InMemorySessionService)"]
+      direction TB
+      Root["rfp_director\nRoot Agent\nGemini 2.5 Flash\n─────────────────\nRoutes: Create RFP / Evaluate Bids / Search
+      Files\nTools: gdrive_search · gdrive_read_file\n slack_post_message · date_time\n asana_create_task ·
+      firecrawl_scrape"]
 
-  %% ── WEB PAGES ────────────────────────────────────
-  subgraph WEB ["🌐  FastAPI Web Server  (main.py · port 8000)"]
-    direction TB
-    Dashboard["/ Dashboard\nStats Overview"]
-    ChatUI["/chat\nRFP Chat Interface"]
-    DocsUI["/documents\nDocument Library"]
-    EvalUI["/evaluations\nEvaluation Dashboard"]
-    API_Chat["POST /api/chat\nSSE Streaming"]
-    API_Evals["GET /api/evaluations"]
-    API_Heatmap["GET /api/risk-heatmap"]
-    API_Stats["GET /api/stats"]
-  end
-
-  %% ── ADK RUNNER ──────────────────────────────────
-  subgraph ADK ["🤖  Google ADK Runner  (InMemorySessionService)"]
-    direction TB
-    Root["rfp_director\nRoot Agent\nGemini 2.5 Flash\n─────────────────\nRoutes: Create RFP / Evaluate Bids / Search Files\nTools: gdrive_search · gdrive_read_file\n        slack_post_message · date_time\n        asana_create_task · firecrawl_scrape"]
-
-    subgraph CreatorAgent ["RFP Creator Sub-Agent"]
+      subgraph CreatorAgent ["RFP Creator Sub-Agent"]
       Creator["rfp_creator\nGemini 2.5 Flash\n─────────────────\nDrafts complete RFPs\nEnsures local-law compliance"]
-    end
+      end
 
-    subgraph EvalAgent ["Bid Evaluator Sub-Agent"]
-      Evaluator["bid_evaluator\nGemini 2.5 Flash\n─────────────────\n4-Dimension Framework\nLegal · Commercial · Technical · Financial"]
-    end
-  end
+      subgraph EvalAgent ["Bid Evaluator Sub-Agent"]
+      Evaluator["bid_evaluator\nGemini 2.5 Flash\n─────────────────\n4-Dimension Framework\nLegal · Commercial ·
+      Technical · Financial"]
+      end
+      end
 
-  %% ── TOOLS ───────────────────────────────────────
-  subgraph TOOLS ["🔧  Custom Tools  (custom_tools.py)"]
-    direction LR
-    T_PDF["create_rfp_pdf\n(PDF Engine + Drive Upload)"]
-    T_FMP["fmp_get_financials\n(REST API)"]
-    T_Heatmap["risk_heatmap\n(→ risk_heatmap.json)"]
-    T_Store["store_evaluation_results\n(→ evaluations.json)"]
-    T_Date["date_time\n(ISO timestamp)"]
-    T_Pwin["calculate_pwin\n(P-Win %)"]
-    T_Code["code_execution\n(Python sandbox)"]
-  end
+      %% ── TOOLS ───────────────────────────────────────
+      subgraph TOOLS ["🔧 Custom Tools (custom_tools.py)"]
+      direction LR
+      T_PDF["create_rfp_pdf\n(PDF Engine + Drive Upload)"]
+      T_FMP["fmp_get_financials\n(REST API)"]
+      T_Heatmap["risk_heatmap\n(→ risk_heatmap.json)"]
+      T_Store["store_evaluation_results\n(→ evaluations.json)"]
+      T_Date["date_time\n(ISO timestamp)"]
+      T_Pwin["calculate_pwin\n(P-Win %)"]
+      T_Code["code_execution\n(Python sandbox)"]
+      end
 
-  %% ── MCP BRIDGES ─────────────────────────────────
-  subgraph MCP ["🔌  MCP & Integration Bridges  (mcp_bridge.py)"]
-    direction LR
-    M_Slack["slack_post_message\n#updates channel"]
-    M_Legal["slack_alert_legal\n#legal channel"]
-    M_Finance["slack_notify_finance\n#finance channel"]
-    M_Linear["linear_create_issue\nTracking tickets"]
-    M_Airtable["airtable_add_vendor_record\nVendor matrix"]
-    M_Asana["asana_create_task\nProject tasks"]
-    M_GDrive["gdrive_search\ngdrive_read_file\n(drive_api.py)"]
-    M_Firecrawl["firecrawl_scrape\n(REST · 2 retries)"]
-  end
+      %% ── MCP BRIDGES ─────────────────────────────────
+      subgraph MCP ["🔌 MCP & Integration Bridges (mcp_bridge.py)"]
+      direction LR
+      M_Slack["slack_post_message\n#updates channel"]
+      M_Legal["slack_alert_legal\n#legal channel"]
+      M_Finance["slack_notify_finance\n#finance channel"]
+      M_Linear["linear_create_issue\nTracking tickets"]
+      M_Airtable["airtable_add_vendor_record\nVendor matrix"]
+      M_Asana["asana_create_task\nProject tasks"]
+      M_GDrive["gdrive_search\ngdrive_read_file\n(drive_api.py)"]
+      M_Firecrawl["firecrawl_scrape\n(REST · 2 retries)"]
+      end
 
-  %% ── EXTERNAL SERVICES ────────────────────────────
-  subgraph EXT ["☁️  External Services"]
-    direction LR
-    GDrive[("Google Drive\nOAuth2\ncredentials.json")]
-    SlackWS[("Slack\nnpx MCP server\nBOT TOKEN")]
-    FMP[("Financial Modeling Prep\nREST API\nIncome · Balance Sheet")]
-    Firecrawl_API[("Firecrawl\nREST API\nCompliance & Vendor\nresearch")]
-    LinearAPI[("Linear\nnpx MCP server\nIssue tracking")]
-    AirtableAPI[("Airtable\nMock bridge")]
-    AsanaAPI[("Asana\nMock bridge")]
-    Gemini[("Gemini 2.5 Flash\nGoogle AI\nAll three agents")]
-  end
+      %% ── EXTERNAL SERVICES ────────────────────────────
+      subgraph EXT ["☁️ External Services"]
+      direction LR
+      GDrive[("Google Drive\nOAuth2\ncredentials.json")]
+      SlackWS[("Slack\nnpx MCP server\nBOT TOKEN")]
+      FMP[("Financial Modeling Prep\nREST API\nIncome · Balance Sheet")]
+      Firecrawl_API[("Firecrawl\nREST API\nCompliance & Vendor\nresearch")]
+      LinearAPI[("Linear\nnpx MCP server\nIssue tracking")]
+      AirtableAPI[("Airtable\nMock bridge")]
+      AsanaAPI[("Asana\nMock bridge")]
+      Gemini[("Gemini 2.5 Flash\nGoogle AI\nAll three agents")]
+      end
 
-  %% ── STORAGE ─────────────────────────────────────
-  subgraph STORAGE ["💾  Local Output  (output/)"]
-    F_PDF["*.pdf\nGenerated RFP Documents"]
-    F_Evals["evaluations.json\nBid evaluation results"]
-    F_Heat["risk_heatmap.json\nVendor risk levels"]
-  end
+      %% ── STORAGE ─────────────────────────────────────
+      subgraph STORAGE ["💾 Local Output (output/)"]
+      F_PDF["*.pdf\nGenerated RFP Documents"]
+      F_Evals["evaluations.json\nBid evaluation results"]
+      F_Heat["risk_heatmap.json\nVendor risk levels"]
+      end
 
-  %% ── CONNECTIONS ─────────────────────────────────
-  User -->|"Visits"| Dashboard
-  User -->|"Chats"| ChatUI
-  User -->|"Views"| DocsUI
-  User -->|"Views"| EvalUI
+      %% ── CONNECTIONS ─────────────────────────────────
+      User -->|"Visits"| Dashboard
+      User -->|"Chats"| ChatUI
+      User -->|"Views"| DocsUI
+      User -->|"Views"| EvalUI
 
-  ChatUI -->|"POST message"| API_Chat
-  EvalUI --> API_Evals
-  EvalUI --> API_Heatmap
-  Dashboard --> API_Stats
+      ChatUI -->|"POST message"| API_Chat
+      EvalUI --> API_Evals
+      EvalUI --> API_Heatmap
+      Dashboard --> API_Stats
 
-  API_Chat -->|"run_async SSE"| Root
-  Root -->|"Create RFP intent"| Creator
-  Root -->|"Evaluate bids intent"| Evaluator
+      API_Chat -->|"run_async SSE"| Root
+      Root -->|"Create RFP intent"| Creator
+      Root -->|"Evaluate bids intent"| Evaluator
 
-  Creator --> T_PDF
-  Creator --> T_FMP
-  Creator --> T_Date
-  Creator --> M_Slack
-  Creator --> M_Legal
-  Creator --> M_Asana
-  Creator --> M_GDrive
-  Creator --> M_Firecrawl
+      Creator --> T_PDF
+      Creator --> T_FMP
+      Creator --> T_Date
+      Creator --> M_Slack
+      Creator --> M_Legal
+      Creator --> M_Asana
+      Creator --> M_GDrive
+      Creator --> M_Firecrawl
 
-  Evaluator --> T_FMP
-  Evaluator --> T_Heatmap
-  Evaluator --> T_Store
-  Evaluator --> T_Date
-  Evaluator --> T_Pwin
-  Evaluator --> T_Code
-  Evaluator --> M_Finance
-  Evaluator --> M_Legal
-  Evaluator --> M_Linear
-  Evaluator --> M_Airtable
-  Evaluator --> M_GDrive
-  Evaluator --> M_Firecrawl
+      Evaluator --> T_FMP
+      Evaluator --> T_Heatmap
+      Evaluator --> T_Store
+      Evaluator --> T_Date
+      Evaluator --> T_Pwin
+      Evaluator --> T_Code
+      Evaluator --> M_Finance
+      Evaluator --> M_Legal
+      Evaluator --> M_Linear
+      Evaluator --> M_Airtable
+      Evaluator --> M_GDrive
+      Evaluator --> M_Firecrawl
 
-  T_PDF -->|"upload"| GDrive
-  M_GDrive -->|"OAuth2 read/write"| GDrive
-  M_Slack -->|"npx"| SlackWS
-  M_Legal -->|"npx"| SlackWS
-  M_Finance -->|"npx"| SlackWS
-  T_FMP -->|"REST"| FMP
-  M_Firecrawl -->|"REST"| Firecrawl_API
-  M_Linear -->|"npx"| LinearAPI
-  M_Airtable --> AirtableAPI
-  M_Asana --> AsanaAPI
-  Root & Creator & Evaluator -->|"LLM calls"| Gemini
+      T_PDF -->|"upload"| GDrive
+      M_GDrive -->|"OAuth2 read/write"| GDrive
+      M_Slack -->|"npx"| SlackWS
+      M_Legal -->|"npx"| SlackWS
+      M_Finance -->|"npx"| SlackWS
+      T_FMP -->|"REST"| FMP
+      M_Firecrawl -->|"REST"| Firecrawl_API
+      M_Linear -->|"npx"| LinearAPI
+      M_Airtable --> AirtableAPI
+      M_Asana --> AsanaAPI
+      Root & Creator & Evaluator -->|"LLM calls"| Gemini
 
-  T_Heatmap -->|"write"| F_Heat
-  T_Store -->|"write"| F_Evals
-  T_PDF -->|"local copy"| F_PDF
+      T_Heatmap -->|"write"| F_Heat
+      T_Store -->|"write"| F_Evals
+      T_PDF -->|"local copy"| F_PDF
 
-  API_Evals -->|"read"| F_Evals
-  API_Heatmap -->|"read"| F_Heat
-  API_Stats -->|"count"| F_PDF
-  API_Stats -->|"read"| F_Evals
+      API_Evals -->|"read"| F_Evals
+      API_Heatmap -->|"read"| F_Heat
+      API_Stats -->|"count"| F_PDF
+      API_Stats -->|"read"| F_Evals
 
-  %% ── STYLES ───────────────────────────────────────
-  classDef userNode fill:#1f4e79,stroke:#1f6feb,color:#e6edf3
-  classDef webNode fill:#0c2d4e,stroke:#388bfd,color:#c9d1d9
-  classDef agentNode fill:#0d3320,stroke:#3fb950,color:#c9d1d9
-  classDef toolNode fill:#3b2a00,stroke:#d29922,color:#c9d1d9
-  classDef mcpNode fill:#3b1a00,stroke:#f0883e,color:#c9d1d9
-  classDef extNode fill:#2d0e0e,stroke:#da3633,color:#c9d1d9
-  classDef storageNode fill:#1e0e3b,stroke:#8957e5,color:#c9d1d9
+      %% ── STYLES ───────────────────────────────────────
+      classDef userNode fill:#1f4e79,stroke:#1f6feb,color:#e6edf3
+      classDef webNode fill:#0c2d4e,stroke:#388bfd,color:#c9d1d9
+      classDef agentNode fill:#0d3320,stroke:#3fb950,color:#c9d1d9
+      classDef toolNode fill:#3b2a00,stroke:#d29922,color:#c9d1d9
+      classDef mcpNode fill:#3b1a00,stroke:#f0883e,color:#c9d1d9
+      classDef extNode fill:#2d0e0e,stroke:#da3633,color:#c9d1d9
+      classDef storageNode fill:#1e0e3b,stroke:#8957e5,color:#c9d1d9
 
-  class User userNode
-  class Dashboard,ChatUI,DocsUI,EvalUI,API_Chat,API_Evals,API_Heatmap,API_Stats webNode
-  class Root,Creator,Evaluator agentNode
-  class T_PDF,T_FMP,T_Heatmap,T_Store,T_Date,T_Pwin,T_Code toolNode
-  class M_Slack,M_Legal,M_Finance,M_Linear,M_Airtable,M_Asana,M_GDrive,M_Firecrawl mcpNode
-  class GDrive,SlackWS,FMP,Firecrawl_API,LinearAPI,AirtableAPI,AsanaAPI,Gemini extNode
-  class F_PDF,F_Evals,F_Heat storageNode
+      class User userNode
+      class Dashboard,ChatUI,DocsUI,EvalUI,API_Chat,API_Evals,API_Heatmap,API_Stats webNode
+      class Root,Creator,Evaluator agentNode
+      class T_PDF,T_FMP,T_Heatmap,T_Store,T_Date,T_Pwin,T_Code toolNode
+      class M_Slack,M_Legal,M_Finance,M_Linear,M_Airtable,M_Asana,M_GDrive,M_Firecrawl mcpNode
+      class GDrive,SlackWS,FMP,Firecrawl_API,LinearAPI,AirtableAPI,AsanaAPI,Gemini extNode
+      class F_PDF,F_Evals,F_Heat storageNode
+    </div>
   </div>
-</div>
 
-<!-- ── WEB LAYER ──────────────────────────────────────────────────── -->
-<div id="pane-web" class="diagram-container hidden">
-  <div class="diagram-title">Web Server — Routes & API Endpoints</div>
-  <div class="mermaid">
-flowchart TD
-  Browser(["👤 Browser"])
+  <!-- ── WEB LAYER ──────────────────────────────────────────────────── -->
+  <div id="pane-web" class="diagram-container hidden">
+    <div class="diagram-title">Web Server — Routes & API Endpoints</div>
+    <div class="mermaid">
+      flowchart TD
+      Browser(["👤 Browser"])
 
-  subgraph FastAPI ["FastAPI Application  (main.py)"]
-    direction TB
+      subgraph FastAPI ["FastAPI Application (main.py)"]
+      direction TB
 
-    subgraph Pages ["HTML Pages (Jinja2 Templates)"]
+      subgraph Pages ["HTML Pages (Jinja2 Templates)"]
       P1["GET /\ndashboard.html\nStats: active RFPs,\npending evals, docs count"]
       P2["GET /chat\nrfp_creator.html\nChat interface with SSE streaming"]
       P3["GET /documents\ndocuments.html\nDocument library view"]
       P4["GET /evaluations\nevaluations.html\nEval results + Risk heatmap"]
-    end
+      end
 
-    subgraph API ["REST / Streaming API Endpoints"]
-      A1["POST /api/chat\nSSE StreamingResponse\nmedia_type: text/event-stream\n────────────────\nEvents:\n• chunk → text delta\n• status → tool/agent activity\n• done → stream complete\n• error → exception"]
+      subgraph API ["REST / Streaming API Endpoints"]
+      A1["POST /api/chat\nSSE StreamingResponse\nmedia_type: text/event-stream\n────────────────\nEvents:\n• chunk →
+      text delta\n• status → tool/agent activity\n• done → stream complete\n• error → exception"]
       A2["GET /api/evaluations\nReads output/evaluations.json\n204 if missing"]
       A3["GET /api/risk-heatmap\nReads output/risk_heatmap.json\n204 if missing"]
       A4["GET /api/stats\nCounts PDFs in output/\nReads evaluations.json\n→ {active_rfps, pending_evals, total_docs}"]
-    end
-  end
+      end
+      end
 
-  Runner["Google ADK Runner\n(run_async generator)"]
-  SessionSvc["InMemorySessionService\nPersists conversation\nacross requests"]
+      Runner["Google ADK Runner\n(run_async generator)"]
+      SessionSvc["InMemorySessionService\nPersists conversation\nacross requests"]
 
-  Browser -->|"HTTP GET"| P1
-  Browser -->|"HTTP GET"| P2
-  Browser -->|"HTTP GET"| P3
-  Browser -->|"HTTP GET"| P4
-  Browser -->|"fetch POST + ReadableStream"| A1
-  Browser --> A2 & A3 & A4
+      Browser -->|"HTTP GET"| P1
+      Browser -->|"HTTP GET"| P2
+      Browser -->|"HTTP GET"| P3
+      Browser -->|"HTTP GET"| P4
+      Browser -->|"fetch POST + ReadableStream"| A1
+      Browser --> A2 & A3 & A4
 
-  A1 -->|"create session if missing"| SessionSvc
-  A1 -->|"run_async(user_id, session_id, message)"| Runner
-  Runner -->|"async events"| A1
+      A1 -->|"create session if missing"| SessionSvc
+      A1 -->|"run_async(user_id, session_id, message)"| Runner
+      Runner -->|"async events"| A1
 
-  classDef page fill:#0c2d4e,stroke:#388bfd,color:#c9d1d9
-  classDef api fill:#0d2d1a,stroke:#3fb950,color:#c9d1d9
-  classDef svc fill:#3b2a00,stroke:#d29922,color:#c9d1d9
-  classDef usr fill:#1f4e79,stroke:#1f6feb,color:#e6edf3
+      classDef page fill:#0c2d4e,stroke:#388bfd,color:#c9d1d9
+      classDef api fill:#0d2d1a,stroke:#3fb950,color:#c9d1d9
+      classDef svc fill:#3b2a00,stroke:#d29922,color:#c9d1d9
+      classDef usr fill:#1f4e79,stroke:#1f6feb,color:#e6edf3
 
-  class P1,P2,P3,P4 page
-  class A1,A2,A3,A4 api
-  class Runner,SessionSvc svc
-  class Browser usr
+      class P1,P2,P3,P4 page
+      class A1,A2,A3,A4 api
+      class Runner,SessionSvc svc
+      class Browser usr
+    </div>
   </div>
-</div>
 
-<!-- ── RFP CREATION FLOW ──────────────────────────────────────────── -->
-<div id="pane-rfp-flow" class="diagram-container hidden">
-  <div class="diagram-title">RFP Creation — Step-by-Step Agent Flow</div>
-  <div class="mermaid">
-flowchart TD
-  Start(["User: 'Create an RFP'\n+ scope, country, budget, timeline"])
+  <!-- ── RFP CREATION FLOW ──────────────────────────────────────────── -->
+  <div id="pane-rfp-flow" class="diagram-container hidden">
+    <div class="diagram-title">RFP Creation — Step-by-Step Agent Flow</div>
+    <div class="mermaid">
+      flowchart TD
+      Start(["User: 'Create an RFP'\n+ scope, country, budget, timeline"])
 
-  subgraph Director ["rfp_director — Root Agent"]
-    Q1{"Collect required context?\n(scope · country · budget\nvendor requirements\nevaluation criteria\nsubmission details)"}
-    Handoff["Hand off to rfp_creator"]
-  end
+      subgraph Director ["rfp_director — Root Agent"]
+      Q1{"Collect required context?\n(scope · country · budget\nvendor requirements\nevaluation criteria\nsubmission
+      details)"}
+      Handoff["Hand off to rfp_creator"]
+      end
 
-  subgraph Creator ["rfp_creator Sub-Agent  (Gemini 2.5 Flash)"]
-    direction TB
-    S1["STEP 1\ngdrive_read_file('Company Template')\nExtract branding, clauses, boilerplate"]
-    S2["STEP 2\ndate_time()\nGet current ISO timestamp\nCalculate all deadlines"]
-    S3["STEP 3\nfirecrawl_scrape(regulatory URL)\nSaudi SDAIA · UAE TDRA\nUK ICO · EU GDPR"]
-    S3b{"Scrape\nsuccessful?"}
-    S3c["Use internal knowledge\n+ add disclaimer in T&C"]
-    S4["STEP 4\nfmp_get_financials(company)\n(skip if not publicly listed)\nValidate budget range"]
-    S5{"Hard legal\nblocker found?\n(sanctions, OFAC, prohibited)"}
-    S5y["slack_alert_legal()\n→ #legal channel\n🚨 Alert legal team"]
-    S6["STEP 6\nCompose full RFP in Markdown\n──────────────────────────\n1. Project Overview\n2. Scope of Work (deliverables,\n   out-of-scope, qualifications)\n3. Submission Requirements\n4. Evaluation Criteria (weighted table)\n5. Terms & Conditions (country-tailored)\n6. Timeline & Appendices"]
-    S6b["create_rfp_pdf(\n  rfp_content,\n  output_filename\n)"]
-    S7["STEP 7\nslack_post_message()\n→ #updates channel\nTitle · Deadline · Drive link · Budget"]
-    S8["STEP 8\nasana_create_task()\n'RFP [Ref] — Vendor Submission Tracking'"]
-    S9["Reply to user:\n✅ RFP reference created\n📄 Drive link\n📣 Slack notified\n✅ Asana task created"]
-  end
+      subgraph Creator ["rfp_creator Sub-Agent (Gemini 2.5 Flash)"]
+      direction TB
+      S1["STEP 1\ngdrive_read_file('Company Template')\nExtract branding, clauses, boilerplate"]
+      S2["STEP 2\ndate_time()\nGet current ISO timestamp\nCalculate all deadlines"]
+      S3["STEP 3\nfirecrawl_scrape(regulatory URL)\nSaudi SDAIA · UAE TDRA\nUK ICO · EU GDPR"]
+      S3b{"Scrape\nsuccessful?"}
+      S3c["Use internal knowledge\n+ add disclaimer in T&C"]
+      S4["STEP 4\nfmp_get_financials(company)\n(skip if not publicly listed)\nValidate budget range"]
+      S5{"Hard legal\nblocker found?\n(sanctions, OFAC, prohibited)"}
+      S5y["slack_alert_legal()\n→ #legal channel\n🚨 Alert legal team"]
+      S6["STEP 6\nCompose full RFP in Markdown\n──────────────────────────\n1. Project Overview\n2. Scope of Work
+      (deliverables,\n out-of-scope, qualifications)\n3. Submission Requirements\n4. Evaluation Criteria (weighted
+      table)\n5. Terms & Conditions (country-tailored)\n6. Timeline & Appendices"]
+      S6b["create_rfp_pdf(\n rfp_content,\n output_filename\n)"]
+      S7["STEP 7\nslack_post_message()\n→ #updates channel\nTitle · Deadline · Drive link · Budget"]
+      S8["STEP 8\nasana_create_task()\n'RFP [Ref] — Vendor Submission Tracking'"]
+      S9["Reply to user:\n✅ RFP reference created\n📄 Drive link\n📣 Slack notified\n✅ Asana task created"]
+      end
 
-  subgraph PDFEngine ["PDF Engine  (pdf_engine.py + drive_api.py)"]
-    PE1["parse_template(template_pdf)\nExtract: primary/secondary/accent colours\nLogo path, company name"]
-    PE2["generate_rfp_pdf(content, template_info)\nWeasyPrint / ReportLab styled PDF"]
-    PE3["drive_api.upload_file(local_path)\nOAuth2 · returns shareable webViewLink"]
-  end
+      subgraph PDFEngine ["PDF Engine (pdf_engine.py + drive_api.py)"]
+      PE1["parse_template(template_pdf)\nExtract: primary/secondary/accent colours\nLogo path, company name"]
+      PE2["generate_rfp_pdf(content, template_info)\nWeasyPrint / ReportLab styled PDF"]
+      PE3["drive_api.upload_file(local_path)\nOAuth2 · returns shareable webViewLink"]
+      end
 
-  Start --> Q1
-  Q1 -->|"All answered"| Handoff
-  Q1 -->|"Missing info"| Q1
-  Handoff --> S1
+      Start --> Q1
+      Q1 -->|"All answered"| Handoff
+      Q1 -->|"Missing info"| Q1
+      Handoff --> S1
 
-  S1 --> S2 --> S3 --> S3b
-  S3b -->|"Yes"| S4
-  S3b -->|"No — SCRAPE_UNAVAILABLE"| S3c --> S4
+      S1 --> S2 --> S3 --> S3b
+      S3b -->|"Yes"| S4
+      S3b -->|"No — SCRAPE_UNAVAILABLE"| S3c --> S4
 
-  S4 --> S5
-  S5 -->|"Yes"| S5y --> S6
-  S5 -->|"No"| S6
+      S4 --> S5
+      S5 -->|"Yes"| S5y --> S6
+      S5 -->|"No"| S6
 
-  S6 --> S6b --> S7 --> S8 --> S9
+      S6 --> S6b --> S7 --> S8 --> S9
 
-  S6b --> PE1 --> PE2 --> PE3
+      S6b --> PE1 --> PE2 --> PE3
 
-  PE3 -->|"Google Drive link"| S7
+      PE3 -->|"Google Drive link"| S7
 
-  classDef step fill:#0d3320,stroke:#3fb950,color:#c9d1d9
-  classDef decision fill:#3b2a00,stroke:#d29922,color:#e6edf3
-  classDef ext fill:#2d0e0e,stroke:#da3633,color:#c9d1d9
-  classDef engine fill:#1e0e3b,stroke:#8957e5,color:#c9d1d9
-  classDef io fill:#1f4e79,stroke:#1f6feb,color:#e6edf3
+      classDef step fill:#0d3320,stroke:#3fb950,color:#c9d1d9
+      classDef decision fill:#3b2a00,stroke:#d29922,color:#e6edf3
+      classDef ext fill:#2d0e0e,stroke:#da3633,color:#c9d1d9
+      classDef engine fill:#1e0e3b,stroke:#8957e5,color:#c9d1d9
+      classDef io fill:#1f4e79,stroke:#1f6feb,color:#e6edf3
 
-  class S1,S2,S3,S4,S6,S7,S8,S9,S6b step
-  class Q1,S3b,S5 decision
-  class S3c,S5y ext
-  class PE1,PE2,PE3 engine
-  class Start,Handoff io
+      class S1,S2,S3,S4,S6,S7,S8,S9,S6b step
+      class Q1,S3b,S5 decision
+      class S3c,S5y ext
+      class PE1,PE2,PE3 engine
+      class Start,Handoff io
+    </div>
   </div>
-</div>
 
-<!-- ── BID EVALUATION FLOW ────────────────────────────────────────── -->
-<div id="pane-eval-flow" class="diagram-container hidden">
-  <div class="diagram-title">Bid Evaluation — 4-Dimension Framework Flow</div>
-  <div class="mermaid">
-flowchart TD
-  Start(["User provides vendor bids\n+ original RFP requirements"])
-  Handoff["rfp_director hands off to bid_evaluator"]
+  <!-- ── BID EVALUATION FLOW ────────────────────────────────────────── -->
+  <div id="pane-eval-flow" class="diagram-container hidden">
+    <div class="diagram-title">Bid Evaluation — 4-Dimension Framework Flow</div>
+    <div class="mermaid">
+      flowchart TD
+      Start(["User provides vendor bids\n+ original RFP requirements"])
+      Handoff["rfp_director hands off to bid_evaluator"]
 
-  subgraph Evaluator ["bid_evaluator Sub-Agent  (Gemini 2.5 Flash)"]
-    direction TB
+      subgraph Evaluator ["bid_evaluator Sub-Agent (Gemini 2.5 Flash)"]
+      direction TB
 
-    subgraph D1 ["Dimension 1 — Legal Qualification"]
+      subgraph D1 ["Dimension 1 — Legal Qualification"]
       L1["Conflict of Interest statement\nincluded?"]
       L2["Insurance certificates\nprovided?"]
       L3{"Both checks\npass?"}
       LR["Legal: PASS / FAIL"]
-    end
+      end
 
-    subgraph D2 ["Dimension 2 — Commercial Qualification"]
+      subgraph D2 ["Dimension 2 — Commercial Qualification"]
       C1["Standard Agreement accepted\nwithout excessive redlines?"]
       C2["Fee structure compliant\nwith RFP format?"]
       C3{"Both checks\npass?"}
       CR["Commercial: PASS / FAIL"]
-    end
+      end
 
-    subgraph D3 ["Dimension 3 — Technical Qualification (0-100)"]
+      subgraph D3 ["Dimension 3 — Technical Qualification (0-100)"]
       T1["Methodology — robust, realistic,\ntailored to project goals?"]
       T2["Team CVs — relevant experience\nfor proposed staff?"]
       T3["Capability — mandatory tech\ncertifications met?"]
-      T3b["firecrawl_scrape(vendor website)\nCross-reference claimed capabilities,\nclient list, certifications, tech stack"]
+      T3b["firecrawl_scrape(vendor website)\nCross-reference claimed capabilities,\nclient list, certifications, tech
+      stack"]
       T4["Technical Score: 0-100"]
-    end
+      end
 
-    subgraph D4 ["Dimension 4 — Financial Qualification"]
-      F1["fmp_get_financials(vendor name/ticker)\n→ Revenue · Net Income · Margins\n   Cash · Debt · Equity"]
-      F2{"Net income < 0\nAND cash runway\n< 18 months?"}
-      F2y["⚠️ RISK FLAG: Cash-flow negative\nslack_alert_legal() → #legal"]
-      F3["Rates within market range?\nCost-control mechanisms defined?"]
-      FR["Financial: PASS / FAIL"]
-    end
+      subgraph D4 ["Dimension 4 — Financial Qualification"]
+      F1["fmp_get_financials(vendor name/ticker)\n→ Revenue · Net Income · Margins\n Cash · Debt · Equity"]
+      F2{"Net income < 0\nAND cash runway\n< 18 months?"} F2y["⚠️ RISK FLAG: Cash-flow negative\nslack_alert_legal() →
+        #legal"] F3["Rates within market range?\nCost-control mechanisms defined?"] FR["Financial: PASS / FAIL"] end
+        HardBlock{"Hard legal blocker?\n(sanctions · invalid insurance\nmissing mandatory cert)"}
+        AlertLegal["slack_alert_legal()\n→ #legal channel IMMEDIATELY\n🚨 Do not wait for full report"] Report["Generate
+        Full Evaluation Report\n──────────────────────────────\n• Summary Table (all vendors · all dimensions)\n•
+        Detailed Justification per vendor per dimension\n• Final Ranking of viable candidates\n• Contract Award
+        Recommendation"] Extra1["calculate_pwin(vendor_data)\n→ Probability of Win %"] Extra2["code_execution(code)\n→
+        Weighted scoring models\n Cost breakdown calculations"] Extra3["airtable_add_vendor_record(name, score)\n→
+        Vendor comparison matrix"] Extra4["linear_create_issue(title, desc, team_id)\n→ Tracking ticket per vendor"]
+        Notify["slack_notify_finance()\n→ #finance channel\nFinal ranking · pass/fail · scores · flags"]
+        Heatmap["risk_heatmap(vendor_dimension_json)\n──────────────────────────────\nMaps PASS/FAIL → LOW/HIGH
+        risk\nTechnical score: ≥80 LOW · ≥60 MODERATE · <60 HIGH\nOverall: CRITICAL if 2+ dimension fails\n→ Writes
+        output/risk_heatmap.json"]
+        Store["store_evaluation_results(results_json)\n──────────────────────────────\nproject · evaluated_at ·
+        recommendation\nrecommendation_reason · contract_value\nvendors[]: name · legal · commercial\n technical_score ·
+        financial · flags\n→ Writes output/evaluations.json"] end Dashboard["Evaluations Dashboard
+        (/evaluations)\nDisplays results + risk heatmap"] Start --> Handoff --> D1
 
-    HardBlock{"Hard legal blocker?\n(sanctions · invalid insurance\nmissing mandatory cert)"}
-    AlertLegal["slack_alert_legal()\n→ #legal channel IMMEDIATELY\n🚨 Do not wait for full report"]
+        L1 --> L2 --> L3
+        L3 -->|"Yes"| LR
+        L3 -->|"No"| LR
 
-    Report["Generate Full Evaluation Report\n──────────────────────────────\n• Summary Table (all vendors · all dimensions)\n• Detailed Justification per vendor per dimension\n• Final Ranking of viable candidates\n• Contract Award Recommendation"]
+        LR --> D2
+        C1 --> C2 --> C3
+        C3 -->|"Yes"| CR
+        C3 -->|"No"| CR
 
-    Extra1["calculate_pwin(vendor_data)\n→ Probability of Win %"]
-    Extra2["code_execution(code)\n→ Weighted scoring models\n   Cost breakdown calculations"]
-    Extra3["airtable_add_vendor_record(name, score)\n→ Vendor comparison matrix"]
-    Extra4["linear_create_issue(title, desc, team_id)\n→ Tracking ticket per vendor"]
+        CR --> D3
+        T1 --> T2 --> T3 --> T3b --> T4
 
-    Notify["slack_notify_finance()\n→ #finance channel\nFinal ranking · pass/fail · scores · flags"]
+        T4 --> D4
+        F1 --> F2
+        F2 -->|"Yes"| F2y --> F3
+        F2 -->|"No"| F3
+        F3 --> FR
 
-    Heatmap["risk_heatmap(vendor_dimension_json)\n──────────────────────────────\nMaps PASS/FAIL → LOW/HIGH risk\nTechnical score: ≥80 LOW · ≥60 MODERATE · <60 HIGH\nOverall: CRITICAL if 2+ dimension fails\n→ Writes output/risk_heatmap.json"]
+        FR --> HardBlock
+        HardBlock -->|"Yes"| AlertLegal --> Report
+        HardBlock -->|"No"| Report
 
-    Store["store_evaluation_results(results_json)\n──────────────────────────────\nproject · evaluated_at · recommendation\nrecommendation_reason · contract_value\nvendors[]: name · legal · commercial\n           technical_score · financial · flags\n→ Writes output/evaluations.json"]
-  end
+        Report --> Extra1 & Extra2 & Extra3 & Extra4
+        Extra1 & Extra2 & Extra3 & Extra4 --> Notify
 
-  Dashboard["Evaluations Dashboard (/evaluations)\nDisplays results + risk heatmap"]
+        Notify --> Heatmap --> Store --> Dashboard
 
-  Start --> Handoff --> D1
+        classDef dim fill:#0c2d4e,stroke:#388bfd,color:#c9d1d9
+        classDef step fill:#0d3320,stroke:#3fb950,color:#c9d1d9
+        classDef decision fill:#3b2a00,stroke:#d29922,color:#e6edf3
+        classDef alert fill:#3b0000,stroke:#da3633,color:#c9d1d9
+        classDef output fill:#1e0e3b,stroke:#8957e5,color:#c9d1d9
+        classDef io fill:#1f4e79,stroke:#1f6feb,color:#e6edf3
 
-  L1 --> L2 --> L3
-  L3 -->|"Yes"| LR
-  L3 -->|"No"| LR
-
-  LR --> D2
-  C1 --> C2 --> C3
-  C3 -->|"Yes"| CR
-  C3 -->|"No"| CR
-
-  CR --> D3
-  T1 --> T2 --> T3 --> T3b --> T4
-
-  T4 --> D4
-  F1 --> F2
-  F2 -->|"Yes"| F2y --> F3
-  F2 -->|"No"| F3
-  F3 --> FR
-
-  FR --> HardBlock
-  HardBlock -->|"Yes"| AlertLegal --> Report
-  HardBlock -->|"No"| Report
-
-  Report --> Extra1 & Extra2 & Extra3 & Extra4
-  Extra1 & Extra2 & Extra3 & Extra4 --> Notify
-
-  Notify --> Heatmap --> Store --> Dashboard
-
-  classDef dim fill:#0c2d4e,stroke:#388bfd,color:#c9d1d9
-  classDef step fill:#0d3320,stroke:#3fb950,color:#c9d1d9
-  classDef decision fill:#3b2a00,stroke:#d29922,color:#e6edf3
-  classDef alert fill:#3b0000,stroke:#da3633,color:#c9d1d9
-  classDef output fill:#1e0e3b,stroke:#8957e5,color:#c9d1d9
-  classDef io fill:#1f4e79,stroke:#1f6feb,color:#e6edf3
-
-  class D1,D2,D3,D4 dim
-  class L1,L2,LR,C1,C2,CR,T1,T2,T3,T3b,T4,F1,F3,FR step
-  class L3,C3,F2,HardBlock decision
-  class F2y,AlertLegal alert
-  class Report,Extra1,Extra2,Extra3,Extra4,Notify step
-  class Heatmap,Store,Dashboard output
-  class Start,Handoff io
+        class D1,D2,D3,D4 dim
+        class L1,L2,LR,C1,C2,CR,T1,T2,T3,T3b,T4,F1,F3,FR step
+        class L3,C3,F2,HardBlock decision
+        class F2y,AlertLegal alert
+        class Report,Extra1,Extra2,Extra3,Extra4,Notify step
+        class Heatmap,Store,Dashboard output
+        class Start,Handoff io
+    </div>
   </div>
-</div>
 
-<!-- ── INTEGRATIONS ──────────────────────────────────────────────── -->
-<div id="pane-integrations" class="diagram-container hidden">
-  <div class="diagram-title">External Integrations — APIs, MCP Bridges & Auth Flows</div>
-  <div class="mermaid">
-flowchart LR
-  subgraph APP ["RFP Agent Application"]
-    A_Root["Root Agent\nrfp_director"]
-    A_Creator["rfp_creator\nSub-Agent"]
-    A_Eval["bid_evaluator\nSub-Agent"]
+  <!-- ── INTEGRATIONS ──────────────────────────────────────────────── -->
+  <div id="pane-integrations" class="diagram-container hidden">
+    <div class="diagram-title">External Integrations — APIs, MCP Bridges & Auth Flows</div>
+    <div class="mermaid">
+      flowchart LR
+      subgraph APP ["RFP Agent Application"]
+      A_Root["Root Agent\nrfp_director"]
+      A_Creator["rfp_creator\nSub-Agent"]
+      A_Eval["bid_evaluator\nSub-Agent"]
+      end
+
+      subgraph SLACK ["Slack (MCP Bridge — mcp_bridge.py)"]
+      S_Invoke["_invoke_mcp()\nSpawns: npx -y\n@modelcontextprotocol/server-slack\nEnv: SLACK_BOT_TOKEN\n
+      SLACK_TEAM_ID"]
+      CH_Updates["#updates Channel\nC0ASMLBU3TK\nGeneral progress"]
+      CH_Legal["#legal Channel\nC0ARWKER0G4\n🚨 Showstopper alerts"]
+      CH_Finance["#finance Channel\nC0ASMA9B33J\n💰 Bid rankings"]
+      end
+
+      subgraph GDRIVE ["Google Drive (drive_api.py)"]
+      GD_Auth["OAuth2 Flow\ncredentials.json\n.gdrive-write-token.json\nScopes: drive.file +
+      drive.readonly\nAuto-refresh on expiry"]
+      GD_Search["files().list()\nSearch by name or fullText"]
+      GD_Download["files().get_media()\nexport_media() for Google Docs\nMediaIoBaseDownload"]
+      GD_Upload["files().create()\nMediaFileUpload resumable=True\nSet permission: anyone reader\nReturns webViewLink"]
+      end
+
+      subgraph FMP ["Financial Modeling Prep (custom_tools.py)"]
+      FMP_Resolve["GET /stable/search\nResolve company name → ticker"]
+      FMP_Profile["GET /stable/profile\nIndustry · Country · Employees"]
+      FMP_Income["GET /stable/income-statement\nlimit=2 · Revenue · Net Income\nGross/Net Margin"]
+      FMP_BS["GET /stable/balance-sheet-statement\nCash · Total Debt · Equity"]
+      FMP_Flag["⚠️ Cash-burn flag\nnet_income < 0 AND\ncash < |net_income| × 1.5"] end subgraph FC ["Firecrawl
+        (mcp_bridge.py)"] FC_API["POST api.firecrawl.dev/v1/scrape\nAuthorization: Bearer FIRECRAWL_API_KEY\nformat:
+        markdown · timeout 90s"] FC_A1["Attempt 1: onlyMainContent=True\n(faster, most sites)"] FC_A2["Attempt 2:
+        onlyMainContent=False\n(gov sites render outside main)"] FC_Fail["SCRAPE_UNAVAILABLE\nFallback: internal
+        knowledge\n+ training data disclaimer"] FC_Cap["Cap: 15,000 chars\n+ truncation note"] end subgraph LINEAR
+        ["Linear (MCP Bridge)"] LIN["_invoke_mcp()\nSpawns: npx -y @linear/mcp-server\nEnv: LINEAR_API_KEY\nTool:
+        linear_createIssue\n→ title · description · teamId"] end subgraph MOCKS ["Mock Bridges (Pending real MCP)"]
+        M_Air["Airtable\nairtable_add_vendor_record()\n→ 'Mock Airtable: ...'"]
+    M_Asana[" Asana\nasana_create_task()\n→ 'Mock Asana: ...'"]
   end
 
-  subgraph SLACK ["Slack  (MCP Bridge — mcp_bridge.py)"]
-    S_Invoke["_invoke_mcp()\nSpawns: npx -y\n@modelcontextprotocol/server-slack\nEnv: SLACK_BOT_TOKEN\n      SLACK_TEAM_ID"]
-    CH_Updates["#updates Channel\nC0ASMLBU3TK\nGeneral progress"]
-    CH_Legal["#legal Channel\nC0ARWKER0G4\n🚨 Showstopper alerts"]
-    CH_Finance["#finance Channel\nC0ASMA9B33J\n💰 Bid rankings"]
-  end
+  subgraph GEMINI [" Google AI — Gemini 2.5 Flash"] G1["All three agents\nuse gemini-2.5-flash model\nvia
+        google.adk.agents.Agent"] end A_Root & A_Creator -->|"slack_post_message"| S_Invoke
+        A_Creator & A_Eval -->|"slack_alert_legal"| S_Invoke
+        A_Eval -->|"slack_notify_finance"| S_Invoke
+        S_Invoke --> CH_Updates & CH_Legal & CH_Finance
 
-  subgraph GDRIVE ["Google Drive  (drive_api.py)"]
-    GD_Auth["OAuth2 Flow\ncredentials.json\n.gdrive-write-token.json\nScopes: drive.file + drive.readonly\nAuto-refresh on expiry"]
-    GD_Search["files().list()\nSearch by name or fullText"]
-    GD_Download["files().get_media()\nexport_media() for Google Docs\nMediaIoBaseDownload"]
-    GD_Upload["files().create()\nMediaFileUpload resumable=True\nSet permission: anyone reader\nReturns webViewLink"]
-  end
+        A_Root & A_Creator & A_Eval -->|"gdrive_search / gdrive_read_file"| GD_Auth
+        A_Creator -->|"upload via create_rfp_pdf"| GD_Auth
+        GD_Auth --> GD_Search & GD_Download & GD_Upload
 
-  subgraph FMP ["Financial Modeling Prep  (custom_tools.py)"]
-    FMP_Resolve["GET /stable/search\nResolve company name → ticker"]
-    FMP_Profile["GET /stable/profile\nIndustry · Country · Employees"]
-    FMP_Income["GET /stable/income-statement\nlimit=2 · Revenue · Net Income\nGross/Net Margin"]
-    FMP_BS["GET /stable/balance-sheet-statement\nCash · Total Debt · Equity"]
-    FMP_Flag["⚠️ Cash-burn flag\nnet_income < 0 AND\ncash < |net_income| × 1.5"]
-  end
+        A_Creator & A_Eval -->|"fmp_get_financials"| FMP_Resolve
+        FMP_Resolve --> FMP_Profile & FMP_Income & FMP_BS
+        FMP_Income & FMP_BS --> FMP_Flag
 
-  subgraph FC ["Firecrawl  (mcp_bridge.py)"]
-    FC_API["POST api.firecrawl.dev/v1/scrape\nAuthorization: Bearer FIRECRAWL_API_KEY\nformat: markdown · timeout 90s"]
-    FC_A1["Attempt 1: onlyMainContent=True\n(faster, most sites)"]
-    FC_A2["Attempt 2: onlyMainContent=False\n(gov sites render outside main)"]
-    FC_Fail["SCRAPE_UNAVAILABLE\nFallback: internal knowledge\n+ training data disclaimer"]
-    FC_Cap["Cap: 15,000 chars\n+ truncation note"]
-  end
+        A_Root & A_Creator & A_Eval -->|"firecrawl_scrape"| FC_API
+        FC_API --> FC_A1
+        FC_A1 -->|"fail"| FC_A2
+        FC_A2 -->|"fail"| FC_Fail
+        FC_A1 & FC_A2 -->|"success"| FC_Cap
 
-  subgraph LINEAR ["Linear  (MCP Bridge)"]
-    LIN["_invoke_mcp()\nSpawns: npx -y @linear/mcp-server\nEnv: LINEAR_API_KEY\nTool: linear_createIssue\n→ title · description · teamId"]
-  end
+        A_Eval -->|"linear_create_issue"| LIN
+        A_Eval -->|"airtable_add_vendor_record"| M_Air
+        A_Creator & A_Root -->|"asana_create_task"| M_Asana
 
-  subgraph MOCKS ["Mock Bridges (Pending real MCP)"]
-    M_Air["Airtable\nairtable_add_vendor_record()\n→ 'Mock Airtable: ...'"]
-    M_Asana["Asana\nasana_create_task()\n→ 'Mock Asana: ...'"]
-  end
+        A_Root & A_Creator & A_Eval -->|"LLM inference"| G1
 
-  subgraph GEMINI ["Google AI — Gemini 2.5 Flash"]
-    G1["All three agents\nuse gemini-2.5-flash model\nvia google.adk.agents.Agent"]
-  end
+        classDef appNode fill:#0d3320,stroke:#3fb950,color:#c9d1d9
+        classDef slackNode fill:#3b1a00,stroke:#f0883e,color:#c9d1d9
+        classDef driveNode fill:#1e0e3b,stroke:#8957e5,color:#c9d1d9
+        classDef fmpNode fill:#2d0e0e,stroke:#da3633,color:#c9d1d9
+        classDef fcNode fill:#3b2a00,stroke:#d29922,color:#c9d1d9
+        classDef mockNode fill:#1f2937,stroke:#4b5563,color:#9ca3af
+        classDef gemNode fill:#0c2d4e,stroke:#388bfd,color:#c9d1d9
 
-  A_Root & A_Creator -->|"slack_post_message"| S_Invoke
-  A_Creator & A_Eval -->|"slack_alert_legal"| S_Invoke
-  A_Eval -->|"slack_notify_finance"| S_Invoke
-  S_Invoke --> CH_Updates & CH_Legal & CH_Finance
-
-  A_Root & A_Creator & A_Eval -->|"gdrive_search / gdrive_read_file"| GD_Auth
-  A_Creator -->|"upload via create_rfp_pdf"| GD_Auth
-  GD_Auth --> GD_Search & GD_Download & GD_Upload
-
-  A_Creator & A_Eval -->|"fmp_get_financials"| FMP_Resolve
-  FMP_Resolve --> FMP_Profile & FMP_Income & FMP_BS
-  FMP_Income & FMP_BS --> FMP_Flag
-
-  A_Root & A_Creator & A_Eval -->|"firecrawl_scrape"| FC_API
-  FC_API --> FC_A1
-  FC_A1 -->|"fail"| FC_A2
-  FC_A2 -->|"fail"| FC_Fail
-  FC_A1 & FC_A2 -->|"success"| FC_Cap
-
-  A_Eval -->|"linear_create_issue"| LIN
-  A_Eval -->|"airtable_add_vendor_record"| M_Air
-  A_Creator & A_Root -->|"asana_create_task"| M_Asana
-
-  A_Root & A_Creator & A_Eval -->|"LLM inference"| G1
-
-  classDef appNode fill:#0d3320,stroke:#3fb950,color:#c9d1d9
-  classDef slackNode fill:#3b1a00,stroke:#f0883e,color:#c9d1d9
-  classDef driveNode fill:#1e0e3b,stroke:#8957e5,color:#c9d1d9
-  classDef fmpNode fill:#2d0e0e,stroke:#da3633,color:#c9d1d9
-  classDef fcNode fill:#3b2a00,stroke:#d29922,color:#c9d1d9
-  classDef mockNode fill:#1f2937,stroke:#4b5563,color:#9ca3af
-  classDef gemNode fill:#0c2d4e,stroke:#388bfd,color:#c9d1d9
-
-  class A_Root,A_Creator,A_Eval appNode
-  class S_Invoke,CH_Updates,CH_Legal,CH_Finance slackNode
-  class GD_Auth,GD_Search,GD_Download,GD_Upload driveNode
-  class FMP_Resolve,FMP_Profile,FMP_Income,FMP_BS,FMP_Flag fmpNode
-  class FC_API,FC_A1,FC_A2,FC_Fail,FC_Cap fcNode
-  class LIN slackNode
-  class M_Air,M_Asana mockNode
-  class G1 gemNode
+        class A_Root,A_Creator,A_Eval appNode
+        class S_Invoke,CH_Updates,CH_Legal,CH_Finance slackNode
+        class GD_Auth,GD_Search,GD_Download,GD_Upload driveNode
+        class FMP_Resolve,FMP_Profile,FMP_Income,FMP_BS,FMP_Flag fmpNode
+        class FC_API,FC_A1,FC_A2,FC_Fail,FC_Cap fcNode
+        class LIN slackNode
+        class M_Air,M_Asana mockNode
+        class G1 gemNode
+    </div>
   </div>
-</div>
 
-<script>
-  mermaid.initialize({
-    startOnLoad: true,
-    theme: 'dark',
-    themeVariables: {
-      darkMode: true,
-      background: '#0d1117',
-      mainBkg: '#161b22',
-      nodeBorder: '#30363d',
-      clusterBkg: '#161b22',
-      clusterBorder: '#30363d',
-      titleColor: '#e6edf3',
-      edgeLabelBackground: '#0d1117',
-      lineColor: '#8b949e',
-      fontFamily: 'Segoe UI, system-ui, sans-serif',
-      fontSize: '13px',
-    },
-    flowchart: {
-      htmlLabels: true,
-      curve: 'basis',
-      padding: 20,
-      nodeSpacing: 50,
-      rankSpacing: 60,
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        darkMode: true,
+        background: '#0d1117',
+        mainBkg: '#161b22',
+        nodeBorder: '#30363d',
+        clusterBkg: '#161b22',
+        clusterBorder: '#30363d',
+        titleColor: '#e6edf3',
+        edgeLabelBackground: '#0d1117',
+        lineColor: '#8b949e',
+        fontFamily: 'Segoe UI, system-ui, sans-serif',
+        fontSize: '13px',
+      },
+      flowchart: {
+        htmlLabels: true,
+        curve: 'basis',
+        padding: 20,
+        nodeSpacing: 50,
+        rankSpacing: 60,
+      }
+    });
+
+    function show(id) {
+      document.querySelectorAll('.diagram-container').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
+      document.getElementById('pane-' + id).classList.remove('hidden');
+      event.target.classList.add('active');
     }
-  });
-
-  function show(id) {
-    document.querySelectorAll('.diagram-container').forEach(el => el.classList.add('hidden'));
-    document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
-    document.getElementById('pane-' + id).classList.remove('hidden');
-    event.target.classList.add('active');
-  }
-</script>
+  </script>
 
 </body>
+
 </html>

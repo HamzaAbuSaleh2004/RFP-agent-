@@ -11,27 +11,49 @@ from typing import Dict, List, Optional
 DATA_DIR = Path(__file__).parent.parent / "data"
 RFP_FILE = DATA_DIR / "rfps.json"
 
-VALID_STATUSES = ("draft", "approved", "done")
+# Lifecycle: draft → published → approved_for_submission → done → archived
+# Any status can be archived. published can be pulled back to draft.
+VALID_STATUSES = ("draft", "published", "approved_for_submission", "done", "archived")
 
-# Which statuses a given status can transition into
 _TRANSITIONS: Dict[str, List[str]] = {
-    "draft":    ["approved"],
-    "approved": ["done"],
-    "done":     [],
+    "draft":                   ["published", "archived"],
+    "published":               ["approved_for_submission", "draft", "archived"],
+    "approved_for_submission": ["done", "archived"],
+    "done":                    ["archived"],
+    "archived":                [],
 }
 
+# Legacy mapping: old "approved" → "published" for backward compat with existing data
+_LEGACY_STATUS_MAP = {"approved": "published"}
 
-# ── Internal helpers ─────────────────────────────────────────────────────────
 
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def _migrate_legacy(records: List[dict]) -> List[dict]:
+    """Migrate legacy status values to current lifecycle."""
+    changed = False
+    for r in records:
+        legacy = _LEGACY_STATUS_MAP.get(r.get("status"))
+        if legacy:
+            r["status"] = legacy
+            changed = True
+        if "bids" not in r:
+            r["bids"] = []
+            changed = True
+        if "archived_at" not in r:
+            r["archived_at"] = None
+            changed = True
+    return records if not changed else records
 
 
 def _load() -> List[dict]:
     if not RFP_FILE.exists():
         return []
     try:
-        return json.loads(RFP_FILE.read_text(encoding="utf-8"))
+        records = json.loads(RFP_FILE.read_text(encoding="utf-8"))
+        return _migrate_legacy(records)
     except Exception:
         return []
 
@@ -43,8 +65,6 @@ def _save(records: List[dict]) -> None:
         encoding="utf-8",
     )
 
-
-# ── Public API ────────────────────────────────────────────────────────────────
 
 def create_rfp(
     title: str,
@@ -65,6 +85,8 @@ def create_rfp(
         "rfp_content":     None,
         "evaluation":      None,
         "risk_heatmap":    None,
+        "bids":            [],
+        "archived_at":     None,
         "created_at":      _now(),
         "updated_at":      _now(),
     }
@@ -87,9 +109,7 @@ def get_rfp(rfp_id: str) -> Optional[dict]:
 
 def patch_rfp(rfp_id: str, updates: dict) -> Optional[dict]:
     """
-    Apply partial updates to an RFP.  Allowed fields:
-      status, rfp_content, assigned_vendor, invited_users, evaluation, risk_heatmap
-
+    Apply partial updates to an RFP.
     Raises ValueError on invalid status or illegal transition.
     Returns None if rfp_id not found.
     """
@@ -98,9 +118,11 @@ def patch_rfp(rfp_id: str, updates: dict) -> Optional[dict]:
         if r["id"] != rfp_id:
             continue
 
-        # Validate status transition
         if "status" in updates:
             new_status = updates["status"]
+            # Normalize legacy status
+            new_status = _LEGACY_STATUS_MAP.get(new_status, new_status)
+            updates["status"] = new_status
             if new_status not in VALID_STATUSES:
                 raise ValueError(f"Invalid status '{new_status}'. Must be one of: {VALID_STATUSES}")
             current = r["status"]
@@ -109,8 +131,11 @@ def patch_rfp(rfp_id: str, updates: dict) -> Optional[dict]:
                     f"Cannot transition from '{current}' to '{new_status}'. "
                     f"Allowed: {_TRANSITIONS[current] or 'none (terminal state)'}"
                 )
+            if new_status == "archived":
+                r["archived_at"] = _now()
 
-        allowed = {"status", "rfp_content", "assigned_vendor", "invited_users", "evaluation", "risk_heatmap"}
+        allowed = {"status", "rfp_content", "assigned_vendor", "invited_users",
+                   "evaluation", "risk_heatmap", "bids"}
         for field in allowed:
             if field in updates and updates[field] is not None:
                 r[field] = updates[field]
@@ -124,10 +149,6 @@ def patch_rfp(rfp_id: str, updates: dict) -> Optional[dict]:
 
 
 def delete_rfp(rfp_id: str) -> bool:
-    """
-    Delete an RFP from the local store.
-    Returns True if found and deleted, False otherwise.
-    """
     records = _load()
     original_len = len(records)
     records = [r for r in records if r["id"] != rfp_id]
@@ -135,3 +156,24 @@ def delete_rfp(rfp_id: str) -> bool:
         _save(records)
         return True
     return False
+
+
+def append_bid(rfp_id: str, bid: dict) -> Optional[dict]:
+    """Append a bid record to an RFP's bids list. Returns the updated record."""
+    records = _load()
+    for i, r in enumerate(records):
+        if r["id"] != rfp_id:
+            continue
+        if "bids" not in r or r["bids"] is None:
+            r["bids"] = []
+        bid_with_meta = {
+            "id":         str(uuid.uuid4()),
+            "submitted_at": _now(),
+            **bid,
+        }
+        r["bids"].append(bid_with_meta)
+        r["updated_at"] = _now()
+        records[i] = r
+        _save(records)
+        return r
+    return None

@@ -108,70 +108,30 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 {% if rtl %}<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet"/>{% endif %}
 </head>
-<body class="bg-surface text-on-surface antialiased">
-<!-- Shared SideNavBar -->
-<aside class="fixed left-0 top-0 h-full flex flex-col p-6 w-64 bg-slate-50 font-['Manrope'] antialiased z-50">
-  <div class="flex items-center gap-3 mb-10">
-    <div class="w-10 h-10 rounded-lg bg-white shadow-sm flex items-center justify-center overflow-hidden shrink-0 border border-slate-100">
-      <img alt="Network Safety Logo" class="w-full h-full object-contain p-1" src="/static/logo.png"/>
-    </div>
-    <div class="flex flex-col overflow-hidden">
-      <h1 class="text-xl font-bold tracking-tight text-blue-900">Network Safety</h1>
-      <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Enterprise Procurement</p>
-    </div>
-  </div>
-  <nav class="flex-1 space-y-2">
-<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/">
-<span class="material-symbols-outlined">dashboard</span>
-<span class="text-sm">{{ t('nav.dashboard', locale) }}</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/documents">
-<span class="material-symbols-outlined">description</span>
-<span class="text-sm">{{ t('nav.documents', locale) }}</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/evaluations">
-<span class="material-symbols-outlined">analytics</span>
-<span class="text-sm">{{ t('nav.evaluations', locale) }}</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/settings">
-<span class="material-symbols-outlined">settings</span>
-<span class="text-sm">{{ t('nav.settings', locale) }}</span>
-</a>
-</nav>
-<div class="mt-auto">
-<a href="/create" class="block w-full bg-primary-container text-white py-3 rounded-lg font-bold text-sm shadow-lg hover:brightness-110 transition-all text-center">
-{{ t('nav.create_rfp', locale) }}
-</a>
-</div>
-</aside>
-<!-- Shared TopNavBar -->
-<header class="flex justify-between items-center w-[calc(100%-16rem)] px-12 py-6 sticky top-0 z-40 ml-64 bg-white/70 backdrop-blur-xl" {% if rtl %}dir="rtl"{% endif %}>
-<div class="flex items-center bg-surface-container-low px-4 py-2.5 rounded-full w-full max-w-md">
-<span class="material-symbols-outlined text-slate-400 mr-2">search</span>
-<input class="bg-transparent border-none focus:ring-0 text-sm w-full text-on-surface" placeholder="Search RFPs, vendors, or intel..." type="text"/>
-</div>
-<div class="flex items-center gap-6">
-<div class="flex items-center gap-4 text-slate-400">
-<button class="hover:text-blue-900 transition-colors"><span class="material-symbols-outlined">notifications</span></button>
-<button class="hover:text-blue-900 transition-colors"><span class="material-symbols-outlined">help_outline</span></button>
-<div class="flex items-center rounded-lg overflow-hidden border border-slate-200 text-[11px] font-bold">
-  <a href="#" onclick="setLang('en');return false;" class="px-2.5 py-1.5 transition-colors {% if locale == 'en' %}bg-primary-container text-white{% else %}text-slate-500 hover:bg-surface-container-low{% endif %}">EN</a>
-  <a href="#" onclick="setLang('ar');return false;" class="px-2.5 py-1.5 transition-colors {% if locale == 'ar' %}bg-primary-container text-white{% else %}text-slate-500 hover:bg-surface-container-low{% endif %}">AR</a>
-</div>
-</div>
-<div class="h-10 w-10 rounded-full bg-slate-200 overflow-hidden">
-<img alt="Executive User Profile" class="w-full h-full object-cover" data-alt="Professional portrait of a senior procurement executive in a light-colored business suit against a clean studio background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCiKaw2mMA_X_2pHGq3lpDpIxJ4s_j63o2FjAE5b9ml195YcbZH2QVPoqFxQgUhHMi9Y8fDwIieJsu5yFrXmCUlBIrNOqgHhlmHY9phj8mwnIGHtNd7Fb6hkyQ8w8kotAA88bmEofM0xOtZXvHeCcVslbQU_Q8P412B7xS4X3erQT3dvlT4QMqKfR6exooEUAIT3vfOkal9-rpyupdlp0meTvNxvTZRHzZZli-pod6lTrW1_3uAVK6-5v7MlAsFVOMxs3vRTmbQ4Y"/>
-</div>
-</div>
-</header>
+<body class="bg-surface text-on-surface antialiased overflow-hidden">
+
+{% set active_nav = 'documents' %}
+{% set page_title = (rfp.title if rfp else None) %}
+{% include "_sidebar.html" %}
+{% include "_topbar.html" %}
+
 <!-- Main Content Canvas -->
-<main class="ml-64 px-12 pb-12 flex gap-8 overflow-hidden" style="height:calc(100vh - 88px); margin-top:88px;" {% if rtl %}dir="rtl"{% endif %}>
+<main class="ml-64 px-10 pb-6 flex gap-6 overflow-hidden" style="height:calc(100vh - 65px);" {% if rtl %}dir="rtl"{% endif %}>
 <!-- Central Chat Area -->
-<section class="flex-grow flex flex-col gap-6 max-w-4xl min-h-0 overflow-hidden">
-<header class="mb-4 shrink-0">
-<h1 class="text-4xl font-extrabold tracking-tight text-primary mb-2">RFP Intelligence Agent</h1>
-<p class="text-on-surface-variant max-w-xl">Accelerate your procurement workflow with context-aware AI drafting and compliance verification.</p>
-</header>
+<section class="flex-grow flex flex-col gap-4 max-w-5xl min-h-0 overflow-hidden pt-4">
+{% if rfp %}
+<div class="flex items-center gap-3 mb-1 shrink-0">
+  <h1 class="text-2xl font-extrabold tracking-tight text-primary truncate">{{ rfp.title }}</h1>
+  <span class="badge-{{ rfp.status }} text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full shrink-0
+               {% if rfp.status == 'draft' %}bg-blue-100 text-blue-800
+               {% elif rfp.status == 'published' %}bg-amber-100 text-amber-800
+               {% elif rfp.status == 'approved_for_submission' %}bg-emerald-100 text-emerald-800
+               {% elif rfp.status == 'done' %}bg-indigo-100 text-indigo-800
+               {% else %}bg-slate-100 text-slate-600{% endif %}">
+    {{ rfp.status | replace('_', ' ') }}
+  </span>
+</div>
+{% endif %}
 {% if not rfp_id %}
 <!-- BUG-8: no-RFP-context banner -->
 <div class="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-2xl px-5 py-4 shrink-0">
@@ -191,23 +151,18 @@
 <div id="chat-messages" class="flex-1 overflow-y-auto space-y-8 pr-4 min-h-0">
 </div>
 <!-- Input Area -->
-<div class="mt-8 pt-6 border-t border-slate-100">
+<div class="mt-6 pt-6 border-t border-slate-100">
 <div class="relative">
-<textarea id="chat-input" rows="1" class="w-full bg-surface-container-low border-none rounded-2xl py-4 px-6 {% if rtl %}pl-16{% else %}pr-16{% endif %} text-primary focus:ring-2 focus:ring-tertiary-fixed-dim transition-all resize-none overflow-y-auto leading-relaxed" placeholder="{{ t('chat.placeholder', locale) }}" style="min-height:58px;max-height:200px;" {% if rtl %}dir="rtl"{% endif %}></textarea>
-<button id="send-button" class="absolute {% if rtl %}left-3{% else %}right-3{% endif %} bottom-3 w-10 h-10 bg-primary text-white rounded-xl flex items-center justify-center shadow-lg hover:scale-95 transition-transform">
+<textarea id="chat-input" rows="2" class="w-full bg-surface-container-low border-none rounded-2xl py-4 px-6 {% if rtl %}pl-16{% else %}pr-16{% endif %} text-primary focus:ring-2 focus:ring-primary-container/40 transition-all resize-none overflow-y-auto leading-relaxed" placeholder="{{ t('chat.placeholder', locale) }}" style="min-height:72px;max-height:200px;" {% if rtl %}dir="rtl"{% endif %}></textarea>
+<button id="send-button" class="absolute {% if rtl %}left-3{% else %}right-3{% endif %} bottom-3 w-10 h-10 bg-primary-container text-white rounded-xl flex items-center justify-center shadow-lg hover:brightness-110 transition-all">
 <span class="material-symbols-outlined">send</span>
 </button>
-</div>
-<div class="mt-4 flex gap-4 overflow-x-auto pb-2 no-scrollbar">
-<button class="bg-surface-container-high px-4 py-2 rounded-full text-xs font-bold text-primary whitespace-nowrap hover:bg-secondary-container transition-colors">Add Security Exhibit</button>
-<button class="bg-surface-container-high px-4 py-2 rounded-full text-xs font-bold text-primary whitespace-nowrap hover:bg-secondary-container transition-colors">Include pricing table</button>
-<button class="bg-surface-container-high px-4 py-2 rounded-full text-xs font-bold text-primary whitespace-nowrap hover:bg-secondary-container transition-colors">Export to PDF</button>
 </div>
 </div>
 </div>
 </section>
-<!-- Right Side Panel: Live Agent Activity -->
-<aside class="w-80 shrink-0 space-y-5 overflow-y-auto">
+<!-- Right Side Panel: Agent context -->
+<aside class="w-80 shrink-0 space-y-5 overflow-y-auto pt-4">
 
   <!-- Active Agent Card -->
   <div class="bg-primary text-white p-6 rounded-3xl shadow-xl relative overflow-hidden">
@@ -215,16 +170,13 @@
     <h3 class="text-sm font-black uppercase tracking-widest text-tertiary-fixed-dim mb-1">Active Agent</h3>
     <p id="active-agent-label" class="text-xl font-bold">RFP Director</p>
     <p id="active-agent-sub" class="text-xs text-secondary-container mt-1">Waiting for your message…</p>
-    <div id="agent-pulse" class="hidden mt-4 flex items-center gap-2">
-      <span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim animate-pulse inline-block"></span>
-      <span class="text-[11px] text-tertiary-fixed-dim font-bold uppercase tracking-wider">Processing</span>
-    </div>
+    <div id="agent-pulse" class="hidden"></div>
   </div>
 
-  <!-- Live Tool Activity Feed -->
+  <!-- Tool Activity Feed -->
   <div class="bg-surface-container-lowest rounded-3xl overflow-hidden shadow-sm">
     <div class="flex items-center justify-between px-6 pt-5 pb-3">
-      <p class="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">Live Tool Activity</p>
+      <p class="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">Tool Activity</p>
       <span id="tool-count-badge" class="text-[10px] font-bold bg-surface-container-high text-slate-500 px-2 py-0.5 rounded-full">0 calls</span>
     </div>
     <div id="tool-feed" class="px-4 pb-4 space-y-2 max-h-56 overflow-y-auto">
@@ -232,39 +184,35 @@
     </div>
   </div>
 
-  <!-- Capabilities Grid -->
+  <!-- Integrations Grid -->
   <div class="bg-surface-container-low p-5 rounded-3xl space-y-3">
     <p class="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Integrations</p>
-    <div class="grid grid-cols-2 gap-2">
-      <div id="cap-firecrawl" class="cap-tile flex items-center gap-2 p-3 bg-white rounded-xl opacity-40 transition-all duration-300">
+    <div class="grid grid-cols-2 gap-2" id="integrations-grid">
+      <div id="cap-firecrawl" data-key="firecrawl" class="cap-tile flex items-center gap-2 p-3 bg-white rounded-xl opacity-40 transition-all duration-300">
         <span class="material-symbols-outlined text-orange-500 text-base">travel_explore</span>
         <span class="text-[11px] font-bold text-primary leading-tight">Firecrawl<br/><span class="font-normal text-slate-400">Web Intel</span></span>
       </div>
-      <div id="cap-fmp" class="cap-tile flex items-center gap-2 p-3 bg-white rounded-xl opacity-40 transition-all duration-300">
+      <div id="cap-fmp" data-key="fmp" class="cap-tile flex items-center gap-2 p-3 bg-white rounded-xl opacity-40 transition-all duration-300">
         <span class="material-symbols-outlined text-emerald-600 text-base">show_chart</span>
         <span class="text-[11px] font-bold text-primary leading-tight">FMP<br/><span class="font-normal text-slate-400">Financials</span></span>
       </div>
-      <div id="cap-gdrive" class="cap-tile flex items-center gap-2 p-3 bg-white rounded-xl opacity-40 transition-all duration-300">
+      <div id="cap-gdrive" data-key="gdrive" class="cap-tile flex items-center gap-2 p-3 bg-white rounded-xl opacity-40 transition-all duration-300">
         <span class="material-symbols-outlined text-blue-500 text-base">folder_open</span>
         <span class="text-[11px] font-bold text-primary leading-tight">Drive<br/><span class="font-normal text-slate-400">Documents</span></span>
       </div>
-      <div id="cap-slack" class="cap-tile flex items-center gap-2 p-3 bg-white rounded-xl opacity-40 transition-all duration-300">
+      <div id="cap-slack" data-key="slack" class="cap-tile flex items-center gap-2 p-3 bg-white rounded-xl opacity-40 transition-all duration-300">
         <span class="material-symbols-outlined text-purple-500 text-base">forum</span>
         <span class="text-[11px] font-bold text-primary leading-tight">Slack<br/><span class="font-normal text-slate-400">Alerts</span></span>
       </div>
-      <div id="cap-pdf" class="cap-tile flex items-center gap-2 p-3 bg-white rounded-xl opacity-40 transition-all duration-300">
+      <div id="cap-pdf" data-key="pdf" class="cap-tile flex items-center gap-2 p-3 bg-white rounded-xl opacity-40 transition-all duration-300">
         <span class="material-symbols-outlined text-red-500 text-base">picture_as_pdf</span>
         <span class="text-[11px] font-bold text-primary leading-tight">PDF Gen<br/><span class="font-normal text-slate-400">Branded</span></span>
       </div>
-      <div id="cap-linear" class="cap-tile flex items-center gap-2 p-3 bg-white rounded-xl opacity-40 transition-all duration-300">
+      <div id="cap-jira" data-key="jira" class="cap-tile flex items-center gap-2 p-3 bg-white rounded-xl opacity-40 transition-all duration-300">
         <span class="material-symbols-outlined text-indigo-500 text-base">task_alt</span>
-        <span class="text-[11px] font-bold text-primary leading-tight">Linear<br/><span class="font-normal text-slate-400">Tracking</span></span>
+        <span class="text-[11px] font-bold text-primary leading-tight">Jira<br/><span class="font-normal text-slate-400">Tracking</span></span>
       </div>
-      <div id="cap-airtable" class="cap-tile flex items-center gap-2 p-3 bg-white rounded-xl opacity-40 transition-all duration-300">
-        <span class="material-symbols-outlined text-teal-500 text-base">table_view</span>
-        <span class="text-[11px] font-bold text-primary leading-tight">Airtable<br/><span class="font-normal text-slate-400">Records</span></span>
-      </div>
-      <div id="cap-pwin" class="cap-tile flex items-center gap-2 p-3 bg-white rounded-xl opacity-40 transition-all duration-300">
+      <div id="cap-pwin" data-key="pwin" class="cap-tile flex items-center gap-2 p-3 bg-white rounded-xl opacity-40 transition-all duration-300">
         <span class="material-symbols-outlined text-amber-500 text-base">percent</span>
         <span class="text-[11px] font-bold text-primary leading-tight">P(Win)<br/><span class="font-normal text-slate-400">Scoring</span></span>
       </div>
@@ -301,8 +249,7 @@
         slack_post_message:     { capId: 'cap-slack',     label: 'Slack — Updates Channel',   icon: 'forum',           color: 'text-purple-500' },
         slack_alert_legal:      { capId: 'cap-slack',     label: 'Slack — 🚨 Legal Alert',    icon: 'forum',           color: 'text-purple-500' },
         slack_notify_finance:   { capId: 'cap-slack',     label: 'Slack — 💰 Finance Update', icon: 'forum',           color: 'text-purple-500' },
-        linear_create_issue:    { capId: 'cap-linear',    label: 'Linear — Create Issue',     icon: 'task_alt',        color: 'text-indigo-500' },
-        airtable_add_vendor_record: { capId: 'cap-airtable', label: 'Airtable — Add Vendor', icon: 'table_view',      color: 'text-teal-500' },
+        jira_create_issue:      { capId: 'cap-jira',      label: 'Jira — Create Issue',       icon: 'task_alt',        color: 'text-indigo-500' },
         calculate_pwin:         { capId: 'cap-pwin',      label: 'P(Win) — Scoring',          icon: 'percent',         color: 'text-amber-500' },
         code_execution:         { capId: 'cap-pwin',      label: 'Code — Weighted Scoring',   icon: 'code',            color: 'text-amber-500' },
         gmail:                  { capId: null,             label: 'Gmail — Send Email',        icon: 'mail',            color: 'text-red-400' },
@@ -319,12 +266,10 @@
     };
 
     function setAgentIdle() {
-        agentPulse.classList.add('hidden');
         activeAgentSub.textContent = 'Ready for your next message.';
     }
 
     function setAgentActive(agentKey) {
-        agentPulse.classList.remove('hidden');
         const info = AGENT_LABELS[agentKey];
         if (info) {
             activeAgentLabel.textContent = info.label;
@@ -333,6 +278,34 @@
             activeAgentSub.textContent = 'Processing…';
         }
     }
+
+    // ── Integration status sync ──────────────────────────────────────────────
+    // Backend returns a map { slack:{configured,mock}, drive:{...}, fmp:{...}, jira:{...} }
+    // Some tiles map to the same backend key (gdrive→drive). Tiles without a backend
+    // key default to "always available" (firecrawl, pdf, pwin).
+    const TILE_TO_BACKEND_KEY = {
+      slack: 'slack', gdrive: 'drive', fmp: 'fmp', jira: 'jira',
+      firecrawl: null, pdf: null, pwin: null,
+    };
+    async function syncIntegrationStatus() {
+      try {
+        const res = await fetch('/api/integrations');
+        if (!res.ok) return;
+        const data = await res.json();
+        document.querySelectorAll('#integrations-grid .cap-tile').forEach(el => {
+          const tileKey = el.dataset.key;
+          const backendKey = TILE_TO_BACKEND_KEY[tileKey];
+          const configured = backendKey === null
+            ? true
+            : !!(data[backendKey] && data[backendKey].configured);
+          if (configured) {
+            el.classList.remove('opacity-40');
+            el.classList.add('opacity-100');
+          }
+        });
+      } catch (_) { /* silent */ }
+    }
+    syncIntegrationStatus();
 
     function flashCapability(capId) {
         if (!capId) return;
@@ -542,7 +515,6 @@
 
         // Sidebar: mark as active
         activeAgentSub.textContent = 'Thinking…';
-        agentPulse.classList.remove('hidden');
 
         const agentUI = createAgentMessageContainer();
         let markdownBuffer = '';
@@ -677,11 +649,5 @@
         chatInput.style.height = 'auto';
         chatInput.style.height = Math.min(chatInput.scrollHeight, 200) + 'px';
     });
-</script>
-<script>
-function setLang(locale) {
-  document.cookie = `ui_lang=${locale};path=/;max-age=31536000`;
-  location.reload();
-}
 </script>
 </body></html>

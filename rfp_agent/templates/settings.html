@@ -86,72 +86,28 @@
 </style>
 </head>
 <body class="bg-surface text-on-surface antialiased">
+{% set active_nav = 'settings' %}
+{% include "_sidebar.html" %}
+{% include "_topbar.html" %}
 
-<!-- ── Sidebar ─────────────────────────────────────────────────────────────── -->
-<aside class="fixed left-0 top-0 h-full flex flex-col p-6 w-64 bg-slate-50 font-['Manrope'] antialiased z-50">
-  <div class="flex items-center gap-3 mb-10">
-    <div class="w-10 h-10 rounded-lg bg-white shadow-sm flex items-center justify-center overflow-hidden shrink-0 border border-slate-100">
-      <img alt="Network Safety Logo" class="w-full h-full object-contain p-1" src="/static/logo.png"/>
-    </div>
-    <div class="flex flex-col overflow-hidden">
-      <h1 class="text-xl font-bold tracking-tight text-blue-900">Network Safety</h1>
-      <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Enterprise Procurement</p>
-    </div>
-  </div>
-  <nav class="flex-1 space-y-2">
-    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/">
-      <span class="material-symbols-outlined">dashboard</span><span class="text-sm">Dashboard</span>
-    </a>
-    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/documents">
-      <span class="material-symbols-outlined">description</span><span class="text-sm">Documents</span>
-    </a>
-    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-blue-900 hover:bg-slate-200/50 transition-colors rounded-lg" href="/evaluations">
-      <span class="material-symbols-outlined">analytics</span><span class="text-sm">Evaluations</span>
-    </a>
-    <a class="flex items-center gap-3 px-4 py-3 text-blue-950 font-semibold bg-white rounded-lg shadow-sm transition-transform duration-150 active:scale-95" href="/settings">
-      <span class="material-symbols-outlined text-blue-900">settings</span><span class="text-sm">Settings</span>
-    </a>
-  </nav>
-  <div class="mt-auto">
-    <a href="/create" class="block w-full bg-primary-container text-white py-3 rounded-lg font-bold text-sm shadow-lg hover:brightness-110 transition-all text-center">
-      Create RFP
-    </a>
-  </div>
-</aside>
-
-<!-- ── Top bar ──────────────────────────────────────────────────────────────── -->
-<header class="flex justify-between items-center px-8 py-4 sticky top-0 z-40 ml-64 bg-white/70 backdrop-blur-xl border-b border-slate-100">
-  <div>
-    <h2 class="text-xl font-bold text-primary font-['Manrope']">Settings</h2>
-    <p class="text-xs text-on-surface-variant mt-0.5">Manage company guidelines and integrations</p>
-  </div>
-  <div class="flex items-center gap-4">
-    <!-- Language toggle -->
-    <div class="flex items-center rounded-lg overflow-hidden border border-slate-200 text-[11px] font-bold">
-      <a href="#" onclick="setLang('en');return false;" class="px-2.5 py-1.5 transition-colors {% if locale == 'en' %}bg-primary-container text-white{% else %}text-slate-500 hover:bg-surface-container-low{% endif %}">EN</a>
-      <a href="#" onclick="setLang('ar');return false;" class="px-2.5 py-1.5 transition-colors {% if locale == 'ar' %}bg-primary-container text-white{% else %}text-slate-500 hover:bg-surface-container-low{% endif %}">AR</a>
-    </div>
-    <div class="flex items-center gap-3">
-      <div class="text-right">
-        <p class="text-xs font-bold text-primary">Alex Sterling</p>
-        <p class="text-[10px] text-slate-400">Executive Director</p>
-      </div>
-      <img alt="Profile" class="w-9 h-9 rounded-full object-cover ring-2 ring-surface-container-high"
-           src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTcWdH7qA3eeGEQCR1saQUN_SAuXVa7cwjbM_FTISLKJQYrX2WaRmNJhpxvErwrgczJ4WjAvPhY-zUE1WIWL85H4wxB_PNVfMaSkNjLn_Coi7GhtUb0ExOfCimWCwdbBTI4bkbNZda80DOWx1P9KI4juMXoLbgAJT8BqRrQUGA8m1-J5kGFOtkqFEF2s2-i04Xk6XXkb0SGX6c3PPrDF4cyzee4Pl4C-NSHyPpZjwTwMMmZENOZvagk03QCcljIXmQbx-6lT9fbDA"/>
-    </div>
-  </div>
-</header>
+<div class="ml-64 px-8 pt-5 pb-2">
+  <h2 class="text-xl font-bold text-primary font-['Manrope']">{{ t('page.settings', locale) }}</h2>
+  <p class="text-xs text-on-surface-variant mt-0.5">Manage company guidelines, integrations and documents</p>
+</div>
 
 <!-- ── Main canvas ──────────────────────────────────────────────────────────── -->
 <main class="ml-64 p-8 min-h-screen">
 
-  <!-- Main tabs: Guidelines | Integrations -->
-  <div class="flex gap-2 mb-8 border-b border-slate-200 pb-0">
+  <!-- Main tabs: Guidelines | Integrations | Manage Documents -->
+  <div class="flex gap-2 mb-8 border-b border-slate-200 pb-0 flex-wrap">
     <button class="main-tab active px-6 py-2.5 rounded-t-lg text-sm font-bold transition-all" onclick="switchMain('guidelines')">
       <span class="material-symbols-outlined text-sm align-middle mr-1">article</span>{{ t('settings.guidelines', locale) }}
     </button>
     <button class="main-tab px-6 py-2.5 rounded-t-lg text-sm font-bold text-slate-500 hover:text-primary transition-all" onclick="switchMain('integrations')">
       <span class="material-symbols-outlined text-sm align-middle mr-1">hub</span>{{ t('settings.integrations', locale) }}
+    </button>
+    <button class="main-tab px-6 py-2.5 rounded-t-lg text-sm font-bold text-slate-500 hover:text-primary transition-all" onclick="switchMain('documents')">
+      <span class="material-symbols-outlined text-sm align-middle mr-1">folder_managed</span>Manage Documents
     </button>
   </div>
 
@@ -252,15 +208,15 @@
         </button>
       </div>
 
-      <!-- Linear -->
+      <!-- Jira -->
       <div class="bg-surface-container-lowest rounded-2xl ambient-shadow p-6 flex flex-col gap-4">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-[#5E6AD2] flex items-center justify-center">
+            <div class="w-10 h-10 rounded-xl bg-[#0052CC] flex items-center justify-center">
               <span class="material-symbols-outlined text-white text-lg">task_alt</span>
             </div>
             <div>
-              <p class="font-bold text-sm text-primary">Linear</p>
+              <p class="font-bold text-sm text-primary">Jira</p>
               <p class="text-xs text-on-surface-variant">Issue & project tracking</p>
             </div>
           </div>
@@ -268,29 +224,7 @@
             <span class="w-2 h-2 rounded-full bg-slate-300 inline-block"></span>Not configured
           </span>
         </div>
-        <p class="text-xs text-on-surface-variant">Creates vendor evaluation issues and tracks procurement workflow tasks.</p>
-        <button class="mt-auto text-xs font-bold text-secondary hover:text-primary transition-colors flex items-center gap-1">
-          Configure <span class="material-symbols-outlined text-sm">arrow_forward</span>
-        </button>
-      </div>
-
-      <!-- Airtable -->
-      <div class="bg-surface-container-lowest rounded-2xl ambient-shadow p-6 flex flex-col gap-4">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-[#FCB400] flex items-center justify-center">
-              <span class="material-symbols-outlined text-white text-lg">table_chart</span>
-            </div>
-            <div>
-              <p class="font-bold text-sm text-primary">Airtable</p>
-              <p class="text-xs text-on-surface-variant">Vendor records database</p>
-            </div>
-          </div>
-          <span class="flex items-center gap-1.5 text-xs font-bold text-slate-400">
-            <span class="w-2 h-2 rounded-full bg-slate-300 inline-block"></span>Not configured
-          </span>
-        </div>
-        <p class="text-xs text-on-surface-variant">Stores vendor bid records, evaluation scores, and historical procurement data.</p>
+        <p class="text-xs text-on-surface-variant">Creates vendor evaluation tickets and tracks procurement workflow tasks in your Jira project.</p>
         <button class="mt-auto text-xs font-bold text-secondary hover:text-primary transition-colors flex items-center gap-1">
           Configure <span class="material-symbols-outlined text-sm">arrow_forward</span>
         </button>
@@ -337,6 +271,23 @@
     </div><!-- /grid -->
   </div><!-- /panel-integrations -->
 
+  <!-- ══ MANAGE DOCUMENTS PANEL ════════════════════════════════════════════════ -->
+  <div id="panel-documents" class="hidden">
+    <p class="text-sm text-on-surface-variant mb-6">
+      Archive or permanently delete RFP documents. Archiving preserves all bids and evaluation history.
+    </p>
+
+    <div class="bg-surface-container-lowest rounded-2xl ambient-shadow overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+        <h3 class="text-sm font-bold text-primary">All RFPs</h3>
+        <span id="docs-count" class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">—</span>
+      </div>
+      <div id="docs-list" class="divide-y divide-slate-100">
+        <div class="px-6 py-8 text-center text-sm text-slate-400">Loading…</div>
+      </div>
+    </div>
+  </div>
+
 </main>
 
 <!-- ── Toast ────────────────────────────────────────────────────────────────── -->
@@ -361,13 +312,86 @@ const guideCache = {};
 
 // ── Tab switchers ────────────────────────────────────────────────────────────
 function switchMain(tab) {
+  const tabs = ['guidelines', 'integrations', 'documents'];
   document.querySelectorAll('.main-tab').forEach((el, i) => {
-    const tabs = ['guidelines', 'integrations'];
     if (tabs[i] === tab) { el.classList.add('active'); el.classList.remove('text-slate-500','hover:text-primary'); }
     else                 { el.classList.remove('active'); el.classList.add('text-slate-500','hover:text-primary'); }
   });
   document.getElementById('panel-guidelines').classList.toggle('hidden',   tab !== 'guidelines');
   document.getElementById('panel-integrations').classList.toggle('hidden', tab !== 'integrations');
+  document.getElementById('panel-documents').classList.toggle('hidden',    tab !== 'documents');
+  if (tab === 'documents') loadDocsList();
+}
+
+// ── Manage Documents ─────────────────────────────────────────────────────────
+const STATUS_LABEL = {
+  draft: 'Draft', published: 'Published',
+  approved_for_submission: 'Approved', done: 'Done', archived: 'Archived',
+};
+
+async function loadDocsList() {
+  const list  = document.getElementById('docs-list');
+  const count = document.getElementById('docs-count');
+  list.innerHTML = '<div class="px-6 py-8 text-center text-sm text-slate-400">Loading…</div>';
+  try {
+    const res  = await fetch('/api/rfps');
+    const rfps = await res.json();
+    count.textContent = `${rfps.length} document${rfps.length === 1 ? '' : 's'}`;
+    if (!rfps.length) {
+      list.innerHTML = '<div class="px-6 py-8 text-center text-sm text-slate-400">No RFPs yet.</div>';
+      return;
+    }
+    list.innerHTML = rfps.map(rfp => {
+      const archived = rfp.status === 'archived';
+      const safeTitle = (rfp.title || '').replace(/</g,'&lt;');
+      return `
+        <div class="px-6 py-4 flex items-center gap-4">
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-bold text-primary truncate">${safeTitle}</p>
+            <p class="text-[11px] text-slate-400 mt-0.5">
+              <span class="font-semibold">${STATUS_LABEL[rfp.status] || rfp.status}</span>
+              · ${(rfp.bids || []).length} bid${(rfp.bids||[]).length === 1 ? '' : 's'}
+              · updated ${new Date(rfp.updated_at).toLocaleDateString()}
+            </p>
+          </div>
+          ${archived ? '' : `
+            <button onclick="archiveRfp('${rfp.id}')" class="px-3 py-1.5 rounded-lg text-[11px] font-bold text-slate-600 bg-surface-container-low hover:bg-surface-container-high transition-all">
+              Archive
+            </button>`}
+          <button onclick="confirmDeleteRfp('${rfp.id}', '${safeTitle.replace(/'/g, "\\'")}')"
+                  class="px-3 py-1.5 rounded-lg text-[11px] font-bold text-red-600 bg-red-50 hover:bg-red-100 transition-all">
+            Delete
+          </button>
+        </div>`;
+    }).join('');
+  } catch (e) {
+    list.innerHTML = `<div class="px-6 py-8 text-center text-sm text-red-500">Failed to load: ${e.message}</div>`;
+  }
+}
+
+async function archiveRfp(id) {
+  try {
+    const res = await fetch(`/api/rfps/${id}/archive`, { method: 'POST' });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || 'Failed to archive');
+    }
+    showToast('RFP archived', 'success');
+    loadDocsList();
+  } catch (e) {
+    showToast(e.message, 'error');
+  }
+}
+
+function confirmDeleteRfp(id, title) {
+  if (!window.confirm(`Permanently delete "${title}"? This cannot be undone — all bids and evaluations will be lost.`)) return;
+  fetch(`/api/rfps/${id}`, { method: 'DELETE' })
+    .then(res => {
+      if (!res.ok) throw new Error('Delete failed');
+      showToast('RFP deleted', 'success');
+      loadDocsList();
+    })
+    .catch(e => showToast(e.message, 'error'));
 }
 
 function switchGuide(cat) {
@@ -513,12 +537,6 @@ document.getElementById('fmp-verified-date').textContent =
   new Date().toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' });
 
 loadGuideline('legal');
-</script>
-<script>
-function setLang(locale) {
-  document.cookie = `ui_lang=${locale};path=/;max-age=31536000`;
-  location.reload();
-}
 </script>
 </body>
 </html>
