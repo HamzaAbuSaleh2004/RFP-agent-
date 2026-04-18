@@ -20,6 +20,13 @@ from pathlib import Path
 import fitz          # PyMuPDF
 from PIL import Image as PILImage
 
+try:
+    import arabic_reshaper
+    from bidi.algorithm import get_display
+    HAS_BIDI = True
+except ImportError:
+    HAS_BIDI = False
+
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT, TA_RIGHT
 from reportlab.lib.pagesizes import A4
@@ -33,6 +40,21 @@ from reportlab.platypus import (
     Table, TableStyle,
 )
 from reportlab.platypus.tableofcontents import TableOfContents
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfbase import pdfmetrics
+
+try:
+    if os.path.exists(r"C:\Windows\Fonts\arial.ttf"):
+        pdfmetrics.registerFont(TTFont('Arial', r'C:\Windows\Fonts\arial.ttf'))
+        pdfmetrics.registerFont(TTFont('Arial-Bold', r'C:\Windows\Fonts\arialbd.ttf'))
+        pdfmetrics.registerFont(TTFont('Arial-Oblique', r'C:\Windows\Fonts\ariali.ttf'))
+        pdfmetrics.registerFont(TTFont('Arial-BoldOblique', r'C:\Windows\Fonts\arialbi.ttf'))
+        pdfmetrics.registerFontFamily('Arial', normal='Arial', bold='Arial-Bold', italic='Arial-Oblique', boldItalic='Arial-BoldOblique')
+        BASE_FONT = 'Arial'
+    else:
+        BASE_FONT = 'Helvetica'
+except Exception:
+    BASE_FONT = 'Helvetica'
 
 PAGE_W, PAGE_H = A4          # 595.27 × 841.89 pt
 MARGIN_L = 2.2 * cm
@@ -223,10 +245,10 @@ def _make_page_cb(tmpl: dict, title: str):
                     pass
 
             # Company name top-right
-            canv.setFont("Helvetica-Bold", 13)
+            canv.setFont(f"{BASE_FONT}-Bold", 13)
             canv.setFillColor(colors.white)
             canv.drawRightString(w - 28, h - 42, company or "")
-            canv.setFont("Helvetica", 9)
+            canv.setFont(BASE_FONT, 9)
             canv.drawRightString(w - 28, h - 60, "Request for Proposal")
 
             # Mid-page decorative band
@@ -237,13 +259,13 @@ def _make_page_cb(tmpl: dict, title: str):
             canv.rect(0, band_y - 6, w, 6, fill=1, stroke=0)
 
             # Document title — centred above the band
-            canv.setFont("Helvetica-Bold", 28)
+            canv.setFont(f"{BASE_FONT}-Bold", 28)
             canv.setFillColor(primary)
             _draw_centered_text(canv, title.replace("_", " ").replace(".pdf", ""),
                                  w, band_y + 50, max_w=w - 80)
 
             # Subtitle
-            canv.setFont("Helvetica", 13)
+            canv.setFont(BASE_FONT, 13)
             canv.setFillColor(_rl(tmpl["accent"]))
             _draw_centered_text(canv, "Request for Proposal", w, band_y + 22)
 
@@ -252,16 +274,16 @@ def _make_page_cb(tmpl: dict, title: str):
             canv.setStrokeColor(primary)
             canv.setFillColor(_rl(_lighten(tmpl["primary"], 0.92)))
             canv.roundRect(box_x, box_y, 200, 36, 4, fill=1, stroke=1)
-            canv.setFont("Helvetica", 8)
+            canv.setFont(BASE_FONT, 8)
             canv.setFillColor(_rl(tmpl["primary"]))
             canv.drawString(box_x + 10, box_y + 22, "DATE ISSUED")
-            canv.setFont("Helvetica-Bold", 11)
+            canv.setFont(f"{BASE_FONT}-Bold", 11)
             canv.drawString(box_x + 10, box_y + 8, today_str)
 
             # Bottom accent bar
             canv.setFillColor(accent)
             canv.rect(0, 0, w, 14, fill=1, stroke=0)
-            canv.setFont("Helvetica", 7)
+            canv.setFont(BASE_FONT, 7)
             canv.setFillColor(colors.white)
             canv.drawCentredString(w/2, 4, "CONFIDENTIAL — FOR AUTHORISED RECIPIENTS ONLY")
 
@@ -279,10 +301,12 @@ def _make_page_cb(tmpl: dict, title: str):
                 except Exception:
                     pass
 
-            canv.setFont("Helvetica-Bold", 9)
+            canv.setFont(f"{BASE_FONT}-Bold", 9)
             canv.setFillColor(colors.white)
             # Truncate header title at word boundary so it never overflows the band
             hdr_title = title.replace("_", " ").replace(".pdf", "")
+            if HAS_BIDI: hdr_title = get_display(arabic_reshaper.reshape(hdr_title))
+            
             max_hdr_w = w - 120  # reserve space for logo on the left
             while canv.stringWidth(hdr_title) > max_hdr_w and " " in hdr_title:
                 hdr_title = hdr_title.rsplit(" ", 1)[0]
@@ -291,7 +315,7 @@ def _make_page_cb(tmpl: dict, title: str):
             # ── Running footer ────────────────────────────────────────────
             canv.setFillColor(primary)
             canv.rect(0, 0, w, 22, fill=1, stroke=0)
-            canv.setFont("Helvetica", 8)
+            canv.setFont(BASE_FONT, 8)
             canv.setFillColor(colors.white)
             canv.drawString(18, 7, company or "Confidential")
             canv.drawRightString(w - 18, 7, f"Page {doc.page}")
@@ -307,6 +331,9 @@ def _draw_centered_text(canv, text, page_w, y, max_w=None):
     If the text exceeds max_w, split at the word boundary that best balances
     the two lines and draw them stacked — never truncate with ellipsis.
     """
+    if HAS_BIDI:
+        text = get_display(arabic_reshaper.reshape(text))
+        
     if max_w is None or canv.stringWidth(text) <= max_w:
         canv.drawCentredString(page_w / 2, y, text)
         return
@@ -358,24 +385,24 @@ def _make_minimal_page_cb(tmpl: dict, title: str):
             # land on the white area of the template (below any letterhead).
             title_y = h * 0.52
 
-            canv.setFont("Helvetica-Bold", 26)
+            canv.setFont(f"{BASE_FONT}-Bold", 26)
             canv.setFillColor(primary)
             _draw_centered_text(canv,
                                 title.replace("_", " ").replace(".pdf", ""),
                                 w, title_y, max_w=w - 80)
 
-            canv.setFont("Helvetica", 13)
+            canv.setFont(BASE_FONT, 13)
             canv.setFillColor(accent)
             _draw_centered_text(canv, "Request for Proposal", w, title_y - 28)
 
-            canv.setFont("Helvetica", 10)
+            canv.setFont(BASE_FONT, 10)
             canv.setFillColor(colors.black)
             _draw_centered_text(canv, today_str, w, title_y - 52)
 
         else:
             # Inner pages: write page number in the footer zone.
             # White text so it reads on dark template footers; black on light ones.
-            canv.setFont("Helvetica", 8)
+            canv.setFont(BASE_FONT, 8)
             canv.setFillColor(colors.white)
             canv.drawRightString(w - 18, 7, f"Page {doc.page}")
 
@@ -481,47 +508,47 @@ def _make_styles(tmpl: dict) -> dict:
 
     return {
         "h1": ParagraphStyle("RFP_H1", parent=base["Normal"],
-            fontName="Helvetica-Bold", fontSize=15, textColor=primary,
+            fontName=f"{BASE_FONT}-Bold", fontSize=15, textColor=primary,
             spaceBefore=10, spaceAfter=3, leading=20, keepWithNext=1),
 
         "h2": ParagraphStyle("RFP_H2", parent=base["Normal"],
-            fontName="Helvetica-Bold", fontSize=12, textColor=primary,
+            fontName=f"{BASE_FONT}-Bold", fontSize=12, textColor=primary,
             spaceBefore=8, spaceAfter=2, leading=16, keepWithNext=1),
 
         "h3": ParagraphStyle("RFP_H3", parent=base["Normal"],
-            fontName="Helvetica-BoldOblique", fontSize=10, textColor=accent,
+            fontName=f"{BASE_FONT}-BoldOblique", fontSize=10, textColor=accent,
             spaceBefore=10, spaceAfter=2, leading=14, keepWithNext=1),
 
         "body": ParagraphStyle("RFP_Body", parent=base["Normal"],
-            fontName="Helvetica", fontSize=10, leading=15,
+            fontName=BASE_FONT, fontSize=10, leading=15,
             spaceAfter=6, alignment=TA_JUSTIFY),
 
         "bullet": ParagraphStyle("RFP_Bullet", parent=base["Normal"],
-            fontName="Helvetica", fontSize=10, leading=14,
+            fontName=BASE_FONT, fontSize=10, leading=14,
             leftIndent=20, firstLineIndent=0, spaceAfter=3,
             alignment=TA_JUSTIFY),
 
         "bold_body": ParagraphStyle("RFP_Bold", parent=base["Normal"],
-            fontName="Helvetica-Bold", fontSize=10, leading=15,
+            fontName=f"{BASE_FONT}-Bold", fontSize=10, leading=15,
             spaceAfter=6, alignment=TA_JUSTIFY),
 
         "toc1": ParagraphStyle("TOC1", parent=base["Normal"],
-            fontName="Helvetica-Bold", fontSize=11, leading=22,
+            fontName=f"{BASE_FONT}-Bold", fontSize=11, leading=22,
             leftIndent=0, textColor=primary),
 
         "toc2": ParagraphStyle("TOC2", parent=base["Normal"],
-            fontName="Helvetica", fontSize=10, leading=20,
+            fontName=BASE_FONT, fontSize=10, leading=20,
             leftIndent=18, textColor=colors.black),
 
         "toc_title": ParagraphStyle("TOC_Title", parent=base["Normal"],
-            fontName="Helvetica-Bold", fontSize=16, textColor=primary,
+            fontName=f"{BASE_FONT}-Bold", fontSize=16, textColor=primary,
             spaceBefore=0, spaceAfter=10, alignment=TA_LEFT),
 
         "cell": ParagraphStyle("TblCell", parent=base["Normal"],
-            fontName="Helvetica", fontSize=9, leading=13),
+            fontName=BASE_FONT, fontSize=9, leading=13),
 
         "cell_hdr": ParagraphStyle("TblHdr", parent=base["Normal"],
-            fontName="Helvetica-Bold", fontSize=9, leading=13,
+            fontName=f"{BASE_FONT}-Bold", fontSize=9, leading=13,
             textColor=colors.white),
     }
 
@@ -532,6 +559,10 @@ def _make_styles(tmpl: dict) -> dict:
 
 def _inline(text: str) -> str:
     """Convert inline markdown to ReportLab XML."""
+    if HAS_BIDI:
+        # Reshape and BiDi order BEFORE matching markdown so HTML tags are in correct reading order
+        text = get_display(arabic_reshaper.reshape(text))
+
     # Escape bare & that aren't already entities
     text = re.sub(r"&(?!(?:amp|lt|gt|quot|apos|bull|nbsp);)", "&amp;", text)
     text = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", text)
