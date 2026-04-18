@@ -56,7 +56,7 @@
     h1, h2, h3, h4 { font-family: {% if rtl %}'Cairo', {% endif %}'Manrope', sans-serif; }
     {% if rtl %}
     .ml-64 { margin-left: 0 !important; margin-right: 16rem; }
-    aside.side-nav { left: auto !important; right: 0; }
+    aside { left: auto !important; right: 0; }
     {% endif %}
 
     .material-symbols-outlined {
@@ -174,19 +174,6 @@
   {% include "_sidebar.html" %}
   {% include "_topbar.html" %}
 
-  <!-- Sub-toolbar -->
-  <div class="ml-64 flex justify-between items-center px-8 py-3 bg-surface-container-low/60 border-b border-slate-100">
-    <button onclick="showRfpSelection()"
-      class="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-primary uppercase tracking-widest transition-colors">
-      <span class="material-symbols-outlined text-sm">grid_view</span>
-      {{ t('eval.select_rfp', locale) }}
-    </button>
-    <button id="refresh-btn" onclick="loadEvaluation()" title="Refresh"
-      class="p-2 rounded-full hover:bg-surface-container-high transition-colors text-slate-400 hover:text-primary">
-      <span class="material-symbols-outlined text-lg">refresh</span>
-    </button>
-  </div>
-
   <!-- Main -->
   <main class="ml-64 p-8 min-h-screen">
 
@@ -196,9 +183,8 @@
         <div class="w-16 h-16 rounded-2xl bg-surface-container-high flex items-center justify-center mx-auto mb-4">
           <span class="material-symbols-outlined text-3xl text-slate-400">assignment</span>
         </div>
-        <h3 class="text-3xl font-extrabold text-primary mb-2">Evaluations Dashboard</h3>
-        <p class="text-on-surface-variant max-w-xl mx-auto text-sm">Select a published RFP below to evaluate vendor bids
-          and determine the optimal choice.</p>
+        <h3 class="text-3xl font-extrabold text-primary mb-2">{{ t('eval.dashboard_heading', locale) }}</h3>
+        <p class="text-on-surface-variant max-w-xl mx-auto text-sm">{{ t('eval.dashboard_subtitle', locale) }}</p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -207,7 +193,7 @@
         <div
           class="col-span-full py-16 text-center text-slate-400 bg-surface-container-lowest rounded-3xl border border-dashed border-outline-variant/50">
           <span class="material-symbols-outlined text-5xl mb-3 opacity-50">inbox</span>
-          <p class="font-medium text-sm">No published RFPs available for evaluation.</p>
+          <p class="font-medium text-sm">{{ t('eval.no_published', locale) }}</p>
         </div>
         {% else %}
         {% for rfp in published_rfps %}
@@ -229,7 +215,7 @@
           <div class="flex items-center justify-between border-t border-outline-variant/10 pt-4 relative z-10">
             <div class="text-xs text-slate-400 flex items-center gap-1.5 font-medium">
               <span class="material-symbols-outlined text-[16px]">group</span>
-              {{ rfp.invited_users | length }} Collaborators
+              {{ rfp.invited_users | length }} {{ t('eval.collaborators', locale) }}
             </div>
             <span
               class="material-symbols-outlined text-primary-container transform translate-x-0 group-hover:translate-x-1 transition-transform">arrow_forward</span>
@@ -266,8 +252,7 @@
         <div class="mt-8 flex items-center justify-between">
           <p class="text-xs text-on-surface-variant max-w-sm">
             <span class="material-symbols-outlined text-xs align-middle">info</span>
-            The AI agent will evaluate all bids against your company's Legal, Commercial, Technical, and Financial
-            benchmarks.
+            {{ t('eval.agent_benchmarks', locale) }}
           </p>
           <button id="evaluate-btn" onclick="submitBidsForEvaluation()"
             class="flex items-center gap-2 px-8 py-3 hero-gradient text-white font-bold rounded-xl shadow-lg hover:scale-[1.02] transition-transform text-sm">
@@ -324,12 +309,12 @@
           </div>
           <h2 id="eval-project-title" class="text-4xl font-extrabold text-primary tracking-tight mb-3"></h2>
           <p class="text-on-surface-variant text-base max-w-2xl leading-relaxed">
-            Evaluated on <span id="eval-timestamp" class="font-semibold text-primary"></span>
+            {{ t('eval.evaluated_on', locale) }} <span id="eval-timestamp" class="font-semibold text-primary"></span>
           </p>
         </div>
         <button onclick="showBidForm()"
           class="px-6 py-3 hero-gradient text-white font-bold rounded-xl flex items-center gap-2 hover:scale-[1.02] transition-transform">
-          <span class="material-symbols-outlined">refresh</span>Re-evaluate
+          <span class="material-symbols-outlined">refresh</span>{{ t('eval.reevaluate', locale) }}
         </button>
       </div>
 
@@ -349,7 +334,7 @@
             <div>
               <div
                 class="inline-flex items-center gap-2 px-3 py-1 bg-tertiary-container/10 text-on-tertiary-container rounded-full text-xs font-bold mb-4">
-                <span class="material-symbols-outlined text-[14px]">auto_awesome</span>AI RECOMMENDATION
+                <span class="material-symbols-outlined text-[14px]">auto_awesome</span>{{ t('eval.ai_recommendation', locale) }}
               </div>
               <h3 id="rec-name" class="text-3xl font-bold text-primary mb-3"></h3>
               <p id="rec-reason" class="text-on-surface-variant text-base leading-relaxed mb-6"></p>
@@ -359,8 +344,7 @@
                   <span class="material-symbols-outlined text-sm">emoji_events</span>{{ t('eval.award_rfp', locale) }}
                 </button>
                 <button
-                  class="px-6 py-3 bg-surface-container-high text-primary font-bold rounded-lg hover:bg-surface-container-highest transition-all">Download
-                  Brief</button>
+                  class="px-6 py-3 bg-surface-container-high text-primary font-bold rounded-lg hover:bg-surface-container-highest transition-all">{{ t('eval.download_brief', locale) }}</button>
               </div>
               <!-- Awarded badge (hidden initially) -->
               <div id="awarded-badge"
@@ -375,22 +359,21 @@
         <div class="col-span-12 lg:col-span-4 flex flex-col gap-4">
           <div id="contract-value-card"
             class="hidden bg-primary-container p-6 rounded-xl text-white flex-1 flex flex-col justify-center">
-            <span class="text-on-primary-container font-bold tracking-widest text-xs block mb-1">TOTAL CONTRACT
-              VALUE</span>
+            <span class="text-on-primary-container font-bold tracking-widest text-xs block mb-1">{{ t('eval.total_contract_value', locale) }}</span>
             <span id="contract-value" class="text-4xl font-extrabold tracking-tight"></span>
           </div>
           <div class="bg-surface-container-lowest p-6 rounded-xl ghost-border flex-1 flex flex-col justify-center">
-            <span class="text-slate-400 font-bold tracking-widest text-xs block mb-1">EVALUATION STATUS</span>
+            <span class="text-slate-400 font-bold tracking-widest text-xs block mb-1">{{ t('eval.evaluation_status', locale) }}</span>
             <div class="flex items-center gap-2">
               <span class="w-3 h-3 rounded-full bg-tertiary-fixed-dim"></span>
-              <span class="text-2xl font-bold text-primary">Final Comparison</span>
+              <span class="text-2xl font-bold text-primary">{{ t('eval.final_comparison', locale) }}</span>
             </div>
           </div>
           <div class="bg-surface-container-lowest p-6 rounded-xl ghost-border flex items-center gap-4">
             <span class="material-symbols-outlined text-primary-container text-3xl">groups</span>
             <div>
               <span id="vendor-count" class="text-3xl font-extrabold text-primary"></span>
-              <span class="text-sm text-slate-400 {% if rtl %}mr-1{% else %}ml-1{% endif %}">vendors evaluated</span>
+              <span class="text-sm text-slate-400 {% if rtl %}mr-1{% else %}ml-1{% endif %}">{{ t('eval.vendors_evaluated', locale) }}</span>
             </div>
           </div>
         </div>
@@ -410,14 +393,14 @@
       <section class="mb-10">
         <div class="flex items-center justify-between mb-6 px-1">
           <div>
-            <h3 class="text-xl font-bold text-primary">Risk Heatmap</h3>
-            <p class="text-sm text-on-surface-variant">Per-dimension risk exposure across all vendors</p>
+            <h3 class="text-xl font-bold text-primary">{{ t('eval.risk_heatmap', locale) }}</h3>
+            <p class="text-sm text-on-surface-variant">{{ t('eval.risk_heatmap_desc', locale) }}</p>
           </div>
           <div class="flex gap-2 text-xs font-bold">
-            <span class="px-2 py-1 risk-low rounded">LOW</span>
-            <span class="px-2 py-1 risk-moderate rounded">MODERATE</span>
-            <span class="px-2 py-1 risk-high rounded">HIGH</span>
-            <span class="px-2 py-1 risk-critical rounded">CRITICAL</span>
+            <span class="px-2 py-1 risk-low rounded">{{ t('eval.risk_low', locale) }}</span>
+            <span class="px-2 py-1 risk-moderate rounded">{{ t('eval.risk_moderate', locale) }}</span>
+            <span class="px-2 py-1 risk-high rounded">{{ t('eval.risk_high', locale) }}</span>
+            <span class="px-2 py-1 risk-critical rounded">{{ t('eval.risk_critical', locale) }}</span>
           </div>
         </div>
         <div id="risk-heatmap-container" class="overflow-x-auto"></div>
@@ -427,7 +410,7 @@
       <div class="grid grid-cols-12 gap-6">
         <div class="col-span-12 md:col-span-4 bg-white p-6 rounded-xl ghost-border">
           <h4 class="font-bold text-primary mb-4 flex items-center gap-2">
-            <span class="material-symbols-outlined text-blue-600">trending_up</span>Risk Exposure
+            <span class="material-symbols-outlined text-blue-600">trending_up</span>{{ t('eval.risk_exposure', locale) }}
           </h4>
           <div id="risk-summary-list" class="space-y-4"></div>
         </div>
@@ -437,7 +420,7 @@
               <span class="material-symbols-outlined text-3xl">insights</span>
             </div>
             <div>
-              <h4 class="font-bold text-white text-lg">Predictive Score Trend</h4>
+              <h4 class="font-bold text-white text-lg">{{ t('eval.score_trend', locale) }}</h4>
               <p id="trend-text" class="text-on-primary-container text-sm"></p>
             </div>
           </div>
@@ -462,17 +445,17 @@
         </div>
         <div>
           <p class="font-bold text-primary text-lg">{{ t('eval.award_rfp', locale) }}</p>
-          <p class="text-xs text-on-surface-variant">Confirm vendor selection and close the RFP.</p>
+          <p class="text-xs text-on-surface-variant">{{ t('eval.confirm_vendor', locale) }}</p>
         </div>
       </div>
       <p class="text-sm text-on-surface-variant mb-4">
-        Award this RFP to <strong id="modal-vendor-name" class="text-primary"></strong>?
-        This will mark the RFP as done and assign the vendor.
+        {{ t('eval.award_question', locale) }} <strong id="modal-vendor-name" class="text-primary"></strong>?
+        {{ t('eval.award_effect', locale) }}
       </p>
       <div class="flex gap-3">
         <button onclick="confirmAward()"
           class="flex-1 py-3 rounded-lg text-sm font-bold text-white bg-emerald-600 hover:brightness-110 transition-all">
-          Confirm Award
+          {{ t('eval.confirm_award', locale) }}
         </button>
         <button onclick="document.getElementById('award-modal').classList.add('hidden')"
           class="flex-1 py-3 rounded-lg text-sm font-bold text-primary bg-surface-container-high hover:bg-surface-container-highest transition-all">
@@ -491,6 +474,50 @@
 
     const RISK_CLASS = {
       LOW: 'risk-low', MODERATE: 'risk-moderate', HIGH: 'risk-high', CRITICAL: 'risk-critical'
+    };
+
+    // ── JS-side translations (rendered strings) ────────────────────────────────
+    const I18N = {
+      project_tag:        {{ t('eval.project_tag', locale) | tojson }},
+      unknown:            {{ t('eval.unknown', locale) | tojson }},
+      criteria:           {{ t('eval.criteria', locale) | tojson }},
+      dimension:          {{ t('eval.dimension', locale) | tojson }},
+      optimal_choice:     {{ t('eval.optimal_choice', locale) | tojson }},
+      row_legal:          {{ t('eval.row.legal', locale) | tojson }},
+      row_legal_sub:      {{ t('eval.row.legal_sub', locale) | tojson }},
+      row_commercial:     {{ t('eval.row.commercial', locale) | tojson }},
+      row_commercial_sub: {{ t('eval.row.commercial_sub', locale) | tojson }},
+      row_technical:      {{ t('eval.row.technical', locale) | tojson }},
+      row_technical_sub:  {{ t('eval.row.technical_sub', locale) | tojson }},
+      row_financial:      {{ t('eval.row.financial', locale) | tojson }},
+      row_financial_sub:  {{ t('eval.row.financial_sub', locale) | tojson }},
+      row_flags:          {{ t('eval.row.flags', locale) | tojson }},
+      row_flags_sub:      {{ t('eval.row.flags_sub', locale) | tojson }},
+      dim_legal:          {{ t('eval.dim.legal', locale) | tojson }},
+      dim_commercial:     {{ t('eval.dim.commercial', locale) | tojson }},
+      dim_technical:      {{ t('eval.dim.technical', locale) | tojson }},
+      dim_financial:      {{ t('eval.dim.financial', locale) | tojson }},
+      dim_overall:        {{ t('eval.dim.overall', locale) | tojson }},
+      result_pass:        {{ t('eval.result.pass', locale) | tojson }},
+      result_fail:        {{ t('eval.result.fail', locale) | tojson }},
+      risk_low:           {{ t('eval.risk_low', locale) | tojson }},
+      risk_moderate:      {{ t('eval.risk_moderate', locale) | tojson }},
+      risk_high:          {{ t('eval.risk_high', locale) | tojson }},
+      risk_critical:      {{ t('eval.risk_critical', locale) | tojson }},
+      tech_leads:         {{ t('eval.tech_leads', locale) | tojson }},
+      awarded_toast:      {{ t('eval.awarded_toast', locale) | tojson }},
+      award_failed:       {{ t('eval.award_failed', locale) | tojson }},
+      eval_failed:        {{ t('eval.eval_failed', locale) | tojson }},
+      select_first:       {{ t('eval.select_first', locale) | tojson }},
+      no_rec:             {{ t('eval.no_rec', locale) | tojson }},
+      file_error:         {{ t('eval.file_error', locale) | tojson }},
+      extracting:         {{ t('eval.extracting', locale) | tojson }},
+      example_vendor:     {{ t('eval.example_vendor', locale) | tojson }},
+      example_company:    {{ t('eval.example_company', locale) | tojson }},
+    };
+    const RISK_LABEL = {
+      LOW: I18N.risk_low, MODERATE: I18N.risk_moderate,
+      HIGH: I18N.risk_high, CRITICAL: I18N.risk_critical,
     };
 
     // ── Bid form helpers ────────────────────────────────────────────────────────
@@ -515,18 +542,18 @@
     <div class="grid grid-cols-2 gap-4 mb-4">
       <div>
         <label class="text-xs font-bold text-slate-500 mb-1.5 block">{{ t('eval.vendor_name', locale) }} *</label>
-        <input type="text" id="bid-${n}-vendor" placeholder="e.g. Acme Corp"
+        <input type="text" id="bid-${n}-vendor" placeholder="${I18N.example_vendor}"
           class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-container focus:border-transparent"/>
       </div>
       <div>
         <label class="text-xs font-bold text-slate-500 mb-1.5 block">{{ t('eval.company_name', locale) }}</label>
-        <input type="text" id="bid-${n}-company" placeholder="e.g. Acme Solutions Ltd."
+        <input type="text" id="bid-${n}-company" placeholder="${I18N.example_company}"
           class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-container focus:border-transparent"/>
       </div>
     </div>
     <div>
       <div class="flex items-center justify-between mb-1.5">
-        <label class="text-xs font-bold text-slate-500">Bid Content *</label>
+        <label class="text-xs font-bold text-slate-500">{{ t('eval.bid_content', locale) }} *</label>
         <label class="flex items-center gap-1.5 text-xs font-medium text-primary-container hover:text-primary cursor-pointer transition-colors">
           <span class="material-symbols-outlined text-sm">upload_file</span>
           {{ t('eval.upload_pdf_docx', locale) }}
@@ -566,7 +593,7 @@
       const textarea = document.getElementById(`bid-${n}-content`);
 
       // Show uploading state
-      nameEl.textContent = `Extracting text from ${file.name}…`;
+      nameEl.textContent = `${I18N.extracting} ${file.name}…`;
       badge.classList.remove('hidden');
       textarea.value = '';
       textarea.disabled = true;
@@ -583,7 +610,7 @@
         textarea.value = data.text;
         nameEl.textContent = file.name;
       } catch (err) {
-        showToast('File error: ' + err.message, 'error');
+        showToast(I18N.file_error + ': ' + err.message, 'error');
         badge.classList.add('hidden');
       } finally {
         textarea.disabled = false;
@@ -696,7 +723,7 @@
 
       } catch (err) {
         console.error('Evaluation failed:', err);
-        showToast('Evaluation failed: ' + err.message, 'error');
+        showToast(I18N.eval_failed + ': ' + err.message, 'error');
         showBidForm();
       }
     }
@@ -735,17 +762,18 @@
     // ── Evaluation rendering (unchanged) ────────────────────────────────────────
 
     function riskBadge(level) {
-      const cls = RISK_CLASS[level?.toUpperCase()] ?? 'risk-unknown';
-      return `<span class="px-2 py-0.5 rounded text-xs font-bold ${cls}">${level ?? 'N/A'}</span>`;
+      const key = level?.toUpperCase();
+      const cls = RISK_CLASS[key] ?? 'risk-unknown';
+      return `<span class="px-2 py-0.5 rounded text-xs font-bold ${cls}">${RISK_LABEL[key] ?? level ?? 'N/A'}</span>`;
     }
 
     function passFail(status) {
       const pass = String(status).toUpperCase() === 'PASS';
       return pass
         ? `<div class="inline-flex items-center gap-1 px-3 py-1 bg-green-100/50 text-green-700 rounded-lg font-bold text-xs">
-         <span class="material-symbols-outlined text-sm">check_circle</span>PASS</div>`
+         <span class="material-symbols-outlined text-sm">check_circle</span>${I18N.result_pass}</div>`
         : `<div class="inline-flex items-center gap-1 px-3 py-1 bg-red-100/50 text-red-700 rounded-lg font-bold text-xs">
-         <span class="material-symbols-outlined text-sm">cancel</span>FAIL</div>`;
+         <span class="material-symbols-outlined text-sm">cancel</span>${I18N.result_fail}</div>`;
     }
 
     function techBar(score) {
@@ -796,10 +824,10 @@
     }
 
     function renderEvaluation(data, heatmap) {
-      document.getElementById('eval-project-tag').textContent = `PROJECT — ${data.project}`;
+      document.getElementById('eval-project-tag').textContent = `${I18N.project_tag} — ${data.project}`;
       document.getElementById('eval-project-title').textContent = data.project;
       document.getElementById('eval-timestamp').textContent =
-        data.evaluated_at ? new Date(data.evaluated_at).toLocaleString() : 'Unknown';
+        data.evaluated_at ? new Date(data.evaluated_at).toLocaleString() : I18N.unknown;
 
       document.getElementById('rec-name').textContent = data.recommendation ?? '—';
       document.getElementById('rec-reason').textContent = data.recommendation_reason ?? '';
@@ -815,11 +843,11 @@
       const isWinner = (v) => v.name === data.recommendation || v.company === data.recommendation;
 
       let thead = `<tr class="bg-transparent">
-    <th class="p-8 text-sm font-bold text-slate-400 tracking-widest uppercase w-1/5">Criteria</th>`;
+    <th class="p-8 text-sm font-bold text-slate-400 tracking-widest uppercase w-1/5">${I18N.criteria}</th>`;
       vendors.forEach(v => {
         const winner = isWinner(v);
         thead += `<th class="p-8 w-1/${vendors.length + 1} ${winner ? 'bg-surface-container-lowest shadow-xl relative' : ''}">
-      ${winner ? `<div class="absolute top-0 left-1/2 -translate-x-1/2 bg-tertiary-fixed-dim px-4 py-1 rounded-b-lg text-xs font-bold text-on-tertiary-fixed">OPTIMAL CHOICE</div>` : ''}
+      ${winner ? `<div class="absolute top-0 left-1/2 -translate-x-1/2 bg-tertiary-fixed-dim px-4 py-1 rounded-b-lg text-xs font-bold text-on-tertiary-fixed">${I18N.optimal_choice}</div>` : ''}
       <div class="flex flex-col items-center pt-4">
         <div class="w-12 h-12 rounded-full ${winner ? 'hero-gradient' : 'bg-slate-200'} mb-4 flex items-center justify-center ${winner ? 'text-white' : 'text-slate-500'} font-bold text-lg">
           ${v.name.charAt(0)}
@@ -833,10 +861,10 @@
       document.getElementById('vendor-thead').innerHTML = thead;
 
       const rows = [
-        { key: 'legal', label: 'Legal Compliance', sub: 'GDPR & ISO Compliance', icon: 'gavel', render: v => passFail(v.legal) },
-        { key: 'commercial', label: 'Commercial Terms', sub: 'MSAs & SLAs', icon: 'handshake', render: v => passFail(v.commercial) },
-        { key: 'technical', label: 'Technical Capability', sub: 'Performance Score (0-100)', icon: 'settings_suggest', render: v => techBar(v.technical_score) },
-        { key: 'financial', label: 'Financial Stability', sub: 'Credit & Revenue Check', icon: 'monetization_on', render: v => passFail(v.financial) },
+        { key: 'legal', label: I18N.row_legal, sub: I18N.row_legal_sub, icon: 'gavel', render: v => passFail(v.legal) },
+        { key: 'commercial', label: I18N.row_commercial, sub: I18N.row_commercial_sub, icon: 'handshake', render: v => passFail(v.commercial) },
+        { key: 'technical', label: I18N.row_technical, sub: I18N.row_technical_sub, icon: 'settings_suggest', render: v => techBar(v.technical_score) },
+        { key: 'financial', label: I18N.row_financial, sub: I18N.row_financial_sub, icon: 'monetization_on', render: v => passFail(v.financial) },
       ];
 
       let tbody = '';
@@ -861,7 +889,7 @@
       <td class="p-8 border-t border-outline-variant/10">
         <div class="flex items-center gap-3">
           <span class="material-symbols-outlined text-slate-400">flag</span>
-          <div><div class="font-bold text-primary">Flags</div><div class="text-xs text-slate-500">Risk indicators</div></div>
+          <div><div class="font-bold text-primary">${I18N.row_flags}</div><div class="text-xs text-slate-500">${I18N.row_flags_sub}</div></div>
         </div>
       </td>`;
         vendors.forEach(v => {
@@ -877,7 +905,7 @@
       document.getElementById('vendor-tbody').innerHTML = tbody;
 
       // Risk heatmap
-      const dims = ['Legal', 'Commercial', 'Technical', 'Financial', 'Overall'];
+      const dims = [I18N.dim_legal, I18N.dim_commercial, I18N.dim_technical, I18N.dim_financial, I18N.dim_overall];
       const dimKeys = ['legal', 'commercial', 'technical', 'financial', 'overall'];
       const riskData = {};
       vendors.forEach(v => {
@@ -897,7 +925,7 @@
       });
 
       let heatTable = `<table class="w-full text-sm border-collapse rounded-xl overflow-hidden">
-    <thead><tr><th class="p-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest bg-surface-container-low">Dimension</th>`;
+    <thead><tr><th class="p-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest bg-surface-container-low">${I18N.dimension}</th>`;
       vendors.forEach(v => {
         heatTable += `<th class="p-4 text-center text-xs font-bold text-slate-500 uppercase bg-surface-container-low">${v.name}<br><span class="font-normal normal-case text-slate-400">${v.company ?? ''}</span></th>`;
       });
@@ -910,7 +938,7 @@
         vendors.forEach(v => {
           const level = (riskData[v.name]?.[dk] ?? 'UNKNOWN').toUpperCase();
           const cls = RISK_CLASS[level] ?? 'risk-unknown';
-          heatTable += `<td class="p-4 text-center"><span class="inline-block px-3 py-1 rounded-lg text-xs font-bold ${cls} w-24">${level}</span></td>`;
+          heatTable += `<td class="p-4 text-center"><span class="inline-block px-3 py-1 rounded-lg text-xs font-bold ${cls} w-24">${RISK_LABEL[level] ?? level}</span></td>`;
         });
         heatTable += '</tr>';
       });
@@ -924,7 +952,7 @@
         const level = (riskData[v.name]?.overall ?? computeOverallRisk(v)).toUpperCase();
         summary += `<div class="flex justify-between items-center">
       <span class="text-sm text-on-surface-variant">${v.name}</span>
-      <span class="text-xs font-bold ${RISK_COLOR[level] ?? 'text-slate-400'}">${level}</span>
+      <span class="text-xs font-bold ${RISK_COLOR[level] ?? 'text-slate-400'}">${RISK_LABEL[level] ?? level}</span>
     </div>`;
       });
       document.getElementById('risk-summary-list').innerHTML = summary;
@@ -932,21 +960,17 @@
       // Trend
       const best = vendors.reduce((a, b) => (Number(b.technical_score) > Number(a.technical_score) ? b : a), vendors[0]);
       document.getElementById('trend-text').textContent = best
-        ? `${best.name} leads with a Technical Score of ${best.technical_score}.`
+        ? `${best.name} ${I18N.tech_leads} ${best.technical_score}.`
         : '';
     }
 
     async function loadEvaluation() {
-      const btn = document.getElementById('refresh-btn');
-      btn.querySelector('span').classList.add('animate-spin');
-
       document.getElementById('skeleton-state').classList.remove('hidden');
       document.getElementById('empty-state').classList.add('hidden');
       document.getElementById('eval-content').classList.add('hidden');
       document.getElementById('processing-state').classList.add('hidden');
 
       if (!selectedRfpId) {
-        btn.querySelector('span').classList.remove('animate-spin');
         showBidForm();
         return;
       }
@@ -956,7 +980,6 @@
           fetch(`/api/rfps/${selectedRfpId}/evaluation`),
           fetch(`/api/rfps/${selectedRfpId}/risk-heatmap`),
         ]);
-        btn.querySelector('span').classList.remove('animate-spin');
 
         if (evalRes.status === 204 || !evalRes.ok) { showBidForm(); return; }
         const data = await evalRes.json();
@@ -970,7 +993,6 @@
         document.getElementById('eval-content').classList.remove('hidden');
         renderEvaluation(data, heatmap);
       } catch (err) {
-        btn.querySelector('span').classList.remove('animate-spin');
         console.error('Failed to load evaluation:', err);
         showBidForm();
       }
@@ -978,8 +1000,8 @@
 
     // Award RFP
     function awardRfp() {
-      if (!selectedRfpId) { showToast('Please select an RFP first', 'error'); return; }
-      if (!evalData?.recommendation) { showToast('No recommendation available', 'error'); return; }
+      if (!selectedRfpId) { showToast(I18N.select_first, 'error'); return; }
+      if (!evalData?.recommendation) { showToast(I18N.no_rec, 'error'); return; }
 
       document.getElementById('modal-vendor-name').textContent = evalData.recommendation;
       document.getElementById('award-modal').classList.remove('hidden');
@@ -1012,7 +1034,7 @@
           }
         }
 
-        showToast(`RFP awarded to ${vendorName}!`, 'success');
+        showToast(`${I18N.awarded_toast} ${vendorName}!`, 'success');
         document.getElementById('award-btn').classList.add('hidden');
         document.getElementById('awarded-badge').classList.remove('hidden');
         document.getElementById('awarded-vendor-name').textContent = vendorName;

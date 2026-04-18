@@ -295,6 +295,7 @@ async def api_chat(body: ChatRequest):
         last_announced_author: str | None = None
         transfer_detected = False
         sub_agent_text_chunks = 0
+        router_text_chunks = 0
 
         # ── Inner helper: process one run_async call ─────────────────────
         async def _stream_run(run_message):
@@ -304,7 +305,7 @@ async def api_chat(body: ChatRequest):
             multiple runs (main run + optional kick-start).
             """
             nonlocal rfp_content_saved, eval_saved, last_announced_author
-            nonlocal transfer_detected, sub_agent_text_chunks
+            nonlocal transfer_detected, sub_agent_text_chunks, router_text_chunks
 
             async for event in runner.run_async(
                 user_id="user1",
@@ -387,6 +388,8 @@ async def api_chat(body: ChatRequest):
                         if text:
                             if transfer_detected:
                                 sub_agent_text_chunks += 1
+                            else:
+                                router_text_chunks += 1
                             accumulated_text.append(text)
                             yield f"data: {json.dumps({'type': 'chunk', 'text': text})}\n\n"
 
@@ -401,6 +404,8 @@ async def api_chat(body: ChatRequest):
                         if text:
                             if transfer_detected:
                                 sub_agent_text_chunks += 1
+                            else:
+                                router_text_chunks += 1
                             accumulated_text.append(text)
                             yield f"data: {json.dumps({'type': 'chunk', 'text': text})}\n\n"
 
@@ -409,6 +414,34 @@ async def api_chat(body: ChatRequest):
             # Run 1: process the user's message
             async for sse in _stream_run(message):
                 yield sse
+
+            # ── Router silent-failure safety net ─────────────────────────
+            # Sometimes the router ends its turn without calling
+            # transfer_to_agent AND without emitting any text — the model
+            # decided all info was present but forgot to fire the tool.
+            # Force a transfer in that case by sending a directive message.
+            if (
+                rfp_id
+                and not transfer_detected
+                and router_text_chunks == 0
+                and len(user_input) > 300
+            ):
+                logging.info(
+                    "Router silent with comprehensive input — forcing transfer "
+                    "(session=%s, input_len=%d)", session_id, len(user_input),
+                )
+                yield f"data: {json.dumps({'type': 'status', 'text': 'Activating RFP drafter...'})}\n\n"
+                force_text = (
+                    "The user has already provided comprehensive project details in the "
+                    "message above. All 5 categories (Scope, Vendor Requirements, Evaluation "
+                    "Criteria, Budget, Submission Details) should be considered covered — "
+                    "fill any minor gaps with sensible defaults. You MUST now call "
+                    "`transfer_to_agent` with `agent_name=\"rfp_creator\"` immediately. "
+                    "Do not ask any follow-up questions."
+                )
+                force_msg = Content(role="user", parts=[Part(text=force_text)])
+                async for sse in _stream_run(force_msg):
+                    yield sse
 
             # ── Backend kick-start ───────────────────────────────────────
             # If a transfer happened but the sub-agent produced no text,
